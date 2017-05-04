@@ -32,10 +32,21 @@ $
 
 
 
-This will start an embedded webserver running Jetty.
+This will start an embedded webserver running Jetty from a jar file. 
+You can also change packaging in pom.xml from jar to war, and deploy war-file to Tomcat,JBoss etc.
 
 The webserver (CORS-enabled) is running at no.geonorge.download.httpd.DownloadWebServer
 The REST-api is autoconfigured with Jersey annotations at no.geonorge.rest.DownloadService
+
+
+
+Use with your favourite IDE:
+
+- Eclipse: mvn eclipse:eclipse
+
+- IntelliJ IDEA: mvn idea:idea
+
+
 
 
 
