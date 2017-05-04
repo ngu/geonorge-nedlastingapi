@@ -25,11 +25,9 @@ Checkout the source code and build from source using Maven:
 ```
 sh
 $ mvn package 
-
 $ java -jar target/geonorge-download-<version>.jar
-
 $ 
-
+```
 
 
 This will start an embedded webserver running Jetty from a jar file. 
@@ -45,7 +43,8 @@ Use with your favourite IDE:
 - Eclipse: mvn eclipse:eclipse
 
 - IntelliJ IDEA: mvn idea:idea
-
+
+
 
 
 
