@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://skjema.geonorge.no/SOSI/tjenestespesifikasjon/nedlastingapi/2.0" xmlns:app="http://skjema.geonorge.no/SOSI/tjenestespesifikasjon/nedlastingapi/2.0" xmlns:rest="http://www.kxml.no/rest/1.0" elementFormDefault="qualified">
+  <xs:import namespace="http://www.kxml.no/rest/1.0" schemaLocation="rest.xsd"/>
+  <!-- Generert av MetaTrans(1.1.0.0) - 17.11.2016 14.39.26-->
+  <xs:element name="Area" type="app:AreaType" />
+  <xs:complexType name="AreaListe">
+    <xs:sequence>
+      <xs:element name="area" type="app:AreaType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AreaType">
+    <xs:sequence>
+      <xs:element name="type" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="name" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="code" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="projections" minOccurs="0" maxOccurs="1" nillable="true" type="app:ProjectionListe" />
+      <xs:element name="formats" minOccurs="0" maxOccurs="1" nillable="true" type="app:FormatListe" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CanDownloadRequest" type="app:CanDownloadRequestType" />
+  <xs:complexType name="CanDownloadRequestListe">
+    <xs:sequence>
+      <xs:element name="candownloadrequest" type="app:CanDownloadRequestType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CanDownloadRequestType">
+    <xs:sequence>
+      <xs:element name="metadataUuid" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="coordinates" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="coordinateSystem" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CanDownloadResponse" type="app:CanDownloadResponseType" />
+  <xs:complexType name="CanDownloadResponseListe">
+    <xs:sequence>
+      <xs:element name="candownloadresponse" type="app:CanDownloadResponseType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CanDownloadResponseType">
+    <xs:sequence>
+      <xs:element name="canDownload" minOccurs="1" maxOccurs="1" type="xs:boolean" />
+      <xs:element name="message" minOccurs="0" maxOccurs="1" nillable="true" type="xs:string" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Capabilities" type="app:CapabilitiesType" />
+  <xs:complexType name="CapabilitiesListe">
+    <xs:sequence>
+      <xs:element name="capabilities" type="app:CapabilitiesType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CapabilitiesType">
+    <xs:sequence>
+      <xs:element name="supportsProjectionSelection" minOccurs="1" maxOccurs="1" type="xs:boolean" />
+      <xs:element name="supportsFormatSelection" minOccurs="1" maxOccurs="1" type="xs:boolean" />
+      <xs:element name="supportsPolygonSelection" minOccurs="1" maxOccurs="1" type="xs:boolean" />
+      <xs:element name="supportsAreaSelection" minOccurs="1" maxOccurs="1" type="xs:boolean" />
+      <xs:element name="mapSelectionLayer" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="File" type="app:FileType" />
+  <xs:complexType name="FileListe">
+    <xs:sequence>
+      <xs:element name="file" type="app:FileType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FileType">
+    <xs:sequence>
+      <xs:element name="downloadUrl" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="fileSize" minOccurs="1" maxOccurs="1" type="xs:integer" />
+      <xs:element name="name" minOccurs="0" maxOccurs="1" nillable="true" type="xs:string" />
+      <xs:element name="fileId" minOccurs="0" maxOccurs="1" nillable="true" type="xs:string" />
+      <xs:element name="metadataUuid" minOccurs="0" maxOccurs="1" nillable="true" type="xs:string" />
+      <xs:element name="area" minOccurs="0" maxOccurs="1" nillable="true" type="xs:string" />
+      <xs:element name="coordinates" minOccurs="0" maxOccurs="1" nillable="true" type="xs:string" />
+      <xs:element name="projection" minOccurs="0" maxOccurs="1" nillable="true" type="xs:string" />
+      <xs:element name="format" minOccurs="0" maxOccurs="1" nillable="true" type="xs:string" />
+      <xs:element name="status" minOccurs="0" maxOccurs="1" nillable="true" type="xs:string" />
+      <xs:element name="metadataName" minOccurs="0" maxOccurs="1" type="xs:string" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Format" type="app:FormatType" />
+  <xs:complexType name="FormatListe">
+    <xs:sequence>
+      <xs:element name="format" type="app:FormatType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FormatType">
+    <xs:sequence>
+      <xs:element name="name" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="version" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Order" type="app:OrderType" />
+  <xs:complexType name="OrderListe">
+    <xs:sequence>
+      <xs:element name="order" type="app:OrderType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OrderType">
+    <xs:sequence>
+      <xs:element name="email" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="orderLines" minOccurs="1" maxOccurs="1" type="app:OrderLineListe" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="OrderArea" type="app:OrderAreaType" />
+  <xs:complexType name="OrderAreaListe">
+    <xs:sequence>
+      <xs:element name="orderarea" type="app:OrderAreaType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OrderAreaType">
+    <xs:sequence>
+      <xs:element name="code" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="name" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="type" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="OrderLine" type="app:OrderLineType" />
+  <xs:complexType name="OrderLineListe">
+    <xs:sequence>
+      <xs:element name="orderline" type="app:OrderLineType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OrderLineType">
+    <xs:sequence>
+      <xs:element name="areas" minOccurs="0" maxOccurs="1" nillable="true" type="app:OrderAreaListe" />
+      <xs:element name="formats" minOccurs="0" maxOccurs="1" nillable="true" type="app:FormatListe" />
+      <xs:element name="metadataUuid" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="projections" minOccurs="0" maxOccurs="1" nillable="true" type="app:ProjectionListe" />
+      <xs:element name="coordinates" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="coordinatesystem" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="OrderReceipt" type="app:OrderReceiptType" />
+  <xs:complexType name="OrderReceiptListe">
+    <xs:sequence>
+      <xs:element name="orderreceipt" type="app:OrderReceiptType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OrderReceiptType">
+    <xs:sequence>
+      <xs:element name="referenceNumber" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="files" minOccurs="0" maxOccurs="1" nillable="true" type="app:FileListe" />
+      <xs:element name="email" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="orderDate" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Projection" type="app:ProjectionType" />
+  <xs:complexType name="ProjectionListe">
+    <xs:sequence>
+      <xs:element name="projection" type="app:ProjectionType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ProjectionType">
+    <xs:sequence>
+      <xs:element name="code" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="name" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="codespace" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="VersionResponse" type="app:VersionResponseType" />
+  <xs:complexType name="VersionResponseListe">
+    <xs:sequence>
+      <xs:element name="versionresponse" type="app:VersionResponseType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="VersionResponseType">
+    <xs:sequence>
+      <xs:element name="version" minOccurs="1" maxOccurs="1" type="xs:string" />
+      <xs:element name="_links" minOccurs="0" maxOccurs="1" nillable="true" type="rest:LinkListeType" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

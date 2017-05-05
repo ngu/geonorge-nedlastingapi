@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (x64) (http://www.altova.com) by Tor Kjetil Nilsen (Arkitektum AS) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rest="http://www.kxml.no/rest/1.0" targetNamespace="http://www.kxml.no/rest/1.0" elementFormDefault="qualified">
+	<!-- Generert av MetaTrans(0.9.0.2) - 01.07.2014 16:20:15-->
+	<xs:element name="Link" type="rest:LinkType"/>
+	<xs:complexType name="LinkType">
+		<xs:annotation>
+			<xs:documentation>Ekstra struktur for HATEOAS lignende støtte</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="href" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="rel" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="templated" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="deprecation" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="LinkListe" type="rest:LinkListeType"/>
+	<xs:complexType name="LinkListeType">
+		<xs:sequence>
+			<xs:element name="_links" type="rest:LinkType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
