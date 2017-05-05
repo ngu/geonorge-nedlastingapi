@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>no.geonorge</groupId>
-  <artifactId>nedlastingapi</artifactId>
+  <artifactId>geonorge-nedlastingapi</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <!-- Change packaging to war to get a deployable war archive -->

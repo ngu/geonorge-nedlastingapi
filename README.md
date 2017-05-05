@@ -25,7 +25,7 @@ Checkout the source code and build from source using Maven:
 ```
 sh
 $ mvn package 
-$ java -jar target/geonorge-nedlasting-<version>.jar
+$ java -jar target/geonorge-nedlastingapi-<version>.jar
 $ 
 ```
 
