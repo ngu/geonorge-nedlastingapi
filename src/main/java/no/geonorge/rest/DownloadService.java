@@ -40,6 +40,10 @@ public class DownloadService {
 	public String returnCapabilities(@PathParam("metadataUuid") String metadataUuid) throws Exception {		
 		CapabilitiesDao cap = new CapabilitiesDaoSqlImpl();
 		ct = cap.getCapabilities(metadataUuid);		
+		// projection,format and area must be supported for use with Geonorge kartkatalog.
+		// polygonsupport is optional.
+		// FIXME: add links for endpoints: projection,format,area,order,can-download and self.
+		// FIXME: Fetch server-part from configuration file, service might served a reverse proxy.
 		Gson gson = new Gson();
 		String json = gson.toJson(ct);
 		return json;		
@@ -110,6 +114,7 @@ public class DownloadService {
 	@POST
 	@Path("v2/can-download")
 	@Produces(MediaType.APPLICATION_JSON)	
+	@Consumes(MediaType.APPLICATION_JSON)
 	public String canDownload(String jsonRequest) throws Exception {	
 		/* Sample JSON HTTP-POST
 		 * {"metadataUuid":"73f863ba-628f-48af-b7fa-30d3ab331b8d","coordinates":"344754 7272921 404330 7187619 304134 7156477 344754 7272921","coordinateSystem":"32633"}
@@ -125,6 +130,21 @@ public class DownloadService {
 		return json;
 		
 	}
+	/**
+	 * 
+	 * @param metadataUuid
+	 * @return json of valid projections of a given metadataUuid
+	 * @throws Exception
+	 */
+	@GET
+	@Path("v2/order/{referenceNumber}")
+	@Produces(MediaType.APPLICATION_JSON)		
+	public String getOrderInfo(@PathParam("referenceNumber") String referenceNumber) throws Exception {			
+		// FIXME: Complete the method with potential lookups in orderdetail tables in rdbms
+		// JSON structure is {"referenceNumber": , "files": [], "email": "foo@bar.baz", "orderDate": "YYYY-MM-DDThh:mm:ss.ms"}
+		return "{}";		
+	}
+	
 	
 	/**
 	 * 
