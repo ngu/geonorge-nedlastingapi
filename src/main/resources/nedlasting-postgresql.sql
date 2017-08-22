@@ -22,10 +22,10 @@ ALTER TABLE dataset ADD PRIMARY KEY (id);
 ALTER TABLE dataset ADD CONSTRAINT idx_uuid UNIQUE (metadatauuid);
 
 CREATE TABLE filliste (
-	id text  NULL,
+	id serial NOT NULL,
 	filnavn text NOT NULL,
 	url text NOT NULL,
-	kateri text NULL,
+	kategori text NULL,
 	underkategori text NULL,
 	inndeling text NULL,
 	inndelingsverdi text NULL,
@@ -47,7 +47,7 @@ CREATE TABLE orderdownload (
 ALTER TABLE orderdownload ADD PRIMARY KEY (referencenumber);
 
 CREATE TABLE orderitem (
-	id serial,
+	id serial NOT NULL,
 	referencenumber int NOT NULL,
 	downloadurl text NULL,
 	filename text NULL,
