@@ -40,7 +40,7 @@ public class Dataset extends _Dataset {
         return ct;
     }
 
-    public List<FormatType> getFromatTypes() {
+    public List<FormatType> getFormatTypes() {
         Set<String> formats = new HashSet<String>();
         for (DatasetFile file : getFiles()) {
             String format = file.getFormat();
