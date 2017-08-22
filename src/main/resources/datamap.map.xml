@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-map xmlns="http://cayenne.apache.org/schema/3.0/modelMap"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/3.0/modelMap http://cayenne.apache.org/schema/3.0/modelMap.xsd"
+	 project-version="6">
+	<property name="defaultPackage" value="no.geonorge.nedlasting.data"/>
+	<db-entity name="DL_DATASET">
+		<db-attribute name="ACCESS_CONSTRAINT" type="VARCHAR" length="1024"/>
+		<db-attribute name="DATASET_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="FME_CUT_URL" type="VARCHAR" length="2048"/>
+		<db-attribute name="MAP_SELECTION_LAYER" type="VARCHAR" length="1024"/>
+		<db-attribute name="MAX_AREA" type="INTEGER"/>
+		<db-attribute name="METADATA_UUID" type="VARCHAR" length="64"/>
+		<db-attribute name="SUPPORTS_AREA_SELECTION" type="BOOLEAN"/>
+		<db-attribute name="SUPPORTS_FORMAT_SELECTION" type="BOOLEAN"/>
+		<db-attribute name="SUPPORTS_POLYGON_SELECTION" type="BOOLEAN"/>
+		<db-attribute name="SUPPORTS_PROJECTION_SELECTION" type="BOOLEAN"/>
+		<db-attribute name="TITLE" type="VARCHAR" length="1024"/>
+	</db-entity>
+	<db-entity name="DL_DATASET_FILE">
+		<db-attribute name="CATEGORY" type="VARCHAR" length="1024"/>
+		<db-attribute name="CATEGORY_SUB" type="VARCHAR" length="1024"/>
+		<db-attribute name="DATASET_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="FILE_NAME" type="VARCHAR" length="1024"/>
+		<db-attribute name="FORMAT" type="VARCHAR" length="1024"/>
+		<db-attribute name="PROJECTION" type="VARCHAR" length="1024"/>
+		<db-attribute name="SEGMENT" type="VARCHAR" length="1024"/>
+		<db-attribute name="SEGMENT_VALUE" type="VARCHAR" length="1024"/>
+		<db-attribute name="URL" type="VARCHAR" isPrimaryKey="true" isMandatory="true" length="2048"/>
+	</db-entity>
+	<obj-entity name="Dataset" className="no.geonorge.nedlasting.data.Dataset" dbEntityName="DL_DATASET">
+		<obj-attribute name="accessConstraint" type="java.lang.String" db-attribute-path="ACCESS_CONSTRAINT"/>
+		<obj-attribute name="fmeCutUrl" type="java.lang.String" db-attribute-path="FME_CUT_URL"/>
+		<obj-attribute name="mapSelectionLayer" type="java.lang.String" db-attribute-path="MAP_SELECTION_LAYER"/>
+		<obj-attribute name="maxArea" type="java.lang.Integer" db-attribute-path="MAX_AREA"/>
+		<obj-attribute name="metadataUuid" type="java.lang.String" db-attribute-path="METADATA_UUID"/>
+		<obj-attribute name="supportsAreaSelection" type="boolean" db-attribute-path="SUPPORTS_AREA_SELECTION"/>
+		<obj-attribute name="supportsFormatSelection" type="boolean" db-attribute-path="SUPPORTS_FORMAT_SELECTION"/>
+		<obj-attribute name="supportsPolygonSelection" type="boolean" db-attribute-path="SUPPORTS_POLYGON_SELECTION"/>
+		<obj-attribute name="supportsProjectionSelection" type="boolean" db-attribute-path="SUPPORTS_PROJECTION_SELECTION"/>
+		<obj-attribute name="title" type="java.lang.String" db-attribute-path="TITLE"/>
+	</obj-entity>
+	<obj-entity name="DatasetFile" className="no.geonorge.nedlasting.data.DatasetFile" dbEntityName="DL_DATASET_FILE">
+		<obj-attribute name="category" type="java.lang.String" db-attribute-path="CATEGORY"/>
+		<obj-attribute name="categorySub" type="java.lang.String" db-attribute-path="CATEGORY_SUB"/>
+		<obj-attribute name="fileName" type="java.lang.String" db-attribute-path="FILE_NAME"/>
+		<obj-attribute name="format" type="java.lang.String" db-attribute-path="FORMAT"/>
+		<obj-attribute name="projection" type="java.lang.String" db-attribute-path="PROJECTION"/>
+		<obj-attribute name="segment" type="java.lang.String" db-attribute-path="SEGMENT"/>
+		<obj-attribute name="segmentValue" type="java.lang.String" db-attribute-path="SEGMENT_VALUE"/>
+		<obj-attribute name="url" type="java.lang.String" db-attribute-path="URL"/>
+	</obj-entity>
+	<db-relationship name="to_dataset_file" source="DL_DATASET" target="DL_DATASET_FILE" toMany="true">
+		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
+	</db-relationship>
+	<db-relationship name="to_dataset" source="DL_DATASET_FILE" target="DL_DATASET" toMany="false">
+		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
+	</db-relationship>
+	<obj-relationship name="files" source="Dataset" target="DatasetFile" deleteRule="Cascade" db-relationship-path="to_dataset_file"/>
+	<obj-relationship name="dataset" source="DatasetFile" target="Dataset" deleteRule="Nullify" db-relationship-path="to_dataset"/>
+</data-map>
