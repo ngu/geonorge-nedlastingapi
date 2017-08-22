@@ -73,7 +73,7 @@ public class DownloadService {
         if (dataset == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        List<FormatType> formats = dataset.getFromatTypes();
+        List<FormatType> formats = dataset.getFormatTypes();
         Gson gson = new Gson();
         String json = gson.toJson(formats);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
