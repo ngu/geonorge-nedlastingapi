@@ -1,9 +1,6 @@
 package no.geonorge.httpd;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.EnumSet;
-import java.util.Properties;
 
 import javax.servlet.DispatcherType;
 
@@ -18,33 +15,22 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.glassfish.jersey.server.ResourceConfig;
-
 import org.glassfish.jersey.servlet.ServletContainer;
 
+import no.geonorge.nedlasting.config.Config;
+
 public class DownloadWebserver {
-	
+    
 	/**
 	 * Geonorge Download Embedded Webserver running Jetty
 	 *
 	 */
 	public static void main(String[] args) throws Exception {
-		int port=10000;		
-		/* Check if webserver-port is overridden in configuration file */
-		Properties prop = new Properties();
-    	InputStream input = null;
-    	try {
-    		input = new FileInputStream("/etc/geonorge.properties");
-    		prop.load(input);
-    		if (prop.containsKey("server.port")) {
-    			port = Integer.parseInt(prop.getProperty("server.port"));
-    		}
-    	} catch (Exception ignored) {
-    	}
-    	createAndStartServer(port);
-
+	    Config.readConfiguration();
+    	createAndStartServer();
 	}
-
-	public static void createAndStartServer(int port) {    				
+	
+	public static void createAndStartServer() {    				
 		Server server = new Server();
 		HandlerCollection handlers = new HandlerCollection();
         ServletContextHandler context = new ServletContextHandler();
@@ -65,7 +51,7 @@ public class DownloadWebserver {
         config.addCustomizer(new ForwardedRequestCustomizer());        
         HttpConnectionFactory http = new HttpConnectionFactory(config);
         ServerConnector httpConnector = new ServerConnector(server, http);
-        httpConnector.setPort(port);
+        httpConnector.setPort(Config.getServerPort());
         server.addConnector(httpConnector);
         handlers.addHandler(context);
         server.setHandler(handlers);

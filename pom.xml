@@ -113,10 +113,20 @@
         <version>${spring.version}</version>
     </dependency>
     <dependency>
+        <groupId>org.apache.cayenne</groupId>
+        <artifactId>cayenne-server</artifactId>
+        <version>3.1.1</version>
+    </dependency>
+    <dependency>
     	<groupId>org.postgresql</groupId>
     	<artifactId>postgresql</artifactId>
     	<version>42.1.1</version>
 	</dependency>
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-dbcp2</artifactId>
+        <version>2.1.1</version>
+    </dependency>
 	<!-- Open Source SQLServer JDBC library 
   	<dependency>
 		<groupId>net.sourceforge.jtds</groupId>
@@ -151,6 +161,11 @@
         <artifactId>mockito-all</artifactId>
         <version>1.9.5</version>
         <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derby</artifactId>
+        <version>10.13.1.1</version>
     </dependency>
   </dependencies>
   <build>

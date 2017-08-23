@@ -1,12 +1,7 @@
 package no.geonorge.rest;
 
-import no.geonorge.nedlasting.dao.CapabilitiesDao;
-import no.geonorge.nedlasting.dao.CapabilitiesDaoSqlImpl;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -16,11 +11,22 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
+import javax.ws.rs.core.Response;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.cayenne.ObjectContext;
+
 import com.google.gson.Gson;
+
+import no.geonorge.nedlasting.config.Config;
+import no.geonorge.nedlasting.data.Dataset;
+import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.AreaType;
+import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CanDownloadResponseType;
+import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CapabilitiesType;
+import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FileListe;
+import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FileType;
+import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FormatType;
+import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.OrderReceiptType;
+import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.ProjectionType;
 
 
 
@@ -32,23 +38,21 @@ import com.google.gson.Gson;
 
 @Path("api")
 public class DownloadService {
-	CapabilitiesType ct = null;	
 		
-	@GET
-	@Path("capabilities/{metadataUuid}")
-	@Produces(MediaType.APPLICATION_JSON)	
-	public String returnCapabilities(@PathParam("metadataUuid") String metadataUuid) throws Exception {		
-		CapabilitiesDao cap = new CapabilitiesDaoSqlImpl();
-		ct = cap.getCapabilities(metadataUuid);		
-		// projection,format and area must be supported for use with Geonorge kartkatalog.
-		// polygonsupport is optional.
-		// FIXME: add links for endpoints: projection,format,area,order,can-download and self.
-		// FIXME: Fetch server-part from configuration file, service might served a reverse proxy.
-		Gson gson = new Gson();
-		String json = gson.toJson(ct);
-		return json;		
-	}
-
+    @GET
+    @Path("capabilities/{metadataUuid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response returnCapabilities(@PathParam("metadataUuid") String metadataUuid) throws IOException {
+        ObjectContext ctxt = Config.getObjectContext();
+        Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
+        if (dataset == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        CapabilitiesType ct = dataset.getCapabilities();
+        Gson gson = new Gson();
+        String json = gson.toJson(ct);
+        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+    }
 	
 	/**
 	 * 
@@ -56,18 +60,24 @@ public class DownloadService {
 	 * @return json of valid file formats of a given metadataUuid
 	 * @throws Exception
 	 */
-	@GET
-	@Path("v2/codelists/format/{metadataUuid}")
-	@Produces(MediaType.APPLICATION_JSON)	
-	public String returnFormats(@PathParam("metadataUuid") String metadataUuid) throws Exception {	
-		/* http://nedlasting.geonorge.no/Help/Api/GET-api-codelists-format-metadataUuid */
-		CapabilitiesDao cap = new CapabilitiesDaoSqlImpl();
-		ct = cap.getCapabilities(metadataUuid);		
-		List<FormatType> formats = new ArrayList<FormatType>();		
-		Gson gson = new Gson();
-		String json = gson.toJson(formats);		
-		return json;
-	}
+    @GET
+    @Path("v2/codelists/format/{metadataUuid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response returnFormats(@PathParam("metadataUuid") String metadataUuid) throws IOException {
+        /*
+         * http://nedlasting.geonorge.no/Help/Api/GET-api-codelists-format-
+         * metadataUuid
+         */
+        ObjectContext ctxt = Config.getObjectContext();
+        Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
+        if (dataset == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        List<FormatType> formats = dataset.getFormatTypes();
+        Gson gson = new Gson();
+        String json = gson.toJson(formats);
+        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+    }
 	
 	/**
 	 * 

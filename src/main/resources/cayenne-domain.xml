@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<domain project-version="6">
+	<map name="datamap"/>
+
+	<node name="datanode"
+		 factory="no.geonorge.nedlasting.config.Config"
+		 parameters="unknown"
+		 schema-update-strategy="org.apache.cayenne.access.dbsync.SkipSchemaUpdateStrategy"
+		>
+		<map-ref name="datamap"/>
+	</node>
+</domain>
