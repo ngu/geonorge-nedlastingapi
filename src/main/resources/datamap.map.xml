@@ -23,9 +23,9 @@
 		<db-attribute name="DATASET_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
 		<db-attribute name="FILE_NAME" type="VARCHAR" length="1024"/>
 		<db-attribute name="FORMAT" type="VARCHAR" length="1024"/>
-		<db-attribute name="PROJECTION" type="VARCHAR" length="1024"/>
 		<db-attribute name="SEGMENT" type="VARCHAR" length="1024"/>
 		<db-attribute name="SEGMENT_VALUE" type="VARCHAR" length="1024"/>
+		<db-attribute name="SRID" type="INTEGER" isMandatory="true"/>
 		<db-attribute name="URL" type="VARCHAR" isPrimaryKey="true" isMandatory="true" length="2048"/>
 	</db-entity>
 	<obj-entity name="Dataset" className="no.geonorge.nedlasting.data.Dataset" dbEntityName="DATASET">
@@ -45,12 +45,12 @@
 		<obj-attribute name="categorySub" type="java.lang.String" db-attribute-path="CATEGORY_SUB"/>
 		<obj-attribute name="fileName" type="java.lang.String" db-attribute-path="FILE_NAME"/>
 		<obj-attribute name="format" type="java.lang.String" db-attribute-path="FORMAT"/>
-		<obj-attribute name="projection" type="java.lang.String" db-attribute-path="PROJECTION"/>
 		<obj-attribute name="segment" type="java.lang.String" db-attribute-path="SEGMENT"/>
 		<obj-attribute name="segmentValue" type="java.lang.String" db-attribute-path="SEGMENT_VALUE"/>
+		<obj-attribute name="srid" type="int" db-attribute-path="SRID"/>
 		<obj-attribute name="url" type="java.lang.String" db-attribute-path="URL"/>
 	</obj-entity>
-	<db-relationship name="to_dataset_file" source="DATASET" target="DATASET_FILE" toMany="true">
+	<db-relationship name="to_dataset_file" source="DATASET" target="DATASET_FILE" toDependentPK="true" toMany="true">
 		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
 	</db-relationship>
 	<db-relationship name="to_dataset" source="DATASET_FILE" target="DATASET" toMany="false">

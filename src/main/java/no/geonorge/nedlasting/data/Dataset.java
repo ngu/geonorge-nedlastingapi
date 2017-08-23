@@ -14,6 +14,7 @@ import org.apache.cayenne.query.SelectQuery;
 import no.geonorge.nedlasting.data.auto._Dataset;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CapabilitiesType;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FormatType;
+import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.ProjectionType;
 
 public class Dataset extends _Dataset {
 
@@ -53,8 +54,23 @@ public class Dataset extends _Dataset {
         for (String format : formats) {
             FormatType formatType = new FormatType();
             formatType.setName(format);
+            formatTypes.add(formatType);
         }
         return Collections.unmodifiableList(formatTypes);
+    }
+
+    public List<ProjectionType> getProjectionTypes() {
+        Set<Integer> srids = new HashSet<Integer>();
+        for (DatasetFile file : getFiles()) {
+            srids.add(file.getSrid());
+        }
+        List<ProjectionType> projectionTypes = new ArrayList<ProjectionType>();
+        for (Integer srid : srids) {
+            ProjectionType projectonType = new ProjectionType();
+            projectonType.setCode(srid.toString());
+            projectionTypes.add(projectonType);
+        }
+        return Collections.unmodifiableList(projectionTypes);
     }
 
 }

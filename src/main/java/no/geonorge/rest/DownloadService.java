@@ -95,25 +95,30 @@ public class DownloadService {
 		String json = gson.toJson(areas);		
 		return json;
 	}
-	
-	
-	/**
-	 * 
-	 * @param metadataUuid
-	 * @return json of valid projections of a given metadataUuid
-	 * @throws Exception
-	 */
-	@GET
-	@Path("v2/codelists/projection/{metadataUuid}")
-	@Produces(MediaType.APPLICATION_JSON)	
-	public String returnProjections(@PathParam("metadataUuid") String metadataUuid) throws Exception {	
-		/* http://nedlasting.geonorge.no/Help/Api/GET-api-codelists-projection-metadataUuid
-		 */
-		List<ProjectionType> projections = new ArrayList<ProjectionType>();
-		Gson gson = new Gson();
-		String json = gson.toJson(projections);		
-		return json;
-	}
+
+    /**
+     * 
+     * @param metadataUuid
+     * @return json of valid projections of a given metadataUuid
+     * @throws Exception
+     */
+    @GET
+    @Path("v2/codelists/projection/{metadataUuid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response returnProjections(@PathParam("metadataUuid") String metadataUuid) throws IOException {
+        /*
+         * http://nedlasting.geonorge.no/Help/Api/GET-api-codelists-projection-
+         * metadataUuid
+         */
+        ObjectContext ctxt = Config.getObjectContext();
+        Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
+        if (dataset == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        List<ProjectionType> projections = dataset.getProjectionTypes();
+        String json = new Gson().toJson(projections);
+        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+    }
 	
 	/**
 	 * 

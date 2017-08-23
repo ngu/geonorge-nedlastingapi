@@ -16,9 +16,9 @@ public abstract class _DatasetFile extends CayenneDataObject {
     public static final String CATEGORY_SUB_PROPERTY = "categorySub";
     public static final String FILE_NAME_PROPERTY = "fileName";
     public static final String FORMAT_PROPERTY = "format";
-    public static final String PROJECTION_PROPERTY = "projection";
     public static final String SEGMENT_PROPERTY = "segment";
     public static final String SEGMENT_VALUE_PROPERTY = "segmentValue";
+    public static final String SRID_PROPERTY = "srid";
     public static final String URL_PROPERTY = "url";
     public static final String DATASET_PROPERTY = "dataset";
 
@@ -53,13 +53,6 @@ public abstract class _DatasetFile extends CayenneDataObject {
         return (String)readProperty(FORMAT_PROPERTY);
     }
 
-    public void setProjection(String projection) {
-        writeProperty(PROJECTION_PROPERTY, projection);
-    }
-    public String getProjection() {
-        return (String)readProperty(PROJECTION_PROPERTY);
-    }
-
     public void setSegment(String segment) {
         writeProperty(SEGMENT_PROPERTY, segment);
     }
@@ -72,6 +65,14 @@ public abstract class _DatasetFile extends CayenneDataObject {
     }
     public String getSegmentValue() {
         return (String)readProperty(SEGMENT_VALUE_PROPERTY);
+    }
+
+    public void setSrid(int srid) {
+        writeProperty(SRID_PROPERTY, srid);
+    }
+    public int getSrid() {
+        Object value = readProperty(SRID_PROPERTY);
+        return (value != null) ? (Integer) value : 0;
     }
 
     public void setUrl(String url) {
