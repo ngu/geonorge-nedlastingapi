@@ -1,9 +1,12 @@
 package no.geonorge.nedlasting.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.cayenne.ObjectContext;
@@ -12,9 +15,10 @@ import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.query.SelectQuery;
 
 import no.geonorge.nedlasting.data.auto._Dataset;
+import no.geonorge.nedlasting.data.client.Area;
+import no.geonorge.nedlasting.data.client.FormatType;
+import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CapabilitiesType;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FormatType;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.ProjectionType;
 
 public class Dataset extends _Dataset {
 
@@ -41,36 +45,40 @@ public class Dataset extends _Dataset {
         return ct;
     }
 
-    public List<FormatType> getFormatTypes() {
-        Set<String> formats = new HashSet<String>();
+    public Collection<FormatType> getFormats() {
+        Set<FormatType> formatTypes = new HashSet<>();
         for (DatasetFile file : getFiles()) {
-            String format = file.getFormat();
-            if (format == null) {
-                continue;
-            }
-            formats.add(format);
+            formatTypes.add(file.getFormatType());
         }
-        List<FormatType> formatTypes = new ArrayList<FormatType>();
-        for (String format : formats) {
-            FormatType formatType = new FormatType();
-            formatType.setName(format);
-            formatTypes.add(formatType);
-        }
-        return Collections.unmodifiableList(formatTypes);
+        return Collections.unmodifiableCollection(formatTypes);
     }
 
-    public List<ProjectionType> getProjectionTypes() {
-        Set<Integer> srids = new HashSet<Integer>();
+    public Collection<Projection> getProjections() {
+        Set<Projection> projectionTypes = new HashSet<>();
         for (DatasetFile file : getFiles()) {
-            srids.add(file.getSrid());
+            projectionTypes.add(file.getProjection());
         }
-        List<ProjectionType> projectionTypes = new ArrayList<ProjectionType>();
-        for (Integer srid : srids) {
-            ProjectionType projectonType = new ProjectionType();
-            projectonType.setCode(srid.toString());
-            projectionTypes.add(projectonType);
+        return Collections.unmodifiableCollection(projectionTypes);
+    }
+
+    public List<Area> getAreas() {
+        Map<String, Area> areaTypeByAreaKey = new HashMap<>();
+        for (DatasetFile file : getFiles()) {
+            String areaKey = file.getAreaKey();
+            Area areaType = areaTypeByAreaKey.get(areaKey);
+            if (areaType == null) {
+                areaType = new Area();
+                areaType.setCode(file.getAreaCode());
+                areaType.setType(file.getAreaType());
+                areaType.setName(file.getAreaName());
+                areaTypeByAreaKey.put(areaKey, areaType);
+            }
+            areaType.addFormat(file.getFormatType());
+            areaType.addProjection(file.getProjection());
         }
-        return Collections.unmodifiableList(projectionTypes);
+
+        List<Area> areas = new ArrayList<>(areaTypeByAreaKey.values());
+        return Collections.unmodifiableList(areas);
     }
 
 }

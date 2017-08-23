@@ -12,6 +12,9 @@ import no.geonorge.nedlasting.data.Dataset;
  */
 public abstract class _DatasetFile extends CayenneDataObject {
 
+    public static final String AREA_CODE_PROPERTY = "areaCode";
+    public static final String AREA_NAME_PROPERTY = "areaName";
+    public static final String AREA_TYPE_PROPERTY = "areaType";
     public static final String CATEGORY_PROPERTY = "category";
     public static final String CATEGORY_SUB_PROPERTY = "categorySub";
     public static final String FILE_NAME_PROPERTY = "fileName";
@@ -24,6 +27,27 @@ public abstract class _DatasetFile extends CayenneDataObject {
 
     public static final String DATASET_ID_PK_COLUMN = "DATASET_ID";
     public static final String URL_PK_COLUMN = "URL";
+
+    public void setAreaCode(String areaCode) {
+        writeProperty(AREA_CODE_PROPERTY, areaCode);
+    }
+    public String getAreaCode() {
+        return (String)readProperty(AREA_CODE_PROPERTY);
+    }
+
+    public void setAreaName(String areaName) {
+        writeProperty(AREA_NAME_PROPERTY, areaName);
+    }
+    public String getAreaName() {
+        return (String)readProperty(AREA_NAME_PROPERTY);
+    }
+
+    public void setAreaType(String areaType) {
+        writeProperty(AREA_TYPE_PROPERTY, areaType);
+    }
+    public String getAreaType() {
+        return (String)readProperty(AREA_TYPE_PROPERTY);
+    }
 
     public void setCategory(String category) {
         writeProperty(CATEGORY_PROPERTY, category);

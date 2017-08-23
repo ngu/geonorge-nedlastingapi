@@ -2,6 +2,7 @@ package no.geonorge.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -19,14 +20,14 @@ import com.google.gson.Gson;
 
 import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.Dataset;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.AreaType;
+import no.geonorge.nedlasting.data.client.Area;
+import no.geonorge.nedlasting.data.client.FormatType;
+import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CanDownloadResponseType;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CapabilitiesType;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FileListe;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FileType;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FormatType;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.OrderReceiptType;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.ProjectionType;
 
 
 
@@ -73,28 +74,36 @@ public class DownloadService {
         if (dataset == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        List<FormatType> formats = dataset.getFormatTypes();
+        Collection<FormatType> formats = dataset.getFormats();
         Gson gson = new Gson();
         String json = gson.toJson(formats);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
-	
-	/**
-	 * 
-	 * @param metadataUuid
-	 * @return json of valid areas of a given metadataUuid
-	 * @throws Exception
-	 */
-	@GET
-	@Path("v2/codelists/area/{metadataUuid}")
-	@Produces(MediaType.APPLICATION_JSON)	
-	public String returnAreas(@PathParam("metadataUuid") String metadataUuid) throws Exception {	
-		/* http://nedlasting.geonorge.no/Help/Api/GET-api-codelists-area-metadataUuid */		 
-		List<AreaType> areas = new ArrayList<AreaType>();	
-		Gson gson = new Gson();
-		String json = gson.toJson(areas);		
-		return json;
-	}
+
+    /**
+     * 
+     * @param metadataUuid
+     * @return json of valid areas of a given metadataUuid
+     * @throws Exception
+     */
+    @GET
+    @Path("v2/codelists/area/{metadataUuid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response returnAreas(@PathParam("metadataUuid") String metadataUuid) throws IOException {
+        /*
+         * http://nedlasting.geonorge.no/Help/Api/GET-api-codelists-area-
+         * metadataUuid
+         */
+        ObjectContext ctxt = Config.getObjectContext();
+        Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
+        if (dataset == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        List<Area> areas = dataset.getAreas();
+        String json = new Gson().toJson(areas);
+        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+    }
 
     /**
      * 
@@ -115,7 +124,7 @@ public class DownloadService {
         if (dataset == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        List<ProjectionType> projections = dataset.getProjectionTypes();
+        Collection<Projection> projections = dataset.getProjections();
         String json = new Gson().toJson(projections);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
