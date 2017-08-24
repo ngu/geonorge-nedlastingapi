@@ -216,6 +216,7 @@ public class DownloadService {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response orderDownload(String jsonRequest) throws IOException {
         /* https://nedlasting.geonorge.no/Help/Api/POST-api-v2-order */
+        log.info("order request: " + jsonRequest);
         Order order = new Gson().fromJson(jsonRequest, Order.class);
         OrderReceipt orderReceipt = new OrderReceipt();
         orderReceipt.setReferenceNumber(UUID.randomUUID().toString());
