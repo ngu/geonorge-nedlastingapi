@@ -20,7 +20,17 @@
       <jetty.version>9.3.9.v20160517</jetty.version>      
       <jackson.version>2.8.5</jackson.version>
       <spring.version>3.2.0.RELEASE</spring.version>
+      <geotools.version>17.2</geotools.version>
   </properties>
+
+  <repositories>
+      <repository>
+          <id>osgeo</id>
+          <name>Open Source Geospatial Foundation Repository</name>
+          <url>http://download.osgeo.org/webdav/geotools/</url>
+      </repository>
+  </repositories>
+
 
   <dependencies>    
     <dependency>
@@ -136,6 +146,16 @@
          Install it manually or setup a Maven proxy such as Nexus and add the local repository to the pom.xml
     -->
     <!-- Test -->
+    <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-referencing</artifactId>
+        <version>${geotools.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-epsg-hsql</artifactId>
+        <version>${geotools.version}</version>
+    </dependency>
     <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
