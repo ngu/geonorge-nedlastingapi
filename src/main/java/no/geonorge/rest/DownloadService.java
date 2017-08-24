@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.query.SelectQuery;
 
 import com.google.gson.Gson;
 
@@ -39,7 +40,23 @@ import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.OrderRecei
 
 @Path("api")
 public class DownloadService {
-		
+
+    @GET
+    @Path("status")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response returnStatus() throws IOException {
+        try {
+            ObjectContext ctxt = Config.getObjectContext();
+            SelectQuery query = new SelectQuery(Dataset.class);
+            query.setFetchLimit(1);
+            ctxt.performQuery(query);
+        } catch (RuntimeException e) {
+            return Response.serverError().build();
+        }
+
+        return Response.ok("ok", MediaType.TEXT_PLAIN).build();
+    }
+
     @GET
     @Path("capabilities/{metadataUuid}")
     @Produces(MediaType.APPLICATION_JSON)
