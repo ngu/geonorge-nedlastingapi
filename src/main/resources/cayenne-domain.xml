@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <domain project-version="6">
+	<property name="cayenne.DataDomain.sharedCache" value="false"/>
+	<property name="cayenne.DataRowStore.snapshot.size" value="0"/>
+
 	<map name="datamap"/>
 
 	<node name="datanode"
