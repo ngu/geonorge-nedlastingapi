@@ -36,12 +36,19 @@ public class OrderReceipt {
     public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
     }
-    
+
     public void addFile(File file) {
         if (files == null) {
             files = new ArrayList<>();
         }
         files.add(file);
+    }
+
+    public List<File> getFiles() {
+        if (files == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(files);
     }
 
     public List<Link> getLinks() {

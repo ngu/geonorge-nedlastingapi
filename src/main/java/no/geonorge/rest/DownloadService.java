@@ -214,7 +214,7 @@ public class DownloadService {
     @Path("v2/order")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response orderDownload(String jsonRequest) throws Exception {
+    public Response orderDownload(String jsonRequest) throws IOException {
         /* https://nedlasting.geonorge.no/Help/Api/POST-api-v2-order */
         Order order = new Gson().fromJson(jsonRequest, Order.class);
         OrderReceipt orderReceipt = new OrderReceipt();

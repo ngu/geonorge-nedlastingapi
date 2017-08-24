@@ -30,7 +30,7 @@ public class DatasetFile extends _DatasetFile {
         setAreaName(name);
     }
 
-    private OrderArea getOrderArea() {
+    public OrderArea getOrderArea() {
         OrderArea oa = new OrderArea();
         oa.setType(getAreaType());
         oa.setCode(getAreaCode());

@@ -20,11 +20,14 @@ import no.geonorge.nedlasting.data.Dataset;
 import no.geonorge.nedlasting.data.DatasetFile;
 import no.geonorge.nedlasting.data.Projection;
 import no.geonorge.nedlasting.data.client.Area;
+import no.geonorge.nedlasting.data.client.Order;
+import no.geonorge.nedlasting.data.client.OrderLine;
+import no.geonorge.nedlasting.data.client.OrderReceipt;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FormatType;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.ProjectionType;
 
 public class DownloadServiceTest extends DbTestCase {
-    
+
     public void testCapabilities() throws IOException {
         DownloadService ds = new DownloadService();
 
@@ -100,11 +103,11 @@ public class DownloadServiceTest extends DbTestCase {
         assertEquals(HttpServletResponse.SC_NOT_FOUND, ds.returnAreas(uuid).getStatus());
 
         ObjectContext ctxt = Config.getObjectContext();
-        
+
         Projection p1 = createOrFind(ctxt, 4326);
         Projection p2 = createOrFind(ctxt, 32633);
         ctxt.commitChanges();
-        
+
         Dataset dataset = ctxt.newObject(Dataset.class);
         dataset.setMetadataUuid(uuid);
         DatasetFile datasetFile1 = ctxt.newObject(DatasetFile.class);
@@ -164,6 +167,43 @@ public class DownloadServiceTest extends DbTestCase {
         assertEquals("Whatever", area03.getName());
         assertEquals(1, area03.getProjections().size());
         assertEquals(1, area03.getFormats().size());
+
+    }
+
+    public void testOrder() throws IOException {
+        DownloadService ds = new DownloadService();
+
+        String uuid = UUID.randomUUID().toString();
+
+        ObjectContext ctxt = Config.getObjectContext();
+
+        Projection p1 = createOrFind(ctxt, 4326);
+        ctxt.commitChanges();
+
+        Dataset dataset = ctxt.newObject(Dataset.class);
+        dataset.setMetadataUuid(uuid);
+        DatasetFile datasetFile1 = ctxt.newObject(DatasetFile.class);
+        datasetFile1.setArea("fylke", "02", "Akershus");
+        datasetFile1.setDataset(dataset);
+        datasetFile1.setFormatName("SOSI");
+        datasetFile1.setUrl("http://a.url.com/1");
+        datasetFile1.setProjection(p1);
+        ctxt.commitChanges();
+
+        Order order = new Order();
+        OrderLine orderLine = new OrderLine();
+        orderLine.addArea(datasetFile1.getOrderArea());
+        orderLine.addFormat(datasetFile1.getFormat());
+        orderLine.addProjection(datasetFile1.getProjection().forClient());
+        orderLine.setMetadataUuid(dataset.getMetadataUuid());
+        order.addOrderLine(orderLine);
+
+        Gson gson = new Gson();
+        OrderReceipt orderReceipt = gson.fromJson(ds.orderDownload(gson.toJson(order)).getEntity().toString(),
+                OrderReceipt.class);
+        assertNotNull(orderReceipt);
+
+        assertEquals(1, orderReceipt.getFiles().size());
 
     }
 

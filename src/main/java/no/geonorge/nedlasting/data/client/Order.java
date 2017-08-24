@@ -1,5 +1,6 @@
 package no.geonorge.nedlasting.data.client;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,6 +16,13 @@ public class Order {
 
     public String getEmail() {
         return email;
+    }
+    
+    public void addOrderLine(OrderLine orderLine) {
+        if (orderLines == null) {
+            orderLines = new ArrayList<>();
+        }
+        orderLines.add(orderLine);
     }
 
     public List<OrderLine> getOrderLines() {

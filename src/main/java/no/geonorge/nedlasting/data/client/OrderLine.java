@@ -1,5 +1,6 @@
 package no.geonorge.nedlasting.data.client;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,6 +38,13 @@ public class OrderLine {
         this.coordinatesystem = coordinatesystem;
     }
 
+    public void addArea(OrderArea area) {
+        if (areas == null) {
+            areas = new ArrayList<>();
+        }
+        areas.add(area);
+    }
+
     public List<OrderArea> getAreas() {
         if (areas == null) {
             return Collections.emptyList();
@@ -44,11 +52,25 @@ public class OrderLine {
         return Collections.unmodifiableList(areas);
     }
 
+    public void addProjection(Projection proj) {
+        if (projections == null) {
+            projections = new ArrayList<>();
+        }
+        projections.add(proj);
+    }
+
     public List<Projection> getProjections() {
         if (projections == null) {
             return Collections.emptyList();
         }
         return Collections.unmodifiableList(projections);
+    }
+
+    public void addFormat(Format format) {
+        if (formats == null) {
+            formats = new ArrayList<>();
+        }
+        formats.add(format);
     }
 
     public List<Format> getFormats() {
