@@ -15,13 +15,9 @@ public abstract class _DatasetFile extends CayenneDataObject {
     public static final String AREA_CODE_PROPERTY = "areaCode";
     public static final String AREA_NAME_PROPERTY = "areaName";
     public static final String AREA_TYPE_PROPERTY = "areaType";
-    public static final String CATEGORY_PROPERTY = "category";
-    public static final String CATEGORY_SUB_PROPERTY = "categorySub";
     public static final String FILE_NAME_PROPERTY = "fileName";
     public static final String FORMAT_NAME_PROPERTY = "formatName";
     public static final String FORMAT_VERSION_PROPERTY = "formatVersion";
-    public static final String SEGMENT_PROPERTY = "segment";
-    public static final String SEGMENT_VALUE_PROPERTY = "segmentValue";
     public static final String SRID_PROPERTY = "srid";
     public static final String URL_PROPERTY = "url";
     public static final String DATASET_PROPERTY = "dataset";
@@ -50,20 +46,6 @@ public abstract class _DatasetFile extends CayenneDataObject {
         return (String)readProperty(AREA_TYPE_PROPERTY);
     }
 
-    public void setCategory(String category) {
-        writeProperty(CATEGORY_PROPERTY, category);
-    }
-    public String getCategory() {
-        return (String)readProperty(CATEGORY_PROPERTY);
-    }
-
-    public void setCategorySub(String categorySub) {
-        writeProperty(CATEGORY_SUB_PROPERTY, categorySub);
-    }
-    public String getCategorySub() {
-        return (String)readProperty(CATEGORY_SUB_PROPERTY);
-    }
-
     public void setFileName(String fileName) {
         writeProperty(FILE_NAME_PROPERTY, fileName);
     }
@@ -83,20 +65,6 @@ public abstract class _DatasetFile extends CayenneDataObject {
     }
     public String getFormatVersion() {
         return (String)readProperty(FORMAT_VERSION_PROPERTY);
-    }
-
-    public void setSegment(String segment) {
-        writeProperty(SEGMENT_PROPERTY, segment);
-    }
-    public String getSegment() {
-        return (String)readProperty(SEGMENT_PROPERTY);
-    }
-
-    public void setSegmentValue(String segmentValue) {
-        writeProperty(SEGMENT_VALUE_PROPERTY, segmentValue);
-    }
-    public String getSegmentValue() {
-        return (String)readProperty(SEGMENT_VALUE_PROPERTY);
     }
 
     public void setSrid(int srid) {
