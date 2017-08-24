@@ -1,5 +1,6 @@
 package no.geonorge.nedlasting.data;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,9 +17,10 @@ import org.apache.cayenne.query.SelectQuery;
 
 import no.geonorge.nedlasting.data.auto._Dataset;
 import no.geonorge.nedlasting.data.client.Area;
+import no.geonorge.nedlasting.data.client.Capabilities;
 import no.geonorge.nedlasting.data.client.Format;
+import no.geonorge.nedlasting.data.client.Link;
 import no.geonorge.nedlasting.data.client.Projection;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CapabilitiesType;
 
 public class Dataset extends _Dataset {
 
@@ -36,12 +38,22 @@ public class Dataset extends _Dataset {
         return dataset.get(0);
     }
 
-    public CapabilitiesType getCapabilities() {
-        CapabilitiesType ct = new CapabilitiesType();
+    public Capabilities getCapabilities(String urlPrefix) {
+        Capabilities ct = new Capabilities();
         ct.setSupportsAreaSelection(isSupportsAreaSelection());
         ct.setSupportsFormatSelection(isSupportsFormatSelection());
         ct.setSupportsPolygonSelection(isSupportsPolygonSelection());
         ct.setSupportsProjectionSelection(isSupportsProjectionSelection());
+
+        String p = urlPrefix;
+        String u = getMetadataUuid();
+        ct.addLink(new Link("http://rel.geonorge.no/download/projection", p + "v2/codelists/projection/" + u));
+        ct.addLink(new Link("http://rel.geonorge.no/download/format", p + "v2/codelists/format/" + u));
+        ct.addLink(new Link("http://rel.geonorge.no/download/area", p + "v2/codelists/area/" + u));
+        ct.addLink(new Link("http://rel.geonorge.no/download/order", p + "v2/order"));
+        ct.addLink(new Link("self", p + "capabilities/" + u));
+        ct.addLink(new Link("http://rel.geonorge.no/download/can-download", p + "v2/can-download"));
+
         return ct;
     }
 

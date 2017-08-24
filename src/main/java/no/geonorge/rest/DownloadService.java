@@ -1,9 +1,11 @@
 package no.geonorge.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -11,8 +13,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.query.SelectQuery;
@@ -22,10 +26,10 @@ import com.google.gson.Gson;
 import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.Dataset;
 import no.geonorge.nedlasting.data.client.Area;
+import no.geonorge.nedlasting.data.client.Capabilities;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CanDownloadResponseType;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CapabilitiesType;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FileListe;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FileType;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.OrderReceiptType;
@@ -40,6 +44,18 @@ import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.OrderRecei
 
 @Path("api")
 public class DownloadService {
+    
+    @Context
+    UriInfo uri;
+    
+    private static final Logger log = Logger.getLogger(DownloadService.class.getName());
+    
+    private String getUrlPrefix() {
+        if (uri == null) {
+            return "";
+        }
+        return uri.getBaseUri().toString() + "api/";
+    }
 
     @GET
     @Path("status")
@@ -66,9 +82,8 @@ public class DownloadService {
         if (dataset == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        CapabilitiesType ct = dataset.getCapabilities();
-        Gson gson = new Gson();
-        String json = gson.toJson(ct);
+        Capabilities ct = dataset.getCapabilities(getUrlPrefix());
+        String json = new Gson().toJson(ct);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 	
@@ -157,6 +172,7 @@ public class DownloadService {
 	@Produces(MediaType.APPLICATION_JSON)	
 	@Consumes(MediaType.APPLICATION_JSON)
 	public String canDownload(String jsonRequest) throws Exception {	
+	    log.info("can-download request: " + jsonRequest);
 		/* Sample JSON HTTP-POST
 		 * {"metadataUuid":"73f863ba-628f-48af-b7fa-30d3ab331b8d","coordinates":"344754 7272921 404330 7187619 304134 7156477 344754 7272921","coordinateSystem":"32633"}
 		 */
@@ -198,6 +214,7 @@ public class DownloadService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public String orderDownload(String jsonRequest) throws Exception {
+	    log.info("order request: " + jsonRequest);
 		/* http://nedlasting.geonorge.no/Help/Api/POST-api-order */
 		/**
 		 * {
