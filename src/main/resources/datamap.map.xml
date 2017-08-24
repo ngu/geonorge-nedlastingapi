@@ -25,7 +25,8 @@
 		<db-attribute name="CATEGORY_SUB" type="VARCHAR" length="1024"/>
 		<db-attribute name="DATASET_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
 		<db-attribute name="FILE_NAME" type="VARCHAR" length="1024"/>
-		<db-attribute name="FORMAT" type="VARCHAR" length="1024"/>
+		<db-attribute name="FORMAT_NAME" type="VARCHAR" length="1024"/>
+		<db-attribute name="FORMAT_VERSION" type="VARCHAR" length="32"/>
 		<db-attribute name="SEGMENT" type="VARCHAR" length="1024"/>
 		<db-attribute name="SEGMENT_VALUE" type="VARCHAR" length="1024"/>
 		<db-attribute name="SRID" type="INTEGER" isMandatory="true"/>
@@ -50,7 +51,8 @@
 		<obj-attribute name="category" type="java.lang.String" db-attribute-path="CATEGORY"/>
 		<obj-attribute name="categorySub" type="java.lang.String" db-attribute-path="CATEGORY_SUB"/>
 		<obj-attribute name="fileName" type="java.lang.String" db-attribute-path="FILE_NAME"/>
-		<obj-attribute name="format" type="java.lang.String" db-attribute-path="FORMAT"/>
+		<obj-attribute name="formatName" type="java.lang.String" db-attribute-path="FORMAT_NAME"/>
+		<obj-attribute name="formatVersion" type="java.lang.String" db-attribute-path="FORMAT_VERSION"/>
 		<obj-attribute name="segment" type="java.lang.String" db-attribute-path="SEGMENT"/>
 		<obj-attribute name="segmentValue" type="java.lang.String" db-attribute-path="SEGMENT_VALUE"/>
 		<obj-attribute name="srid" type="int" db-attribute-path="SRID"/>

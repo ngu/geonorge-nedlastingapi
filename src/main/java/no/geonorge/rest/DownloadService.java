@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.Dataset;
 import no.geonorge.nedlasting.data.client.Area;
-import no.geonorge.nedlasting.data.client.FormatType;
+import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CanDownloadResponseType;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CapabilitiesType;
@@ -74,7 +74,7 @@ public class DownloadService {
         if (dataset == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        Collection<FormatType> formats = dataset.getFormats();
+        Collection<Format> formats = dataset.getFormats();
         Gson gson = new Gson();
         String json = gson.toJson(formats);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();

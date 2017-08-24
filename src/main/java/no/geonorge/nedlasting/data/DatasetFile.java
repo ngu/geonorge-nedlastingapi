@@ -1,7 +1,7 @@
 package no.geonorge.nedlasting.data;
 
 import no.geonorge.nedlasting.data.auto._DatasetFile;
-import no.geonorge.nedlasting.data.client.FormatType;
+import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Projection;
 
 public class DatasetFile extends _DatasetFile {
@@ -12,10 +12,11 @@ public class DatasetFile extends _DatasetFile {
         return projectonType;
     }
 
-    public FormatType getFormatType() {
-        FormatType formatType = new FormatType();
-        formatType.setName(getFormat());
-        return formatType;
+    public Format getFormat() {
+        Format format = new Format();
+        format.setName(getFormatName());
+        format.setVersion(getFormatVersion());
+        return format;
     }
 
     String getAreaKey() {

@@ -18,7 +18,8 @@ public abstract class _DatasetFile extends CayenneDataObject {
     public static final String CATEGORY_PROPERTY = "category";
     public static final String CATEGORY_SUB_PROPERTY = "categorySub";
     public static final String FILE_NAME_PROPERTY = "fileName";
-    public static final String FORMAT_PROPERTY = "format";
+    public static final String FORMAT_NAME_PROPERTY = "formatName";
+    public static final String FORMAT_VERSION_PROPERTY = "formatVersion";
     public static final String SEGMENT_PROPERTY = "segment";
     public static final String SEGMENT_VALUE_PROPERTY = "segmentValue";
     public static final String SRID_PROPERTY = "srid";
@@ -70,11 +71,18 @@ public abstract class _DatasetFile extends CayenneDataObject {
         return (String)readProperty(FILE_NAME_PROPERTY);
     }
 
-    public void setFormat(String format) {
-        writeProperty(FORMAT_PROPERTY, format);
+    public void setFormatName(String formatName) {
+        writeProperty(FORMAT_NAME_PROPERTY, formatName);
     }
-    public String getFormat() {
-        return (String)readProperty(FORMAT_PROPERTY);
+    public String getFormatName() {
+        return (String)readProperty(FORMAT_NAME_PROPERTY);
+    }
+
+    public void setFormatVersion(String formatVersion) {
+        writeProperty(FORMAT_VERSION_PROPERTY, formatVersion);
+    }
+    public String getFormatVersion() {
+        return (String)readProperty(FORMAT_VERSION_PROPERTY);
     }
 
     public void setSegment(String segment) {

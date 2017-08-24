@@ -16,7 +16,7 @@ import org.apache.cayenne.query.SelectQuery;
 
 import no.geonorge.nedlasting.data.auto._Dataset;
 import no.geonorge.nedlasting.data.client.Area;
-import no.geonorge.nedlasting.data.client.FormatType;
+import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CapabilitiesType;
 
@@ -45,10 +45,10 @@ public class Dataset extends _Dataset {
         return ct;
     }
 
-    public Collection<FormatType> getFormats() {
-        Set<FormatType> formatTypes = new HashSet<>();
+    public Collection<Format> getFormats() {
+        Set<Format> formatTypes = new HashSet<>();
         for (DatasetFile file : getFiles()) {
-            formatTypes.add(file.getFormatType());
+            formatTypes.add(file.getFormat());
         }
         return Collections.unmodifiableCollection(formatTypes);
     }
@@ -73,7 +73,7 @@ public class Dataset extends _Dataset {
                 areaType.setName(file.getAreaName());
                 areaTypeByAreaKey.put(areaKey, areaType);
             }
-            areaType.addFormat(file.getFormatType());
+            areaType.addFormat(file.getFormat());
             areaType.addProjection(file.getProjection());
         }
 

@@ -11,7 +11,7 @@ public class Area {
     private String name;
 
     private Collection<Projection> projections;
-    private Collection<FormatType> formats;
+    private Collection<Format> formats;
 
     public void setCode(String code) {
         this.code = code;
@@ -51,14 +51,14 @@ public class Area {
         return Collections.unmodifiableCollection(projections);
     }
 
-    public void addFormat(FormatType format) {
+    public void addFormat(Format format) {
         if (formats == null) {
             formats = new HashSet<>();
         }
         formats.add(format);
     }
 
-    public Collection<FormatType> getFormats() {
+    public Collection<Format> getFormats() {
         if (formats == null) {
             return Collections.emptyList();
         }
