@@ -1,10 +1,9 @@
 package no.geonorge.rest;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -25,14 +24,17 @@ import com.google.gson.Gson;
 
 import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.Dataset;
+import no.geonorge.nedlasting.data.DatasetFile;
 import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.nedlasting.data.client.Capabilities;
+import no.geonorge.nedlasting.data.client.File;
 import no.geonorge.nedlasting.data.client.Format;
+import no.geonorge.nedlasting.data.client.Order;
+import no.geonorge.nedlasting.data.client.OrderLine;
+import no.geonorge.nedlasting.data.client.OrderReceipt;
 import no.geonorge.nedlasting.data.client.Projection;
+import no.geonorge.nedlasting.utils.SHA1Helper;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CanDownloadResponseType;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FileListe;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FileType;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.OrderReceiptType;
 
 
 
@@ -201,58 +203,44 @@ public class DownloadService {
 		// JSON structure is {"referenceNumber": , "files": [], "email": "foo@bar.baz", "orderDate": "YYYY-MM-DDThh:mm:ss.ms"}
 		return "{}";		
 	}
-	
-	
-	/**
-	 * 
-	 *
-	 * @return String json with reference to order
-	 * @throws Exception
-	 */
-	@POST
-	@Path("order")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String orderDownload(String jsonRequest) throws Exception {
-	    log.info("order request: " + jsonRequest);
-		/* http://nedlasting.geonorge.no/Help/Api/POST-api-order */
-		/**
-		 * {
-			"email": "foo@bar.bazo",
-			"orderLines": [{
-			  "areas": [{
-				"code": "1622",
-				"type": "kommune",
-				"name": null
-			  }],
-			  "formats": [{
-				"name": "SOSI",
-				"version": null
-			  }],
-			  "metadataUuid": "a5c76d05-33bd-4a1d-b28b-81575092e468",
-			  "coordinates": null,
-			  "coordinatesystem": null,
-			  "projections": [{
-				"code": "25832",
-				"name": null,
-				"codespace": null
-				}]
-			  }]
-		   }
-		 */
 
-		/*
-		 * FIXME: complete the order and return a file list
-		 */
-     	OrderReceiptType order = new OrderReceiptType();
-     	FileType noFiles = new FileType();
-     	ArrayList<FileListe> files = new ArrayList<FileListe>();
+    /**
+     * 
+     *
+     * @return String json with reference to order
+     * @throws Exception
+     */
+    @POST
+    @Path("v2/order")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response orderDownload(String jsonRequest) throws Exception {
+        /* https://nedlasting.geonorge.no/Help/Api/POST-api-v2-order */
+        Order order = new Gson().fromJson(jsonRequest, Order.class);
+        OrderReceipt orderReceipt = new OrderReceipt();
+        orderReceipt.setReferenceNumber(UUID.randomUUID().toString());
 
-		
-     	// Convert OrderReceiptType to JSON
-		Gson gson = new Gson();		
-		return gson.toJson(order);
-	}
-	
-	
+        ObjectContext ctxt = Config.getObjectContext();
+        for (OrderLine orderLine : order.getOrderLines()) {
+            for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
+                File file = new File();
+                file.setFileId(SHA1Helper.sha1String(datasetFile.getUrl()));
+                file.setDownloadUrl(datasetFile.getUrl());
+                file.setName(datasetFile.getFileName());
+                file.setMetadataUuid(orderLine.getMetadataUuid());
+                file.setMetadataName(datasetFile.getDataset().getTitle());
+                file.setFormat(datasetFile.getFormatName());
+                file.setProjection(datasetFile.getProjection().getSrid().toString());
+                file.setProjectionName(datasetFile.getProjection().getName());
+                file.setArea(datasetFile.getAreaCode());
+                file.setAreaName(datasetFile.getAreaName());
+                file.setStatus("ReadyForDownload");
+                orderReceipt.addFile(file);
+            }
+        }
+
+        String json = new Gson().toJson(orderReceipt);
+        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+    }
+
 }

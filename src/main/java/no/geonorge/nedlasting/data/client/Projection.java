@@ -1,10 +1,6 @@
 package no.geonorge.nedlasting.data.client;
 
-import java.util.logging.Logger;
-
 public class Projection {
-
-    private static final Logger log = Logger.getLogger(Projection.class.getName());
 
     private String code;
     private String name;
