@@ -2,13 +2,8 @@ package no.geonorge.nedlasting.data;
 
 import no.geonorge.nedlasting.data.auto._DatasetFile;
 import no.geonorge.nedlasting.data.client.Format;
-import no.geonorge.nedlasting.data.client.Projection;
 
 public class DatasetFile extends _DatasetFile {
-
-    public Projection getProjection() {
-        return Projection.create(getSrid());
-    }
 
     public Format getFormat() {
         Format format = new Format();

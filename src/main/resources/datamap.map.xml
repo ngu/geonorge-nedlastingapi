@@ -28,6 +28,11 @@
 		<db-attribute name="SRID" type="INTEGER" isMandatory="true"/>
 		<db-attribute name="URL" type="VARCHAR" isPrimaryKey="true" isMandatory="true" length="2048"/>
 	</db-entity>
+	<db-entity name="PROJECTION">
+		<db-attribute name="CODESPACE" type="VARCHAR" isMandatory="true" length="512"/>
+		<db-attribute name="NAME" type="VARCHAR" isMandatory="true" length="512"/>
+		<db-attribute name="SRID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
+	</db-entity>
 	<obj-entity name="Dataset" className="no.geonorge.nedlasting.data.Dataset" dbEntityName="DATASET">
 		<obj-attribute name="accessConstraint" type="java.lang.String" db-attribute-path="ACCESS_CONSTRAINT"/>
 		<obj-attribute name="fmeCutUrl" type="java.lang.String" db-attribute-path="FME_CUT_URL"/>
@@ -47,15 +52,27 @@
 		<obj-attribute name="fileName" type="java.lang.String" db-attribute-path="FILE_NAME"/>
 		<obj-attribute name="formatName" type="java.lang.String" db-attribute-path="FORMAT_NAME"/>
 		<obj-attribute name="formatVersion" type="java.lang.String" db-attribute-path="FORMAT_VERSION"/>
-		<obj-attribute name="srid" type="int" db-attribute-path="SRID"/>
 		<obj-attribute name="url" type="java.lang.String" db-attribute-path="URL"/>
+	</obj-entity>
+	<obj-entity name="Projection" className="no.geonorge.nedlasting.data.Projection" dbEntityName="PROJECTION">
+		<obj-attribute name="codespace" type="java.lang.String" db-attribute-path="CODESPACE"/>
+		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
+		<obj-attribute name="srid" type="java.lang.Integer" db-attribute-path="SRID"/>
 	</obj-entity>
 	<db-relationship name="to_dataset_file" source="DATASET" target="DATASET_FILE" toDependentPK="true" toMany="true">
 		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
 	</db-relationship>
+	<db-relationship name="toProjection" source="DATASET_FILE" target="PROJECTION" toMany="false">
+		<db-attribute-pair source="SRID" target="SRID"/>
+	</db-relationship>
 	<db-relationship name="to_dataset" source="DATASET_FILE" target="DATASET" toMany="false">
 		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
 	</db-relationship>
+	<db-relationship name="toFile" source="PROJECTION" target="DATASET_FILE" toMany="true">
+		<db-attribute-pair source="SRID" target="SRID"/>
+	</db-relationship>
 	<obj-relationship name="files" source="Dataset" target="DatasetFile" deleteRule="Cascade" db-relationship-path="to_dataset_file"/>
 	<obj-relationship name="dataset" source="DatasetFile" target="Dataset" deleteRule="Nullify" db-relationship-path="to_dataset"/>
+	<obj-relationship name="projection" source="DatasetFile" target="Projection" deleteRule="Nullify" db-relationship-path="toProjection"/>
+	<obj-relationship name="files" source="Projection" target="DatasetFile" deleteRule="Deny" db-relationship-path="toFile"/>
 </data-map>

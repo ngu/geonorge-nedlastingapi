@@ -1,3 +1,7 @@
+
+insert into projection (srid, codespace, name) values (25833, 'http://www.opengis.net/def/crs/EPSG/0/25833', 'EUREF89 UTM sone 33, 2d');
+insert into projection (srid, codespace, name) values (32632, 'http://www.opengis.net/def/crs/EPSG/0/32632', 'EPSG:WGS 84 / UTM zone 32N');
+
 -- http://kartkatalog.test.geonorge.no/metadata/norges-geologiske-undersokelse/test-sky-nedlasting-api/18777cf4-1f06-4cb0-803d-d6382b76681f
 insert into dataset 
     (dataset_id, metadata_uuid, title, supports_area_selection, supports_format_selection, supports_polygon_selection, supports_projection_selection) 

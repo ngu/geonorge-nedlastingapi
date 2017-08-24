@@ -68,7 +68,7 @@ public class Dataset extends _Dataset {
     public Collection<Projection> getProjections() {
         Set<Projection> projectionTypes = new HashSet<>();
         for (DatasetFile file : getFiles()) {
-            projectionTypes.add(file.getProjection());
+            projectionTypes.add(file.getProjection().forClient());
         }
         return Collections.unmodifiableCollection(projectionTypes);
     }
@@ -86,7 +86,7 @@ public class Dataset extends _Dataset {
                 areaTypeByAreaKey.put(areaKey, areaType);
             }
             areaType.addFormat(file.getFormat());
-            areaType.addProjection(file.getProjection());
+            areaType.addProjection(file.getProjection().forClient());
         }
 
         List<Area> areas = new ArrayList<>(areaTypeByAreaKey.values());

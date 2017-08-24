@@ -2,11 +2,8 @@ package no.geonorge.nedlasting.data.client;
 
 import java.util.logging.Logger;
 
-import org.geotools.referencing.CRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 public class Projection {
-    
+
     private static final Logger log = Logger.getLogger(Projection.class.getName());
 
     private String code;
@@ -57,23 +54,6 @@ public class Projection {
             return -1;
         }
         return code.hashCode();
-    }
-    
-    public static Projection create(int srid) {
-        Projection p = new Projection();
-        p.setCode(Integer.toString(srid));
-        p.setCodespace("http://www.opengis.net/def/crs/EPSG/0/" + srid);
-        
-        try {
-            CoordinateReferenceSystem crs = CRS.decode("EPSG:" + srid);
-            if (crs != null) {
-                p.setName(crs.getName().toString());
-            }
-        } catch (Exception e) {
-            log.info("could not find crs for srid " + srid + ". " + e.getMessage());
-        }        
-
-        return p;
     }
 
 }

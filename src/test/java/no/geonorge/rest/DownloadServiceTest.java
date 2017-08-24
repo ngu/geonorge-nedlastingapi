@@ -18,12 +18,13 @@ import no.geonorge.junit.DbTestCase;
 import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.Dataset;
 import no.geonorge.nedlasting.data.DatasetFile;
+import no.geonorge.nedlasting.data.Projection;
 import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FormatType;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.ProjectionType;
 
 public class DownloadServiceTest extends DbTestCase {
-
+    
     public void testCapabilities() throws IOException {
         DownloadService ds = new DownloadService();
 
@@ -51,7 +52,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile.setDataset(dataset);
         datasetFile.setFormatName("SOSI");
         datasetFile.setUrl("http://a.url.com");
-        datasetFile.setSrid(4326);
+        datasetFile.setProjection(createOrFind(ctxt, 4326));
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnFormats(uuid).getStatus());
@@ -78,7 +79,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile.setDataset(dataset);
         datasetFile.setFormatName("SOSI");
         datasetFile.setUrl("http://a.url.com");
-        datasetFile.setSrid(4326);
+        datasetFile.setProjection(createOrFind(ctxt, 4326));
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnProjections(uuid).getStatus());
@@ -99,6 +100,11 @@ public class DownloadServiceTest extends DbTestCase {
         assertEquals(HttpServletResponse.SC_NOT_FOUND, ds.returnAreas(uuid).getStatus());
 
         ObjectContext ctxt = Config.getObjectContext();
+        
+        Projection p1 = createOrFind(ctxt, 4326);
+        Projection p2 = createOrFind(ctxt, 32633);
+        ctxt.commitChanges();
+        
         Dataset dataset = ctxt.newObject(Dataset.class);
         dataset.setMetadataUuid(uuid);
         DatasetFile datasetFile1 = ctxt.newObject(DatasetFile.class);
@@ -106,31 +112,31 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile1.setDataset(dataset);
         datasetFile1.setFormatName("SOSI");
         datasetFile1.setUrl("http://a.url.com/1");
-        datasetFile1.setSrid(4326);
+        datasetFile1.setProjection(p1);
         DatasetFile datasetFile2 = ctxt.newObject(DatasetFile.class);
         datasetFile2.setArea("fylke", "02", "Akershus");
         datasetFile2.setDataset(dataset);
         datasetFile2.setFormatName("GML");
         datasetFile2.setUrl("http://a.url.com/2");
-        datasetFile2.setSrid(4326);
+        datasetFile2.setProjection(p1);
         DatasetFile datasetFile3 = ctxt.newObject(DatasetFile.class);
         datasetFile3.setArea("fylke", "02", "Akershus");
         datasetFile3.setDataset(dataset);
         datasetFile3.setFormatName("SOSI");
         datasetFile3.setUrl("http://a.url.com/3");
-        datasetFile3.setSrid(32633);
+        datasetFile3.setProjection(p1);
         DatasetFile datasetFile4 = ctxt.newObject(DatasetFile.class);
         datasetFile4.setArea("fylke", "02", "Akershus");
         datasetFile4.setDataset(dataset);
         datasetFile4.setFormatName("GML");
         datasetFile4.setUrl("http://a.url.com/4");
-        datasetFile4.setSrid(32633);
+        datasetFile4.setProjection(p2);
         DatasetFile datasetFile5 = ctxt.newObject(DatasetFile.class);
         datasetFile5.setArea("fylke", "03", "Whatever");
         datasetFile5.setDataset(dataset);
         datasetFile5.setFormatName("GML");
         datasetFile5.setUrl("http://a.url.com/5");
-        datasetFile5.setSrid(32633);
+        datasetFile5.setProjection(p2);
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnAreas(uuid).getStatus());
