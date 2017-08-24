@@ -33,6 +33,7 @@ import no.geonorge.nedlasting.utils.IOUtils;
 public class Config implements DataSourceFactory {
 
     public static final String KEY_SERVER_PORT = "server.port";
+    public static final String KEY_JETTY_PORT = "jetty.port";
 
     public static final String KEY_DATABASE_DRIVER = "database.driver";
     public static final String KEY_DATABASE_URL = "database.url";
@@ -70,7 +71,11 @@ public class Config implements DataSourceFactory {
             }
         }
 
+        // look for two different variables for port number. This is to both
+        // be compatible with geonorge.properties and 
+        // https://github.com/ElectronicChartCentre/deploy-scripts
         Config.serverPort = getProperty(prop, KEY_SERVER_PORT, Config.serverPort);
+        Config.serverPort = getProperty(prop, KEY_JETTY_PORT, Config.serverPort);
 
         BasicDataSource nds = new BasicDataSource();
         nds.setUrl(getRequiredProperty(prop, KEY_DATABASE_URL));
