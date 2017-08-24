@@ -8,7 +8,6 @@ public class Order {
 
     private String email;
     private List<OrderLine> orderLines;
-    private List<Link> _links;
 
     public void setEmail(String email) {
         this.email = email;
@@ -17,7 +16,7 @@ public class Order {
     public String getEmail() {
         return email;
     }
-    
+
     public void addOrderLine(OrderLine orderLine) {
         if (orderLines == null) {
             orderLines = new ArrayList<>();
@@ -30,13 +29,6 @@ public class Order {
             return Collections.emptyList();
         }
         return Collections.unmodifiableList(orderLines);
-    }
-
-    public List<Link> getLinks() {
-        if (_links == null) {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(_links);
     }
 
 }
