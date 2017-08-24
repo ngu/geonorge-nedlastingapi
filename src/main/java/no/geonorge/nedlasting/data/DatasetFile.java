@@ -9,6 +9,7 @@ public class DatasetFile extends _DatasetFile {
     public Projection getProjection() {
         Projection projectonType = new Projection();
         projectonType.setCode(Integer.toString(getSrid()));
+        projectonType.setCodespace("http://www.opengis.net/def/crs/EPSG/0/" + getSrid());
         return projectonType;
     }
 
