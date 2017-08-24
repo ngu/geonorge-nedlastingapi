@@ -1,9 +1,13 @@
 package no.geonorge.nedlasting.data.client;
 
+import java.util.logging.Logger;
+
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class Projection {
+    
+    private static final Logger log = Logger.getLogger(Projection.class.getName());
 
     private String code;
     private String name;
@@ -66,7 +70,7 @@ public class Projection {
                 p.setName(crs.getName().toString());
             }
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            log.info("could not find crs for srid " + srid + ". " + e.getMessage());
         }        
 
         return p;
