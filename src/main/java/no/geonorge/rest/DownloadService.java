@@ -2,6 +2,7 @@ package no.geonorge.rest;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -25,6 +26,8 @@ import com.google.gson.Gson;
 import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.Dataset;
 import no.geonorge.nedlasting.data.DatasetFile;
+import no.geonorge.nedlasting.data.DownloadItem;
+import no.geonorge.nedlasting.data.DownloadOrder;
 import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.nedlasting.data.client.Capabilities;
 import no.geonorge.nedlasting.data.client.File;
@@ -222,6 +225,12 @@ public class DownloadService {
         orderReceipt.setReferenceNumber(UUID.randomUUID().toString());
 
         ObjectContext ctxt = Config.getObjectContext();
+
+        DownloadOrder downloadOrder = ctxt.newObject(DownloadOrder.class);
+        downloadOrder.setEmail(order.getEmail());
+        downloadOrder.setReferenceNumber(orderReceipt.getReferenceNumber());
+        downloadOrder.setStartTime(new Date());
+
         for (OrderLine orderLine : order.getOrderLines()) {
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
                 File file = new File();
@@ -237,8 +246,15 @@ public class DownloadService {
                 file.setAreaName(datasetFile.getAreaName());
                 file.setStatus("ReadyForDownload");
                 orderReceipt.addFile(file);
+
+                DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
+                downloadItem.setSrid(datasetFile.getProjection().getSrid());
+                downloadItem.setUrl(datasetFile.getUrl());
+                downloadOrder.addToItems(downloadItem);
             }
         }
+
+        ctxt.commitChanges();
 
         String json = new Gson().toJson(orderReceipt);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();

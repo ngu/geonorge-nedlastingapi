@@ -28,6 +28,18 @@
 		<db-attribute name="SRID" type="INTEGER" isMandatory="true"/>
 		<db-attribute name="URL" type="VARCHAR" isPrimaryKey="true" isMandatory="true" length="2048"/>
 	</db-entity>
+	<db-entity name="DOWNLOAD_ITEM">
+		<db-attribute name="ORDER_ID" type="BIGINT" isMandatory="true"/>
+		<db-attribute name="ORDER_ITEM_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="SRID" type="INTEGER" isMandatory="true"/>
+		<db-attribute name="URL" type="VARCHAR" length="2048"/>
+	</db-entity>
+	<db-entity name="DOWNLOAD_ORDER">
+		<db-attribute name="EMAIL" type="VARCHAR" length="512"/>
+		<db-attribute name="ORDER_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="REFERENCE_NUMBER" type="VARCHAR" isMandatory="true" length="128"/>
+		<db-attribute name="START_TIME" type="TIMESTAMP" isMandatory="true"/>
+	</db-entity>
 	<db-entity name="PROJECTION">
 		<db-attribute name="CODESPACE" type="VARCHAR" isMandatory="true" length="512"/>
 		<db-attribute name="NAME" type="VARCHAR" isMandatory="true" length="512"/>
@@ -54,6 +66,15 @@
 		<obj-attribute name="formatVersion" type="java.lang.String" db-attribute-path="FORMAT_VERSION"/>
 		<obj-attribute name="url" type="java.lang.String" db-attribute-path="URL"/>
 	</obj-entity>
+	<obj-entity name="DownloadItem" className="no.geonorge.nedlasting.data.DownloadItem" dbEntityName="DOWNLOAD_ITEM">
+		<obj-attribute name="srid" type="java.lang.Integer" db-attribute-path="SRID"/>
+		<obj-attribute name="url" type="java.lang.String" db-attribute-path="URL"/>
+	</obj-entity>
+	<obj-entity name="DownloadOrder" className="no.geonorge.nedlasting.data.DownloadOrder" dbEntityName="DOWNLOAD_ORDER">
+		<obj-attribute name="email" type="java.lang.String" db-attribute-path="EMAIL"/>
+		<obj-attribute name="referenceNumber" type="java.lang.String" db-attribute-path="REFERENCE_NUMBER"/>
+		<obj-attribute name="startTime" type="java.util.Date" db-attribute-path="START_TIME"/>
+	</obj-entity>
 	<obj-entity name="Projection" className="no.geonorge.nedlasting.data.Projection" dbEntityName="PROJECTION">
 		<obj-attribute name="codespace" type="java.lang.String" db-attribute-path="CODESPACE"/>
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
@@ -68,11 +89,19 @@
 	<db-relationship name="to_dataset" source="DATASET_FILE" target="DATASET" toMany="false">
 		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
 	</db-relationship>
+	<db-relationship name="toOrder" source="DOWNLOAD_ITEM" target="DOWNLOAD_ORDER" toMany="false">
+		<db-attribute-pair source="ORDER_ID" target="ORDER_ID"/>
+	</db-relationship>
+	<db-relationship name="toItems" source="DOWNLOAD_ORDER" target="DOWNLOAD_ITEM" toMany="true">
+		<db-attribute-pair source="ORDER_ID" target="ORDER_ID"/>
+	</db-relationship>
 	<db-relationship name="toFile" source="PROJECTION" target="DATASET_FILE" toMany="true">
 		<db-attribute-pair source="SRID" target="SRID"/>
 	</db-relationship>
 	<obj-relationship name="files" source="Dataset" target="DatasetFile" deleteRule="Cascade" db-relationship-path="to_dataset_file"/>
 	<obj-relationship name="dataset" source="DatasetFile" target="Dataset" deleteRule="Nullify" db-relationship-path="to_dataset"/>
 	<obj-relationship name="projection" source="DatasetFile" target="Projection" deleteRule="Nullify" db-relationship-path="toProjection"/>
+	<obj-relationship name="order" source="DownloadItem" target="DownloadOrder" deleteRule="Deny" db-relationship-path="toOrder"/>
+	<obj-relationship name="items" source="DownloadOrder" target="DownloadItem" deleteRule="Cascade" db-relationship-path="toItems"/>
 	<obj-relationship name="files" source="Projection" target="DatasetFile" deleteRule="Deny" db-relationship-path="toFile"/>
 </data-map>
