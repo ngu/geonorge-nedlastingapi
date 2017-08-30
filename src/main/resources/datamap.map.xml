@@ -4,6 +4,10 @@
 	 xsi:schemaLocation="http://cayenne.apache.org/schema/3.0/modelMap http://cayenne.apache.org/schema/3.0/modelMap.xsd"
 	 project-version="6">
 	<property name="defaultPackage" value="no.geonorge.nedlasting.data"/>
+	<db-entity name="API_USER">
+		<db-attribute name="PASSWORD_SHA512" type="VARCHAR" length="128"/>
+		<db-attribute name="USERNAME" type="VARCHAR" isPrimaryKey="true" isMandatory="true" length="128"/>
+	</db-entity>
 	<db-entity name="DATASET">
 		<db-attribute name="ACCESS_CONSTRAINT" type="VARCHAR" length="1024"/>
 		<db-attribute name="DATASET_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
@@ -79,6 +83,10 @@
 		<obj-attribute name="codespace" type="java.lang.String" db-attribute-path="CODESPACE"/>
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
 		<obj-attribute name="srid" type="java.lang.Integer" db-attribute-path="SRID"/>
+	</obj-entity>
+	<obj-entity name="User" className="no.geonorge.nedlasting.data.User" dbEntityName="API_USER">
+		<obj-attribute name="passwordSha512" type="java.lang.String" db-attribute-path="PASSWORD_SHA512"/>
+		<obj-attribute name="username" type="java.lang.String" db-attribute-path="USERNAME"/>
 	</obj-entity>
 	<db-relationship name="to_dataset_file" source="DATASET" target="DATASET_FILE" toDependentPK="true" toMany="true">
 		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>

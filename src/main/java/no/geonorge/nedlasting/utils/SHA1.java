@@ -4,10 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
- * A helper class for basic SHA1 operations.
- */
-public class SHA1Helper {
+public class SHA1 {
 
     public static String sha1String(String clrtxt) {
         try {
@@ -16,7 +13,7 @@ public class SHA1Helper {
             throw new RuntimeException(e.getMessage());
         }
     }
-    
+
     public static String sha1String(byte[] clr) {
         MessageDigest sha;
         try {

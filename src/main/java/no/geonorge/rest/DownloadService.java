@@ -1,6 +1,7 @@
 package no.geonorge.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -30,13 +31,14 @@ import no.geonorge.nedlasting.data.DownloadItem;
 import no.geonorge.nedlasting.data.DownloadOrder;
 import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.nedlasting.data.client.Capabilities;
+import no.geonorge.nedlasting.data.client.DatasetView;
 import no.geonorge.nedlasting.data.client.File;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Order;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.OrderReceipt;
 import no.geonorge.nedlasting.data.client.Projection;
-import no.geonorge.nedlasting.utils.SHA1Helper;
+import no.geonorge.nedlasting.utils.SHA1;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CanDownloadResponseType;
 
 
@@ -234,7 +236,7 @@ public class DownloadService {
         for (OrderLine orderLine : order.getOrderLines()) {
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
                 File file = new File();
-                file.setFileId(SHA1Helper.sha1String(datasetFile.getUrl()));
+                file.setFileId(SHA1.sha1String(datasetFile.getUrl()));
                 file.setDownloadUrl(datasetFile.getUrl());
                 file.setName(datasetFile.getFileName());
                 file.setMetadataUuid(orderLine.getMetadataUuid());
@@ -260,4 +262,30 @@ public class DownloadService {
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 
+    @GET
+    @Path("internal/dataset")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDatasets() {
+        ObjectContext ctxt = Config.getObjectContext();
+        List<DatasetView> datasetViews = new ArrayList<>();
+        for (Dataset dataset : Dataset.getAll(ctxt)) {
+            datasetViews.add(dataset.forClientView());
+        }
+        String json = new Gson().toJson(datasetViews);
+        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+    }
+
+    @GET
+    @Path("internal/dataset/{metadataUuid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDataset(@PathParam("metadataUuid") String metadataUuid) {
+        ObjectContext ctxt = Config.getObjectContext();
+        Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
+        if (dataset == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        String json = new Gson().toJson(dataset.forClient());
+        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+    }
+    
 }

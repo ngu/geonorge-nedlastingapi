@@ -1,6 +1,5 @@
 package no.geonorge.nedlasting.data;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,11 +17,19 @@ import org.apache.cayenne.query.SelectQuery;
 import no.geonorge.nedlasting.data.auto._Dataset;
 import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.nedlasting.data.client.Capabilities;
+import no.geonorge.nedlasting.data.client.DatasetView;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Link;
 import no.geonorge.nedlasting.data.client.Projection;
 
 public class Dataset extends _Dataset {
+
+    public static List<Dataset> getAll(ObjectContext ctxt) {
+        SelectQuery query = new SelectQuery(Dataset.class);
+        @SuppressWarnings("unchecked")
+        List<Dataset> dataset = ctxt.performQuery(query);
+        return dataset;
+    }
 
     public static Dataset forMetadataUUID(ObjectContext ctxt, String metadataUuid) {
         Expression qual = ExpressionFactory.matchExp(METADATA_UUID_PROPERTY, metadataUuid);
@@ -56,6 +63,21 @@ public class Dataset extends _Dataset {
 
         return ct;
     }
+
+    public no.geonorge.nedlasting.data.client.Dataset forClient() {
+        no.geonorge.nedlasting.data.client.Dataset d = new no.geonorge.nedlasting.data.client.Dataset();
+        d.setMetadataUuid(getMetadataUuid());
+        d.setTitle(getTitle());
+        return d;
+    }
+    
+    public DatasetView forClientView() {
+        DatasetView d = new DatasetView();
+        d.setMetadataUuid(getMetadataUuid());
+        d.setTitle(getTitle());
+        return d;
+    }
+
 
     public Collection<Format> getFormats() {
         Set<Format> formatTypes = new HashSet<>();

@@ -41,6 +41,10 @@ public class DownloadWebserver {
         cors.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
         cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,POST,HEAD");
         cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "X-Requested-With,Content-Type,Accept,Origin");
+        
+        // Authentication for /api/internal
+        context.addFilter(AuthenticationFilter.class, "/api/internal/*",
+                EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD));
 
         ServletHolder publicRestApiServlet = new ServletHolder(new ServletContainer(pconfig));
         publicRestApiServlet.setInitOrder(1);
