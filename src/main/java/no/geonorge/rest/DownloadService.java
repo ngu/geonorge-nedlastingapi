@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -34,6 +33,8 @@ import no.geonorge.nedlasting.data.DatasetFile;
 import no.geonorge.nedlasting.data.DownloadItem;
 import no.geonorge.nedlasting.data.DownloadOrder;
 import no.geonorge.nedlasting.data.client.Area;
+import no.geonorge.nedlasting.data.client.CanDownloadRequest;
+import no.geonorge.nedlasting.data.client.CanDownloadResponse;
 import no.geonorge.nedlasting.data.client.Capabilities;
 import no.geonorge.nedlasting.data.client.File;
 import no.geonorge.nedlasting.data.client.Format;
@@ -41,16 +42,11 @@ import no.geonorge.nedlasting.data.client.Order;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.OrderReceipt;
 import no.geonorge.nedlasting.data.client.Projection;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CanDownloadResponseType;
-
-
-
 
 /**
  * This REST api implements the Norway Digital (Geonorge) Download API
  * For more information: http://nedlasting.geonorge.no/Help
  */
-
 @Path("api")
 public class DownloadService {
     
@@ -170,45 +166,55 @@ public class DownloadService {
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 	
-	/**
-	 * 
-	 * @param metadataUuid
-	 * @return json of valid projections of a given metadataUuid
-	 * @throws Exception
-	 */
-	@POST
-	@Path("v2/can-download")
-	@Produces(MediaType.APPLICATION_JSON)	
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String canDownload(String jsonRequest) throws Exception {	
-	    log.info("can-download request: " + jsonRequest);
-		/* Sample JSON HTTP-POST
-		 * {"metadataUuid":"73f863ba-628f-48af-b7fa-30d3ab331b8d","coordinates":"344754 7272921 404330 7187619 304134 7156477 344754 7272921","coordinateSystem":"32633"}
-		 */
-		boolean is_valid_area = false;
-		// FIXME: Parse JSON-string and generate a Polygon object		
-		// FIXME: Calculate Polygon area and validate against dataset configuration. 
-		// Possibly even a system default in /etc/geonorge.conf if always enabled.		
-		CanDownloadResponseType canDownload = new CanDownloadResponseType();
-		canDownload.setCanDownload(is_valid_area);
-		Gson gson = new Gson();
-		String json = gson.toJson(canDownload);		
-		return json;
-		
-	}
-	/**
-	 * 
-	 * @param metadataUuid
-	 * @return json of valid projections of a given metadataUuid
-	 * @throws Exception
-	 */
-	@GET
-	@Path("v2/order/{referenceNumber}")
-	@Produces(MediaType.APPLICATION_JSON)		
-	public String getOrderInfo(@PathParam("referenceNumber") String referenceNumber) throws Exception {			
-		// FIXME: Complete the method with potential lookups in orderdetail tables in rdbms
-		// JSON structure is {"referenceNumber": , "files": [], "email": "foo@bar.baz", "orderDate": "YYYY-MM-DDThh:mm:ss.ms"}
-		return "{}";		
+    @POST
+    @Path("v2/can-download")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String canDownload(String jsonRequest) throws IOException {
+        log.info("can-download request: " + jsonRequest);
+        /*
+         * Sample JSON HTTP-POST
+         * {"metadataUuid":"73f863ba-628f-48af-b7fa-30d3ab331b8d",
+         * "coordinates":"344754 7272921 404330 7187619 304134 7156477 344754 7272921"
+         * ,"coordinateSystem":"32633"}
+         */
+        CanDownloadRequest req = new Gson().fromJson(jsonRequest, CanDownloadRequest.class);
+
+        ObjectContext ctxt = Config.getObjectContext();
+        Dataset dataset = Dataset.forMetadataUUID(ctxt, req.getMetadataUuid());
+        if (dataset == null) {
+            CanDownloadResponse canDownload = new CanDownloadResponse();
+            canDownload.setCanDownload(false);
+            return new Gson().toJson(canDownload);
+        }
+
+        // FIXME: Parse JSON-string and generate a Polygon object
+        // FIXME: Calculate Polygon area and validate against dataset
+        // configuration.
+        // Possibly even a system default in /etc/geonorge.conf if always
+        // enabled.
+        CanDownloadResponse canDownload = new CanDownloadResponse();
+        canDownload.setCanDownload(false);
+        return new Gson().toJson(canDownload);
+    }
+
+    /**
+     * 
+     * @param metadataUuid
+     * @return json of valid projections of a given metadataUuid
+     * @throws Exception
+     */
+    @GET
+    @Path("v2/order/{referenceNumber}")
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response getOrderInfo(@PathParam("referenceNumber") String referenceNumber) throws IOException {
+        ObjectContext ctxt = Config.getObjectContext();
+        DownloadOrder order = DownloadOrder.get(ctxt, referenceNumber);
+        if (order == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        String json = new Gson().toJson(order.getOrderReceipt());
+        return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
     /**
@@ -226,13 +232,11 @@ public class DownloadService {
         log.info("order request: " + jsonRequest);
         Order order = new Gson().fromJson(jsonRequest, Order.class);
         OrderReceipt orderReceipt = new OrderReceipt();
-        orderReceipt.setReferenceNumber(UUID.randomUUID().toString());
 
         ObjectContext ctxt = Config.getObjectContext();
 
         DownloadOrder downloadOrder = ctxt.newObject(DownloadOrder.class);
         downloadOrder.setEmail(order.getEmail());
-        downloadOrder.setReferenceNumber(orderReceipt.getReferenceNumber());
         downloadOrder.setStartTime(new Date());
 
         for (OrderLine orderLine : order.getOrderLines()) {
@@ -242,13 +246,18 @@ public class DownloadService {
                 orderReceipt.addFile(file);
 
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
-                downloadItem.setSrid(datasetFile.getProjection().getSrid());
+                downloadItem.setProjection(datasetFile.getProjection());
                 downloadItem.setUrl(datasetFile.getUrl());
+                downloadItem.setFileId(datasetFile.getFileId());
+                downloadItem.setFileName(datasetFile.getFileName());
+                downloadItem.setMetadataUuid(datasetFile.getDataset().getMetadataUuid());
                 downloadOrder.addToItems(downloadItem);
             }
         }
 
         ctxt.commitChanges();
+        
+        orderReceipt.setReferenceNumber(downloadOrder.getOrderId().toString());
 
         String json = new Gson().toJson(orderReceipt);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();

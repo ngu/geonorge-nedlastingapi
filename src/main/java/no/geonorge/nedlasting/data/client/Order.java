@@ -8,7 +8,7 @@ public class Order {
 
     private String email;
     private List<OrderLine> orderLines;
-
+    
     public void setEmail(String email) {
         this.email = email;
     }

@@ -16,7 +16,6 @@ import no.geonorge.nedlasting.data.DownloadItem;
 public abstract class _DownloadOrder extends CayenneDataObject {
 
     public static final String EMAIL_PROPERTY = "email";
-    public static final String REFERENCE_NUMBER_PROPERTY = "referenceNumber";
     public static final String START_TIME_PROPERTY = "startTime";
     public static final String ITEMS_PROPERTY = "items";
 
@@ -27,13 +26,6 @@ public abstract class _DownloadOrder extends CayenneDataObject {
     }
     public String getEmail() {
         return (String)readProperty(EMAIL_PROPERTY);
-    }
-
-    public void setReferenceNumber(String referenceNumber) {
-        writeProperty(REFERENCE_NUMBER_PROPERTY, referenceNumber);
-    }
-    public String getReferenceNumber() {
-        return (String)readProperty(REFERENCE_NUMBER_PROPERTY);
     }
 
     public void setStartTime(Date startTime) {

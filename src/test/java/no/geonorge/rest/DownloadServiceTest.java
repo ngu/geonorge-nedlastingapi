@@ -206,6 +206,9 @@ public class DownloadServiceTest extends DbTestCase {
 
         assertEquals(1, orderReceipt.getFiles().size());
 
+        assertEquals(200, ds.getOrderInfo(orderReceipt.getReferenceNumber()).getStatus());
+        assertEquals(404, ds.getOrderInfo(UUID.randomUUID().toString()).getStatus());
+
     }
 
     public void testPutGetDataset() throws IOException {
@@ -239,7 +242,7 @@ public class DownloadServiceTest extends DbTestCase {
         dsf3.setDownloadUrl("http://a/b/c/d");
         dsf3.setProjection("4326");
         ds2.addFile(dsf3);
-        
+
         dls.putDataset(ds.getMetadataUuid(), new Gson().toJson(ds2));
         no.geonorge.nedlasting.data.client.Dataset ds3 = new Gson().fromJson(
                 dls.getDataset(ds.getMetadataUuid()).getEntity().toString(),
@@ -247,7 +250,7 @@ public class DownloadServiceTest extends DbTestCase {
         assertEquals(ds.getMetadataUuid(), ds3.getMetadataUuid());
         assertEquals(ds.getTitle(), ds3.getTitle());
         assertEquals(2, ds3.getFiles().size());
-        
+
         // try to remove a file
         ds3.removeFile(dsf3.getFileId());
         assertEquals(1, ds3.getFiles().size());
@@ -259,12 +262,12 @@ public class DownloadServiceTest extends DbTestCase {
         assertEquals(ds.getMetadataUuid(), ds4.getMetadataUuid());
         assertEquals(ds.getTitle(), ds4.getTitle());
         assertEquals(1, ds4.getFiles().size());
-        
+
         // try to update with null files. handle as ignore, not zero.
         assertFalse(ds4.ignoreFiles());
         ds4.setFiles(null);
         assertTrue(ds4.ignoreFiles());
-        
+
         dls.putDataset(ds.getMetadataUuid(), new Gson().toJson(ds4));
         no.geonorge.nedlasting.data.client.Dataset ds5 = new Gson().fromJson(
                 dls.getDataset(ds.getMetadataUuid()).getEntity().toString(),
