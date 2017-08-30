@@ -68,6 +68,9 @@ public class Dataset extends _Dataset {
         no.geonorge.nedlasting.data.client.Dataset d = new no.geonorge.nedlasting.data.client.Dataset();
         d.setMetadataUuid(getMetadataUuid());
         d.setTitle(getTitle());
+        for (DatasetFile file : getFiles()) {
+            d.addFile(file.forClient());
+        }
         return d;
     }
     

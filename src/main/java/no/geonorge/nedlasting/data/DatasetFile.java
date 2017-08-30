@@ -7,12 +7,14 @@ import java.util.List;
 import org.apache.cayenne.ObjectContext;
 
 import no.geonorge.nedlasting.data.auto._DatasetFile;
+import no.geonorge.nedlasting.data.client.File;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.OrderArea;
 import no.geonorge.nedlasting.data.client.OrderLine;
+import no.geonorge.nedlasting.utils.SHA1;
 
 public class DatasetFile extends _DatasetFile {
-    
+
     public Format getFormat() {
         Format format = new Format();
         format.setName(getFormatName());
@@ -49,6 +51,21 @@ public class DatasetFile extends _DatasetFile {
         String u = getUrl();
         int lp = u.lastIndexOf('/');
         return u.substring(lp + 1);
+    }
+
+    public File forClient() {
+        File file = new File();
+        file.setFileId(SHA1.sha1String(getUrl()));
+        file.setDownloadUrl(getUrl());
+        file.setName(getFileName());
+        file.setMetadataUuid(getDataset().getMetadataUuid());
+        file.setMetadataName(getDataset().getTitle());
+        file.setFormat(getFormatName());
+        file.setProjection(getProjection().getSrid().toString());
+        file.setProjectionName(getProjection().getName());
+        file.setArea(getAreaCode());
+        file.setAreaName(getAreaName());
+        return file;
     }
 
     public static List<DatasetFile> findForOrderLine(ObjectContext ctxt, OrderLine orderLine) {

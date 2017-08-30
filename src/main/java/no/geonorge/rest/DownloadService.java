@@ -235,17 +235,7 @@ public class DownloadService {
 
         for (OrderLine orderLine : order.getOrderLines()) {
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
-                File file = new File();
-                file.setFileId(SHA1.sha1String(datasetFile.getUrl()));
-                file.setDownloadUrl(datasetFile.getUrl());
-                file.setName(datasetFile.getFileName());
-                file.setMetadataUuid(orderLine.getMetadataUuid());
-                file.setMetadataName(datasetFile.getDataset().getTitle());
-                file.setFormat(datasetFile.getFormatName());
-                file.setProjection(datasetFile.getProjection().getSrid().toString());
-                file.setProjectionName(datasetFile.getProjection().getName());
-                file.setArea(datasetFile.getAreaCode());
-                file.setAreaName(datasetFile.getAreaName());
+                File file = datasetFile.forClient();
                 file.setStatus("ReadyForDownload");
                 orderReceipt.addFile(file);
 

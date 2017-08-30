@@ -1,5 +1,6 @@
 package no.geonorge.nedlasting.data.client;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,6 +31,13 @@ public class Dataset {
             return Collections.emptyList();
         }
         return Collections.unmodifiableList(files);
+    }
+
+    public void addFile(File file) {
+        if (files == null) {
+            files = new ArrayList<>();
+        }
+        files.add(file);
     }
 
 }
