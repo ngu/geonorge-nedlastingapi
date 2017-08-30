@@ -16,6 +16,7 @@ public abstract class _DatasetFile extends CayenneDataObject {
     public static final String AREA_CODE_PROPERTY = "areaCode";
     public static final String AREA_NAME_PROPERTY = "areaName";
     public static final String AREA_TYPE_PROPERTY = "areaType";
+    public static final String FILE_ID_PROPERTY = "fileId";
     public static final String FILE_NAME_PROPERTY = "fileName";
     public static final String FORMAT_NAME_PROPERTY = "formatName";
     public static final String FORMAT_VERSION_PROPERTY = "formatVersion";
@@ -24,7 +25,7 @@ public abstract class _DatasetFile extends CayenneDataObject {
     public static final String PROJECTION_PROPERTY = "projection";
 
     public static final String DATASET_ID_PK_COLUMN = "DATASET_ID";
-    public static final String URL_PK_COLUMN = "URL";
+    public static final String FILE_ID_PK_COLUMN = "FILE_ID";
 
     public void setAreaCode(String areaCode) {
         writeProperty(AREA_CODE_PROPERTY, areaCode);
@@ -45,6 +46,13 @@ public abstract class _DatasetFile extends CayenneDataObject {
     }
     public String getAreaType() {
         return (String)readProperty(AREA_TYPE_PROPERTY);
+    }
+
+    public void setFileId(String fileId) {
+        writeProperty(FILE_ID_PROPERTY, fileId);
+    }
+    public String getFileId() {
+        return (String)readProperty(FILE_ID_PROPERTY);
     }
 
     public void setFileName(String fileName) {

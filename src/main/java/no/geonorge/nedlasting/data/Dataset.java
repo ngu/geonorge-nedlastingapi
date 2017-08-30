@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.cayenne.Cayenne;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
@@ -17,12 +18,15 @@ import org.apache.cayenne.query.SelectQuery;
 import no.geonorge.nedlasting.data.auto._Dataset;
 import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.nedlasting.data.client.Capabilities;
-import no.geonorge.nedlasting.data.client.DatasetView;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Link;
 import no.geonorge.nedlasting.data.client.Projection;
 
 public class Dataset extends _Dataset {
+
+    public Integer getDatasetId() {
+        return Cayenne.intPKForObject(this);
+    }
 
     public static List<Dataset> getAll(ObjectContext ctxt) {
         SelectQuery query = new SelectQuery(Dataset.class);
@@ -73,14 +77,13 @@ public class Dataset extends _Dataset {
         }
         return d;
     }
-    
-    public DatasetView forClientView() {
-        DatasetView d = new DatasetView();
+
+    public no.geonorge.nedlasting.data.client.Dataset forClientWithoutFiles() {
+        no.geonorge.nedlasting.data.client.Dataset d = new no.geonorge.nedlasting.data.client.Dataset();
         d.setMetadataUuid(getMetadataUuid());
         d.setTitle(getTitle());
         return d;
     }
-
 
     public Collection<Format> getFormats() {
         Set<Format> formatTypes = new HashSet<>();
@@ -116,6 +119,32 @@ public class Dataset extends _Dataset {
 
         List<Area> areas = new ArrayList<>(areaTypeByAreaKey.values());
         return Collections.unmodifiableList(areas);
+    }
+
+    public DatasetFile getFile(String fileId) {
+        if (fileId == null) {
+            return null;
+        }
+        if (getObjectId().isTemporary()) {
+            for (DatasetFile file : getFiles()) {
+                if (fileId.equals(file.getFileId())) {
+                    return file;
+                }
+            }
+            return null;
+        }
+        Map<String, Object> pk = new HashMap<>(2);
+        pk.put(DatasetFile.DATASET_ID_PK_COLUMN, getDatasetId());
+        pk.put(DatasetFile.FILE_ID_PK_COLUMN, fileId);
+        return Cayenne.objectForPK(getObjectContext(), DatasetFile.class, pk);
+    }
+    
+    public Set<String> getFileIds() {
+        Set<String> fileIds = new HashSet<>();
+        for (DatasetFile file : getFiles()) {
+            fileIds.add(file.getFileId());
+        }
+        return Collections.unmodifiableSet(fileIds);
     }
 
 }

@@ -20,6 +20,7 @@ import no.geonorge.nedlasting.data.Dataset;
 import no.geonorge.nedlasting.data.DatasetFile;
 import no.geonorge.nedlasting.data.Projection;
 import no.geonorge.nedlasting.data.client.Area;
+import no.geonorge.nedlasting.data.client.File;
 import no.geonorge.nedlasting.data.client.Order;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.OrderReceipt;
@@ -204,6 +205,73 @@ public class DownloadServiceTest extends DbTestCase {
         assertNotNull(orderReceipt);
 
         assertEquals(1, orderReceipt.getFiles().size());
+
+    }
+
+    public void testPutGetDataset() throws IOException {
+        no.geonorge.nedlasting.data.client.Dataset ds = new no.geonorge.nedlasting.data.client.Dataset();
+        ds.setMetadataUuid(UUID.randomUUID().toString());
+        ds.setTitle("hello " + System.currentTimeMillis());
+
+        File dsf = new File();
+        dsf.setFileId("1");
+        dsf.setDownloadUrl("http://a/b/c");
+        dsf.setProjection("4326");
+        ds.addFile(dsf);
+
+        DownloadService dls = new DownloadService();
+        dls.putDataset(ds.getMetadataUuid(), new Gson().toJson(ds));
+
+        no.geonorge.nedlasting.data.client.Dataset ds2 = new Gson().fromJson(
+                dls.getDataset(ds.getMetadataUuid()).getEntity().toString(),
+                no.geonorge.nedlasting.data.client.Dataset.class);
+        assertEquals(ds.getMetadataUuid(), ds2.getMetadataUuid());
+        assertEquals(ds.getTitle(), ds2.getTitle());
+        assertEquals(1, ds2.getFiles().size());
+
+        File dsf2 = ds2.getFiles().get(0);
+        assertEquals(dsf.getFileId(), dsf2.getFileId());
+        assertEquals(dsf.getDownloadUrl(), dsf2.getDownloadUrl());
+
+        // try to add a file
+        File dsf3 = new File();
+        dsf3.setFileId("11");
+        dsf3.setDownloadUrl("http://a/b/c/d");
+        dsf3.setProjection("4326");
+        ds2.addFile(dsf3);
+        
+        dls.putDataset(ds.getMetadataUuid(), new Gson().toJson(ds2));
+        no.geonorge.nedlasting.data.client.Dataset ds3 = new Gson().fromJson(
+                dls.getDataset(ds.getMetadataUuid()).getEntity().toString(),
+                no.geonorge.nedlasting.data.client.Dataset.class);
+        assertEquals(ds.getMetadataUuid(), ds3.getMetadataUuid());
+        assertEquals(ds.getTitle(), ds3.getTitle());
+        assertEquals(2, ds3.getFiles().size());
+        
+        // try to remove a file
+        ds3.removeFile(dsf3.getFileId());
+        assertEquals(1, ds3.getFiles().size());
+
+        dls.putDataset(ds.getMetadataUuid(), new Gson().toJson(ds3));
+        no.geonorge.nedlasting.data.client.Dataset ds4 = new Gson().fromJson(
+                dls.getDataset(ds.getMetadataUuid()).getEntity().toString(),
+                no.geonorge.nedlasting.data.client.Dataset.class);
+        assertEquals(ds.getMetadataUuid(), ds4.getMetadataUuid());
+        assertEquals(ds.getTitle(), ds4.getTitle());
+        assertEquals(1, ds4.getFiles().size());
+        
+        // try to update with null files. handle as ignore, not zero.
+        assertFalse(ds4.ignoreFiles());
+        ds4.setFiles(null);
+        assertTrue(ds4.ignoreFiles());
+        
+        dls.putDataset(ds.getMetadataUuid(), new Gson().toJson(ds4));
+        no.geonorge.nedlasting.data.client.Dataset ds5 = new Gson().fromJson(
+                dls.getDataset(ds.getMetadataUuid()).getEntity().toString(),
+                no.geonorge.nedlasting.data.client.Dataset.class);
+        assertEquals(ds.getMetadataUuid(), ds5.getMetadataUuid());
+        assertEquals(ds.getTitle(), ds5.getTitle());
+        assertEquals(1, ds5.getFiles().size());
 
     }
 

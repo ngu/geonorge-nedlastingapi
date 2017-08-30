@@ -11,7 +11,6 @@ import no.geonorge.nedlasting.data.client.File;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.OrderArea;
 import no.geonorge.nedlasting.data.client.OrderLine;
-import no.geonorge.nedlasting.utils.SHA1;
 
 public class DatasetFile extends _DatasetFile {
 
@@ -55,7 +54,7 @@ public class DatasetFile extends _DatasetFile {
 
     public File forClient() {
         File file = new File();
-        file.setFileId(SHA1.sha1String(getUrl()));
+        file.setFileId(getFileId());
         file.setDownloadUrl(getUrl());
         file.setName(getFileName());
         file.setMetadataUuid(getDataset().getMetadataUuid());

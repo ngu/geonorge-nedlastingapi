@@ -4,13 +4,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -31,14 +35,12 @@ import no.geonorge.nedlasting.data.DownloadItem;
 import no.geonorge.nedlasting.data.DownloadOrder;
 import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.nedlasting.data.client.Capabilities;
-import no.geonorge.nedlasting.data.client.DatasetView;
 import no.geonorge.nedlasting.data.client.File;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Order;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.OrderReceipt;
 import no.geonorge.nedlasting.data.client.Projection;
-import no.geonorge.nedlasting.utils.SHA1;
 import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.CanDownloadResponseType;
 
 
@@ -257,9 +259,9 @@ public class DownloadService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDatasets() {
         ObjectContext ctxt = Config.getObjectContext();
-        List<DatasetView> datasetViews = new ArrayList<>();
+        List<no.geonorge.nedlasting.data.client.Dataset> datasetViews = new ArrayList<>();
         for (Dataset dataset : Dataset.getAll(ctxt)) {
-            datasetViews.add(dataset.forClientView());
+            datasetViews.add(dataset.forClientWithoutFiles());
         }
         String json = new Gson().toJson(datasetViews);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
@@ -276,6 +278,70 @@ public class DownloadService {
         }
         String json = new Gson().toJson(dataset.forClient());
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
+    }
+    
+    @PUT
+    @Path("internal/dataset/{metadataUuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void putDataset(@PathParam("metadataUuid") String metadataUuid, String jsonRequest) {
+        ObjectContext ctxt = Config.getObjectContext();
+        Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
+        if (dataset == null) {
+            dataset = ctxt.newObject(Dataset.class);
+            dataset.setMetadataUuid(metadataUuid);
+        }
+
+        no.geonorge.nedlasting.data.client.Dataset requestDataset = new Gson().fromJson(jsonRequest,
+                no.geonorge.nedlasting.data.client.Dataset.class);
+        dataset.setTitle(requestDataset.getTitle());
+
+        if (!requestDataset.ignoreFiles()) {
+            Set<String> restFileIds = new HashSet<>(dataset.getFileIds());
+            for (File file : requestDataset.getFiles()) {
+                restFileIds.remove(file.getFileId());
+                DatasetFile datasetFile = dataset.getFile(file.getFileId());
+                if (datasetFile == null) {
+                    datasetFile = ctxt.newObject(DatasetFile.class);
+                    datasetFile.setFileId(file.getFileId());
+                    dataset.addToFiles(datasetFile);
+                }
+                datasetFile.setUrl(file.getDownloadUrl());
+                datasetFile.setAreaCode(file.getArea());
+                datasetFile.setAreaName(file.getAreaName());
+                datasetFile.setProjection(no.geonorge.nedlasting.data.Projection.getForSrid(ctxt,
+                        Integer.parseInt(file.getProjection())));
+                datasetFile.setFormatName(file.getFormat());
+                datasetFile.setFileName(file.getName());
+            }
+            for (String fileId : restFileIds) {
+                DatasetFile file = dataset.getFile(fileId);
+                if (file != null) {
+                    ctxt.deleteObject(file);
+                }
+            }
+        }
+
+        ctxt.commitChanges();
+    }
+
+    @POST
+    @Path("internal/dataset/{metadataUuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void postDataset(@PathParam("metadataUuid") String metadataUuid, String jsonRequest) {
+        putDataset(metadataUuid, jsonRequest);
+    }
+
+    @DELETE
+    @Path("internal/dataset/{metadataUuid}")
+    public Response deleteDataset(@PathParam("metadataUuid") String metadataUuid) {
+        ObjectContext ctxt = Config.getObjectContext();
+        Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
+        if (dataset == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        ctxt.deleteObject(dataset);
+        ctxt.commitChanges();
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
     
 }
