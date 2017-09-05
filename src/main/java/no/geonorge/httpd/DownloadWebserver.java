@@ -10,10 +10,12 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
+import org.eclipse.jetty.util.resource.Resource;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -49,6 +51,10 @@ public class DownloadWebserver {
         ServletHolder publicRestApiServlet = new ServletHolder(new ServletContainer(pconfig));
         publicRestApiServlet.setInitOrder(1);
         context.addServlet(publicRestApiServlet, "/*");
+        
+        context.setBaseResource(Resource.newClassPathResource("/webroot"));
+        context.addServlet(DefaultServlet.class, "/api/docs/*");
+        
         HttpConfiguration config = new HttpConfiguration();
         config.addCustomizer(new ForwardedRequestCustomizer());
         HttpConnectionFactory http = new HttpConnectionFactory(config);
