@@ -294,6 +294,7 @@ public class DownloadService {
     @Path("internal/dataset/{metadataUuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     public void putDataset(@PathParam("metadataUuid") String metadataUuid, String jsonRequest) {
+        System.out.println("DEBUG: putDataset: " + metadataUuid + " " + jsonRequest);
         try {
             ObjectContext ctxt = Config.getObjectContext();
             Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
