@@ -7,7 +7,7 @@ insert into projection (srid, codespace, name) values (32632, 'http://www.opengi
 insert into api_user (username, password_sha512) values ('admin', 'bbb5e8484f4cfbb67ab1b6ec026ebe433091436fe6135955e5e9796f2f6c6f5fad16f528aa20edf0e3dadf217480a94c4fc571cd5c5695cf2393eea714384026');
 -- or use pgcrypto
 CREATE EXTENSION pgcrypto;
-insert into api_user values ('minbruker', encode(digest('mittpassord','sha512'),'hex'));
+insert into api_user (username, password_sha512) values ('minbruker', encode(digest('mittpassord','sha512'),'hex'));
 
 -- http://kartkatalog.test.geonorge.no/metadata/norges-geologiske-undersokelse/test-sky-nedlasting-api/18777cf4-1f06-4cb0-803d-d6382b76681f
 insert into dataset 
