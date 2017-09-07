@@ -294,50 +294,44 @@ public class DownloadService {
     @Path("internal/dataset/{metadataUuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     public void putDataset(@PathParam("metadataUuid") String metadataUuid, String jsonRequest) {
-        System.out.println("DEBUG: putDataset: " + metadataUuid + " " + jsonRequest);
-        try {
-            ObjectContext ctxt = Config.getObjectContext();
-            Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
-            if (dataset == null) {
-                dataset = ctxt.newObject(Dataset.class);
-                dataset.setMetadataUuid(metadataUuid);
-            }
-
-            no.geonorge.nedlasting.data.client.Dataset requestDataset = new Gson().fromJson(jsonRequest,
-                    no.geonorge.nedlasting.data.client.Dataset.class);
-            dataset.setTitle(requestDataset.getTitle());
-
-            if (!requestDataset.ignoreFiles()) {
-                Set<String> restFileIds = new HashSet<>(dataset.getFileIds());
-                for (File file : requestDataset.getFiles()) {
-                    restFileIds.remove(file.getFileId());
-                    DatasetFile datasetFile = dataset.getFile(file.getFileId());
-                    if (datasetFile == null) {
-                        datasetFile = ctxt.newObject(DatasetFile.class);
-                        datasetFile.setFileId(file.getFileId());
-                        dataset.addToFiles(datasetFile);
-                    }
-                    datasetFile.setUrl(file.getDownloadUrl());
-                    datasetFile.setAreaCode(file.getArea());
-                    datasetFile.setAreaName(file.getAreaName());
-                    datasetFile.setProjection(no.geonorge.nedlasting.data.Projection.getForSrid(ctxt,
-                            Integer.parseInt(file.getProjection())));
-                    datasetFile.setFormatName(file.getFormat());
-                    datasetFile.setFileName(file.getName());
-                }
-                for (String fileId : restFileIds) {
-                    DatasetFile file = dataset.getFile(fileId);
-                    if (file != null) {
-                        ctxt.deleteObject(file);
-                    }
-                }
-            }
-
-            ctxt.commitChanges();
-        } catch (RuntimeException e) {
-            log.log(Level.INFO, "failed to put dataset. " + jsonRequest, e);
-            throw e;
+        ObjectContext ctxt = Config.getObjectContext();
+        Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
+        if (dataset == null) {
+            dataset = ctxt.newObject(Dataset.class);
+            dataset.setMetadataUuid(metadataUuid);
         }
+
+        no.geonorge.nedlasting.data.client.Dataset requestDataset = new Gson().fromJson(jsonRequest,
+                no.geonorge.nedlasting.data.client.Dataset.class);
+        dataset.setTitle(requestDataset.getTitle());
+
+        if (!requestDataset.ignoreFiles()) {
+            Set<String> restFileIds = new HashSet<>(dataset.getFileIds());
+            for (File file : requestDataset.getFiles()) {
+                restFileIds.remove(file.getFileId());
+                DatasetFile datasetFile = dataset.getFile(file.getFileId());
+                if (datasetFile == null) {
+                    datasetFile = ctxt.newObject(DatasetFile.class);
+                    datasetFile.setFileId(file.getFileId());
+                    dataset.addToFiles(datasetFile);
+                }
+                datasetFile.setUrl(file.getDownloadUrl());
+                datasetFile.setAreaCode(file.getArea());
+                datasetFile.setAreaName(file.getAreaName());
+                datasetFile.setProjection(no.geonorge.nedlasting.data.Projection.getForSrid(ctxt,
+                        Integer.parseInt(file.getProjection())));
+                datasetFile.setFormatName(file.getFormat());
+                datasetFile.setFileName(file.getName());
+            }
+            for (String fileId : restFileIds) {
+                DatasetFile file = dataset.getFile(fileId);
+                if (file != null) {
+                    ctxt.deleteObject(file);
+                }
+            }
+        }
+
+        ctxt.commitChanges();
     }
 
     @POST
