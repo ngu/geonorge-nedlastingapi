@@ -102,7 +102,18 @@ $ curl --user username:password http://127.0.0.1:10000/api/internal/dataset/6aba
 }
 $ curl --user username:password -X DELETE http://127.0.0.1:10000/api/internal/dataset/6aba5993-94bd-48f9-91d4-3a5f4ba7d9a7
 </pre>
-        
+
+<script>
+    var isDefaultPort = (window.location.protocol == 'https:' && window.location.port == 443) || (window.location.protocol == 'http:' && window.location.port == 80);
+    var urlPrefix = window.location.protocol + '//' + window.location.hostname + (isDefaultPort ? '' : (':'+window.location.port)) + '/api';
+    console.log('url prefix: ' + urlPrefix);
+    
+    var elements = document.getElementsByTagName('pre');
+    for (var i=0; i<elements.length; i++) {
+        var pre = elements[i];
+        pre.innerHTML = pre.innerHTML.replace(/http:\/\/127.0.0.1:10000\/api/g, urlPrefix);
+    }
+</script>
     
     </body>
 </html>
