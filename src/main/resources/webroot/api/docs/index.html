@@ -104,7 +104,7 @@ $ curl --user username:password -X DELETE http://127.0.0.1:10000/api/internal/da
 </pre>
 
 <script>
-    var isDefaultPort = (window.location.protocol == 'https:' && window.location.port == 443) || (window.location.protocol == 'http:' && window.location.port == 80);
+    var isDefaultPort = !port || port == '' || ((window.location.protocol == 'https:' && window.location.port == 443) || (window.location.protocol == 'http:' && window.location.port == 80));
     var urlPrefix = window.location.protocol + '//' + window.location.hostname + (isDefaultPort ? '' : (':'+window.location.port)) + '/api';
     console.log('url prefix: ' + urlPrefix);
     
