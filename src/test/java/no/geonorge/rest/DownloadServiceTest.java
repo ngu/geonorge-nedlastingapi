@@ -21,11 +21,10 @@ import no.geonorge.nedlasting.data.DatasetFile;
 import no.geonorge.nedlasting.data.Projection;
 import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.nedlasting.data.client.File;
+import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Order;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.OrderReceipt;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.FormatType;
-import no.geonorge.skjema.sosi.tjenestespesifikasjon.nedlastingapi._2.ProjectionType;
 
 public class DownloadServiceTest extends DbTestCase {
 
@@ -61,12 +60,12 @@ public class DownloadServiceTest extends DbTestCase {
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnFormats(uuid).getStatus());
 
-        Type type = new TypeToken<List<FormatType>>() {
+        Type type = new TypeToken<List<Format>>() {
         }.getType();
-        List<FormatType> formats = new Gson().fromJson(ds.returnFormats(uuid).getEntity().toString(), type);
+        List<Format> formats = new Gson().fromJson(ds.returnFormats(uuid).getEntity().toString(), type);
         assertNotNull(formats);
         assertEquals(1, formats.size());
-        FormatType format = formats.get(0);
+        Format format = formats.get(0);
         assertEquals("SOSI", format.getName());
     }
 
@@ -88,12 +87,13 @@ public class DownloadServiceTest extends DbTestCase {
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnProjections(uuid).getStatus());
 
-        Type type = new TypeToken<List<ProjectionType>>() {
+        Type type = new TypeToken<List<no.geonorge.nedlasting.data.client.Projection>>() {
         }.getType();
-        List<ProjectionType> projections = new Gson().fromJson(ds.returnProjections(uuid).getEntity().toString(), type);
+        List<no.geonorge.nedlasting.data.client.Projection> projections = new Gson()
+                .fromJson(ds.returnProjections(uuid).getEntity().toString(), type);
         assertNotNull(projections);
         assertEquals(1, projections.size());
-        ProjectionType projection = projections.get(0);
+        no.geonorge.nedlasting.data.client.Projection projection = projections.get(0);
         assertEquals("4326", projection.getCode());
     }
 
