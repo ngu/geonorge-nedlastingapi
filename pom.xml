@@ -19,7 +19,6 @@
       <jerseyframework.version>2.7</jerseyframework.version>
       <jetty.version>9.3.9.v20160517</jetty.version>      
       <jackson.version>2.8.5</jackson.version>
-      <spring.version>3.2.0.RELEASE</spring.version>
   </properties>
 
   <dependencies>    
@@ -96,21 +95,6 @@
         <version>${jetty.version}</version>
     </dependency>
     <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-core</artifactId>
-        <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context</artifactId>
-        <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
-        <version>${spring.version}</version>
-    </dependency>
-    <dependency>
         <groupId>org.apache.cayenne</groupId>
         <artifactId>cayenne-server</artifactId>
         <version>3.1.1</version>
@@ -140,18 +124,6 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.12</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-jndi</artifactId>
-        <version>${jetty.version}</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-plus</artifactId>
-        <version>${jetty.version}</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -188,29 +160,8 @@
                     <include>**/*TestCase.java</include>
                     <include>**/*Tester.java</include>
                 </includes>
-                <excludes>
-                    <exclude>**/*Integration*.java</exclude>
-                </excludes>
             </configuration>
-
         </plugin>
-        <plugin>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-maven-plugin</artifactId>
-            <version>${jetty.version}</version>
-            <configuration>
-                <scanIntervalSeconds>10</scanIntervalSeconds>
-                <!-- Override contextpath. Default is /
-                <webApp>
-                    <contextPath>/api</contextPath>
-                </webApp>
-                -->
-                <httpConnector>
-                    <port>8000</port>
-                </httpConnector>
-            </configuration>
-      </plugin>
-      
       <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -249,29 +200,6 @@
                     </execution>
                 </executions>
             </plugin>
-        <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>2.2</version>
-                <executions>
-                    <execution>
-                        <id>xjc</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <xjbSources>
-                        <xjbSource>src/main/resources/nedlastingapiv2.xjb</xjbSource>
-                    </xjbSources>
-                    <sources>
-                        <source>src/main/resources/nedlastingapiv2.xsd</source>
-                        <source>src/main/resources/rest.xsd</source>
-                    </sources>
-                </configuration>
-            </plugin>
-      
     </plugins>
     </build>
 </project>
