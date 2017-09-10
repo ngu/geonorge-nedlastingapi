@@ -28,6 +28,7 @@ import org.apache.cayenne.merge.ExecutingMergerContext;
 import org.apache.cayenne.merge.MergerToken;
 import org.apache.commons.dbcp2.BasicDataSource;
 
+import no.geonorge.nedlasting.data.upgrade.DbUpgrade;
 import no.geonorge.nedlasting.utils.IOUtils;
 
 public class Config implements DataSourceFactory {
@@ -145,6 +146,8 @@ public class Config implements DataSourceFactory {
         for (AbstractToDbToken token : toDbTokens) {
             token.execute(mc);
         }
+        
+        DbUpgrade.upgrade();
 
         log.info("inited geonorge download..");
     }
