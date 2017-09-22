@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -27,6 +26,7 @@ import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.query.SelectQuery;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.Dataset;
@@ -62,6 +62,24 @@ public class DownloadService {
         }
         return uri.getBaseUri().toString() + "api/";
     }
+    
+    private boolean isPretty() {
+        if (uri == null) {
+            return false;
+        }
+        if (!uri.getQueryParameters().containsKey("pretty")) {
+            return false;
+        }
+        return !uri.getQueryParameters().getFirst("pretty").equalsIgnoreCase(Boolean.FALSE.toString());
+    }
+    
+    private Gson gson() {
+        GsonBuilder b = new GsonBuilder();
+        if (isPretty()) {
+            b = b.setPrettyPrinting();
+        }
+        return b.create();
+    }
 
     @GET
     @Path("status")
@@ -89,7 +107,7 @@ public class DownloadService {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         Capabilities ct = dataset.getCapabilities(getUrlPrefix());
-        String json = new Gson().toJson(ct);
+        String json = gson().toJson(ct);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 	
@@ -113,7 +131,7 @@ public class DownloadService {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         Collection<Format> formats = dataset.getFormats();
-        Gson gson = new Gson();
+        Gson gson = gson();
         String json = gson.toJson(formats);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
@@ -139,7 +157,7 @@ public class DownloadService {
         }
 
         List<Area> areas = dataset.getAreas();
-        String json = new Gson().toJson(areas);
+        String json = gson().toJson(areas);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 
@@ -163,7 +181,7 @@ public class DownloadService {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         Collection<Projection> projections = dataset.getProjections();
-        String json = new Gson().toJson(projections);
+        String json = gson().toJson(projections);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 	
@@ -179,14 +197,14 @@ public class DownloadService {
          * "coordinates":"344754 7272921 404330 7187619 304134 7156477 344754 7272921"
          * ,"coordinateSystem":"32633"}
          */
-        CanDownloadRequest req = new Gson().fromJson(jsonRequest, CanDownloadRequest.class);
+        CanDownloadRequest req = gson().fromJson(jsonRequest, CanDownloadRequest.class);
 
         ObjectContext ctxt = Config.getObjectContext();
         Dataset dataset = Dataset.forMetadataUUID(ctxt, req.getMetadataUuid());
         if (dataset == null) {
             CanDownloadResponse canDownload = new CanDownloadResponse();
             canDownload.setCanDownload(false);
-            return new Gson().toJson(canDownload);
+            return gson().toJson(canDownload);
         }
 
         // FIXME: Parse JSON-string and generate a Polygon object
@@ -196,7 +214,7 @@ public class DownloadService {
         // enabled.
         CanDownloadResponse canDownload = new CanDownloadResponse();
         canDownload.setCanDownload(false);
-        return new Gson().toJson(canDownload);
+        return gson().toJson(canDownload);
     }
 
     /**
@@ -214,7 +232,7 @@ public class DownloadService {
         if (order == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        String json = new Gson().toJson(order.getOrderReceipt());
+        String json = gson().toJson(order.getOrderReceipt());
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
@@ -231,7 +249,7 @@ public class DownloadService {
     public Response orderDownload(String jsonRequest) throws IOException {
         /* https://nedlasting.geonorge.no/Help/Api/POST-api-v2-order */
         log.info("order request: " + jsonRequest);
-        Order order = new Gson().fromJson(jsonRequest, Order.class);
+        Order order = gson().fromJson(jsonRequest, Order.class);
         OrderReceipt orderReceipt = new OrderReceipt();
 
         ObjectContext ctxt = Config.getObjectContext();
@@ -260,7 +278,7 @@ public class DownloadService {
         
         orderReceipt.setReferenceNumber(downloadOrder.getOrderId().toString());
 
-        String json = new Gson().toJson(orderReceipt);
+        String json = gson().toJson(orderReceipt);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 
@@ -273,7 +291,7 @@ public class DownloadService {
         for (Dataset dataset : Dataset.getAll(ctxt)) {
             datasetViews.add(dataset.forClientWithoutFiles());
         }
-        String json = new Gson().toJson(datasetViews);
+        String json = gson().toJson(datasetViews);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 
@@ -286,7 +304,7 @@ public class DownloadService {
         if (dataset == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        String json = new Gson().toJson(dataset.forClient());
+        String json = gson().toJson(dataset.forClient());
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
     
@@ -301,7 +319,7 @@ public class DownloadService {
             dataset.setMetadataUuid(metadataUuid);
         }
 
-        no.geonorge.nedlasting.data.client.Dataset requestDataset = new Gson().fromJson(jsonRequest,
+        no.geonorge.nedlasting.data.client.Dataset requestDataset = gson().fromJson(jsonRequest,
                 no.geonorge.nedlasting.data.client.Dataset.class);
         dataset.setTitle(requestDataset.getTitle());
 
