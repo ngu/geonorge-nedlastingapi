@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.cayenne.CayenneDataObject;
 
+import no.geonorge.nedlasting.data.DatasetExternalParameter;
 import no.geonorge.nedlasting.data.DatasetFile;
 
 /**
@@ -24,6 +25,7 @@ public abstract class _Dataset extends CayenneDataObject {
     public static final String SUPPORTS_POLYGON_SELECTION_PROPERTY = "supportsPolygonSelection";
     public static final String SUPPORTS_PROJECTION_SELECTION_PROPERTY = "supportsProjectionSelection";
     public static final String TITLE_PROPERTY = "title";
+    public static final String EXTERNAL_PARAMETERS_PROPERTY = "externalParameters";
     public static final String FILES_PROPERTY = "files";
 
     public static final String DATASET_ID_PK_COLUMN = "DATASET_ID";
@@ -101,6 +103,18 @@ public abstract class _Dataset extends CayenneDataObject {
     public String getTitle() {
         return (String)readProperty(TITLE_PROPERTY);
     }
+
+    public void addToExternalParameters(DatasetExternalParameter obj) {
+        addToManyTarget(EXTERNAL_PARAMETERS_PROPERTY, obj, true);
+    }
+    public void removeFromExternalParameters(DatasetExternalParameter obj) {
+        removeToManyTarget(EXTERNAL_PARAMETERS_PROPERTY, obj, true);
+    }
+    @SuppressWarnings("unchecked")
+    public List<DatasetExternalParameter> getExternalParameters() {
+        return (List<DatasetExternalParameter>)readProperty(EXTERNAL_PARAMETERS_PROPERTY);
+    }
+
 
     public void addToFiles(DatasetFile obj) {
         addToManyTarget(FILES_PROPERTY, obj, true);

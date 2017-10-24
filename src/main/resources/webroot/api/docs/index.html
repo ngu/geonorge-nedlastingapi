@@ -54,7 +54,7 @@
         
         <p>
             
-<h3>Example</h3>
+<h3>Example with static file</h3>
     
     <p>
         The example below show how to store, fetch and delete a dataset using the Internal Dataset API.
@@ -101,6 +101,29 @@ $ curl --user username:password http://127.0.0.1:10000/api/internal/dataset/6aba
     ]
 }
 $ curl --user username:password -X DELETE http://127.0.0.1:10000/api/internal/dataset/6aba5993-94bd-48f9-91d4-3a5f4ba7d9a7
+</pre>
+
+<h3>Example with async FME task</h3>
+    
+    <p>
+        The example below show how to store, fetch and delete a dataset using the Internal Dataset API.
+    </p>
+                
+<pre>
+$ cat new_external_dataset.json 
+{
+    "metadataUuid": "77ba5993-94bd-48f9-91d4-3a5f4ba7d9b8",
+    "title": "A title",
+    "external": {
+        "type": "ngufme",
+        "urlPrefix": "http://download.ngu.no",
+        "username": "xxx",
+        "password": "yyy",
+        "repository": "Datanedlasting",
+        "workspace": "GrunnvannBorehull_Nedlasting.fmw"
+    }
+}
+$ curl --user username:password -X POST -H "Content-Type: application/json" -d @new_external_dataset.json http://127.0.0.1:10000/api/internal/dataset/6aba5993-94bd-48f9-91d4-3a5f4ba7d9a7
 </pre>
 
 <script>

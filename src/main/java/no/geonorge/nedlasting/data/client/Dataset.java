@@ -2,14 +2,18 @@ package no.geonorge.nedlasting.data.client;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class Dataset {
 
     private String metadataUuid;
     private String title;
     private List<File> files;
+
+    private Map<String, String> external;
 
     public String getMetadataUuid() {
         return metadataUuid;
@@ -62,6 +66,32 @@ public class Dataset {
                 it.remove();
             }
         }
+    }
+
+    public boolean isExternal() {
+        return external != null && !external.isEmpty();
+    }
+
+    public Map<String, String> getExternalParameters() {
+        if (external == null) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(external);
+    }
+
+    public void setExternalParameters(Map<String, String> parameters) {
+        if (parameters == null) {
+            this.external = null;
+            return;
+        }
+        this.external = new HashMap<>(parameters);
+    }
+    
+    public void setExternalParameter(String key, String value) {
+        if (external == null) {
+            external = new HashMap<>();
+        }
+        external.put(key, value);
     }
 
 }

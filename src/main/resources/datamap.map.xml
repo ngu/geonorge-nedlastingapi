@@ -21,6 +21,11 @@
 		<db-attribute name="SUPPORTS_PROJECTION_SELECTION" type="BOOLEAN"/>
 		<db-attribute name="TITLE" type="VARCHAR" length="1024"/>
 	</db-entity>
+	<db-entity name="DATASET_EXTERNAL_PARAMETER">
+		<db-attribute name="DATASET_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="KEY" type="VARCHAR" isPrimaryKey="true" isMandatory="true" length="1024"/>
+		<db-attribute name="VALUE" type="VARCHAR" isMandatory="true" length="1024"/>
+	</db-entity>
 	<db-entity name="DATASET_FILE">
 		<db-attribute name="AREA_CODE" type="VARCHAR" length="32"/>
 		<db-attribute name="AREA_NAME" type="VARCHAR" length="1024"/>
@@ -64,6 +69,10 @@
 		<obj-attribute name="supportsProjectionSelection" type="boolean" db-attribute-path="SUPPORTS_PROJECTION_SELECTION"/>
 		<obj-attribute name="title" type="java.lang.String" db-attribute-path="TITLE"/>
 	</obj-entity>
+	<obj-entity name="DatasetExternalParameter" className="no.geonorge.nedlasting.data.DatasetExternalParameter" dbEntityName="DATASET_EXTERNAL_PARAMETER">
+		<obj-attribute name="key" type="java.lang.String" db-attribute-path="KEY"/>
+		<obj-attribute name="value" type="java.lang.String" db-attribute-path="VALUE"/>
+	</obj-entity>
 	<obj-entity name="DatasetFile" className="no.geonorge.nedlasting.data.DatasetFile" dbEntityName="DATASET_FILE">
 		<obj-attribute name="areaCode" type="java.lang.String" db-attribute-path="AREA_CODE"/>
 		<obj-attribute name="areaName" type="java.lang.String" db-attribute-path="AREA_NAME"/>
@@ -93,7 +102,13 @@
 		<obj-attribute name="passwordSha512" type="java.lang.String" db-attribute-path="PASSWORD_SHA512"/>
 		<obj-attribute name="username" type="java.lang.String" db-attribute-path="USERNAME"/>
 	</obj-entity>
+	<db-relationship name="to_dataset_external_parameter" source="DATASET" target="DATASET_EXTERNAL_PARAMETER" toDependentPK="true" toMany="true">
+		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
+	</db-relationship>
 	<db-relationship name="to_dataset_file" source="DATASET" target="DATASET_FILE" toDependentPK="true" toMany="true">
+		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
+	</db-relationship>
+	<db-relationship name="to_dataset" source="DATASET_EXTERNAL_PARAMETER" target="DATASET" toMany="false">
 		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
 	</db-relationship>
 	<db-relationship name="toProjection" source="DATASET_FILE" target="PROJECTION" toMany="false">
@@ -117,7 +132,9 @@
 	<db-relationship name="toFile" source="PROJECTION" target="DATASET_FILE" toMany="true">
 		<db-attribute-pair source="SRID" target="SRID"/>
 	</db-relationship>
+	<obj-relationship name="externalParameters" source="Dataset" target="DatasetExternalParameter" deleteRule="Cascade" db-relationship-path="to_dataset_external_parameter"/>
 	<obj-relationship name="files" source="Dataset" target="DatasetFile" deleteRule="Cascade" db-relationship-path="to_dataset_file"/>
+	<obj-relationship name="dataset" source="DatasetExternalParameter" target="Dataset" deleteRule="Nullify" db-relationship-path="to_dataset"/>
 	<obj-relationship name="dataset" source="DatasetFile" target="Dataset" deleteRule="Nullify" db-relationship-path="to_dataset"/>
 	<obj-relationship name="projection" source="DatasetFile" target="Projection" deleteRule="Nullify" db-relationship-path="toProjection"/>
 	<obj-relationship name="order" source="DownloadItem" target="DownloadOrder" deleteRule="Deny" db-relationship-path="toOrder"/>

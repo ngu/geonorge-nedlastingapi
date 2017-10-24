@@ -3,6 +3,7 @@ package no.geonorge.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +44,7 @@ import no.geonorge.nedlasting.data.client.Order;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.OrderReceipt;
 import no.geonorge.nedlasting.data.client.Projection;
+import no.geonorge.nedlasting.external.External;
 
 /**
  * This REST api implements the Norway Digital (Geonorge) Download API
@@ -131,8 +133,7 @@ public class DownloadService {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         Collection<Format> formats = dataset.getFormats();
-        Gson gson = gson();
-        String json = gson.toJson(formats);
+        String json = gson().toJson(formats);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 
@@ -155,7 +156,7 @@ public class DownloadService {
         if (dataset == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-
+        
         List<Area> areas = dataset.getAreas();
         String json = gson().toJson(areas);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
@@ -311,7 +312,23 @@ public class DownloadService {
     @PUT
     @Path("internal/dataset/{metadataUuid}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void putDataset(@PathParam("metadataUuid") String metadataUuid, String jsonRequest) {
+    public Response putDataset(@PathParam("metadataUuid") String metadataUuid, String jsonRequest) throws IOException {
+
+        no.geonorge.nedlasting.data.client.Dataset requestDataset = gson().fromJson(jsonRequest,
+                no.geonorge.nedlasting.data.client.Dataset.class);
+        
+        if (requestDataset.isExternal()) {
+            // test external configuration
+            try {
+                External e = External.create(requestDataset.getExternalParameters());
+                if (e == null) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+            } catch (RuntimeException e) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+        }
+        
         ObjectContext ctxt = Config.getObjectContext();
         Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
         if (dataset == null) {
@@ -319,8 +336,6 @@ public class DownloadService {
             dataset.setMetadataUuid(metadataUuid);
         }
 
-        no.geonorge.nedlasting.data.client.Dataset requestDataset = gson().fromJson(jsonRequest,
-                no.geonorge.nedlasting.data.client.Dataset.class);
         dataset.setTitle(requestDataset.getTitle());
 
         if (!requestDataset.ignoreFiles()) {
@@ -348,15 +363,28 @@ public class DownloadService {
                 }
             }
         }
+        
+        if (requestDataset.isExternal()) {
+            dataset.setExternal(requestDataset.getExternalParameters());
+        } else {
+            dataset.setExternal(Collections.emptyMap());
+        }
+        
+        dataset.setSupportsAreaSelection(!dataset.getAreas().isEmpty());
+        dataset.setSupportsFormatSelection(!dataset.getFormats().isEmpty());
+        dataset.setSupportsProjectionSelection(!dataset.getProjections().isEmpty());
+        dataset.setSupportsPolygonSelection(dataset.isExternal());
 
         ctxt.commitChanges();
+        
+        return Response.status(Response.Status.OK).build();
     }
 
     @POST
     @Path("internal/dataset/{metadataUuid}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void postDataset(@PathParam("metadataUuid") String metadataUuid, String jsonRequest) {
-        putDataset(metadataUuid, jsonRequest);
+    public Response postDataset(@PathParam("metadataUuid") String metadataUuid, String jsonRequest) throws IOException {
+        return putDataset(metadataUuid, jsonRequest);
     }
 
     @DELETE

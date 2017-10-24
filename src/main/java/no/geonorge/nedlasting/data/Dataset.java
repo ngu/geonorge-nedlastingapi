@@ -1,5 +1,6 @@
 package no.geonorge.nedlasting.data;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import no.geonorge.nedlasting.data.client.Capabilities;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Link;
 import no.geonorge.nedlasting.data.client.Projection;
+import no.geonorge.nedlasting.external.External;
 
 public class Dataset extends _Dataset {
 
@@ -75,6 +77,9 @@ public class Dataset extends _Dataset {
         for (DatasetFile file : getFiles()) {
             d.addFile(file.forClient());
         }
+        for (DatasetExternalParameter dep : getExternalParameters()) {
+            d.setExternalParameter(dep.getKey(), dep.getValue());
+        }
         return d;
     }
 
@@ -85,20 +90,30 @@ public class Dataset extends _Dataset {
         return d;
     }
 
-    public Collection<Format> getFormats() {
-        Set<Format> formatTypes = new HashSet<>();
+    public Collection<Format> getFormats() throws IOException {
+        Set<Format> formats = new HashSet<>();
         for (DatasetFile file : getFiles()) {
-            formatTypes.add(file.getFormat());
+            formats.add(file.getFormat());
         }
-        return Collections.unmodifiableCollection(formatTypes);
+        
+        if (isExternal()) {
+            formats.addAll(getExternal().getFormats());
+        }
+        
+        return Collections.unmodifiableCollection(formats);
     }
 
-    public Collection<Projection> getProjections() {
-        Set<Projection> projectionTypes = new HashSet<>();
+    public Collection<Projection> getProjections() throws IOException {
+        Set<Projection> projections = new HashSet<>();
         for (DatasetFile file : getFiles()) {
-            projectionTypes.add(file.getProjection().forClient());
+            projections.add(file.getProjection().forClient());
         }
-        return Collections.unmodifiableCollection(projectionTypes);
+        
+        if (isExternal()) {
+            projections.addAll(getExternal().getProjections());
+        }
+        
+        return Collections.unmodifiableCollection(projections);
     }
 
     public List<Area> getAreas() {
@@ -138,13 +153,45 @@ public class Dataset extends _Dataset {
         pk.put(DatasetFile.FILE_ID_PK_COLUMN, fileId);
         return Cayenne.objectForPK(getObjectContext(), DatasetFile.class, pk);
     }
-    
+
     public Set<String> getFileIds() {
         Set<String> fileIds = new HashSet<>();
         for (DatasetFile file : getFiles()) {
             fileIds.add(file.getFileId());
         }
         return Collections.unmodifiableSet(fileIds);
+    }
+
+    public boolean isExternal() {
+        return !getExternalParameters().isEmpty();
+    }
+
+    public External getExternal() {
+        Map<String, String> e = new HashMap<>();
+        for (DatasetExternalParameter ep : getExternalParameters()) {
+            e.put(ep.getKey(), ep.getValue());
+        }
+        return External.create(e);
+    }
+
+    public void setExternal(Map<String, String> parameters) {
+        Map<String, String> rest = new HashMap<>(parameters);
+        for (DatasetExternalParameter ep : new ArrayList<>(getExternalParameters())) {
+            if (rest.containsKey(ep.getKey())) {
+                ep.setValue(rest.remove(ep.getKey()));
+            } else {
+                getObjectContext().deleteObject(ep);
+            }
+        }
+        for (Map.Entry<String, String> e : rest.entrySet()) {
+            DatasetExternalParameter ep = getObjectContext().newObject(DatasetExternalParameter.class);
+            if (ep.getKey().toLowerCase().contains("pass")) {
+                continue;
+            }
+            ep.setKey(e.getKey());
+            ep.setValue(e.getValue());
+            ep.setDataset(this);
+        }
     }
 
 }
