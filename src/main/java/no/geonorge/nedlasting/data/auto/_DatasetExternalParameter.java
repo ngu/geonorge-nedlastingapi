@@ -17,7 +17,7 @@ public abstract class _DatasetExternalParameter extends CayenneDataObject {
     public static final String DATASET_PROPERTY = "dataset";
 
     public static final String DATASET_ID_PK_COLUMN = "DATASET_ID";
-    public static final String KEY_PK_COLUMN = "KEY";
+    public static final String PARAMETER_NAME_PK_COLUMN = "PARAMETER_NAME";
 
     public void setKey(String key) {
         writeProperty(KEY_PROPERTY, key);

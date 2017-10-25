@@ -23,8 +23,8 @@
 	</db-entity>
 	<db-entity name="DATASET_EXTERNAL_PARAMETER">
 		<db-attribute name="DATASET_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
-		<db-attribute name="KEY" type="VARCHAR" isPrimaryKey="true" isMandatory="true" length="1024"/>
-		<db-attribute name="VALUE" type="VARCHAR" isMandatory="true" length="1024"/>
+		<db-attribute name="PARAMETER_NAME" type="VARCHAR" isPrimaryKey="true" isMandatory="true" length="1024"/>
+		<db-attribute name="PARAMETER_VALUE" type="VARCHAR" isMandatory="true" length="1024"/>
 	</db-entity>
 	<db-entity name="DATASET_FILE">
 		<db-attribute name="AREA_CODE" type="VARCHAR" length="32"/>
@@ -70,8 +70,8 @@
 		<obj-attribute name="title" type="java.lang.String" db-attribute-path="TITLE"/>
 	</obj-entity>
 	<obj-entity name="DatasetExternalParameter" className="no.geonorge.nedlasting.data.DatasetExternalParameter" dbEntityName="DATASET_EXTERNAL_PARAMETER">
-		<obj-attribute name="key" type="java.lang.String" db-attribute-path="KEY"/>
-		<obj-attribute name="value" type="java.lang.String" db-attribute-path="VALUE"/>
+		<obj-attribute name="key" type="java.lang.String" db-attribute-path="PARAMETER_NAME"/>
+		<obj-attribute name="value" type="java.lang.String" db-attribute-path="PARAMETER_VALUE"/>
 	</obj-entity>
 	<obj-entity name="DatasetFile" className="no.geonorge.nedlasting.data.DatasetFile" dbEntityName="DATASET_FILE">
 		<obj-attribute name="areaCode" type="java.lang.String" db-attribute-path="AREA_CODE"/>
