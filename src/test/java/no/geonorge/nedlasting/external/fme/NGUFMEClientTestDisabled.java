@@ -11,7 +11,7 @@ import no.geonorge.nedlasting.external.fme.NGUFMEClient;
 import no.geonorge.nedlasting.external.fme.data.JobInfo;
 import no.geonorge.nedlasting.external.fme.data.JobResult;
 
-public class NGUFMEClientTest extends TestCase {
+public class NGUFMEClientTestDisabled extends TestCase {
 
     private String urlPrefix = System.getProperty("fme.urlPrefix");
     private String username = System.getProperty("fme.username");
