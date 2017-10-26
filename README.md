@@ -49,4 +49,4 @@ Use with your favourite IDE:
 
 
 
-Author: Bjorn.Ove.Grotan@ngu.no
+Contact: Bjorn.Ove.Grotan AT ngu.no
