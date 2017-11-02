@@ -78,6 +78,9 @@ public class Dataset extends _Dataset {
             d.addFile(file.forClient());
         }
         for (DatasetExternalParameter dep : getExternalParameters()) {
+            if (dep.getKey().toLowerCase().contains("pass")) {
+                continue;
+            }
             d.setExternalParameter(dep.getKey(), dep.getValue());
         }
         return d;
