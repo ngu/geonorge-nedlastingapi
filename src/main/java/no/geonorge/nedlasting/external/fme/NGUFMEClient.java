@@ -1,6 +1,10 @@
 package no.geonorge.nedlasting.external.fme;
 
+import java.io.IOException;
 import java.util.Map;
+
+import no.geonorge.nedlasting.data.client.Format;
+import no.geonorge.nedlasting.data.client.Projection;
 
 public class NGUFMEClient extends FMEClient {
 
@@ -34,6 +38,11 @@ public class NGUFMEClient extends FMEClient {
     @Override
     public String getFormatParameterName() {
         return "Dataformat";
+    }
+
+    @Override
+    public String getCoordinatesParameterName() {
+        return "koordinatListe";
     }
 
 }

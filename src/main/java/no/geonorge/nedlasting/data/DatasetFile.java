@@ -68,6 +68,9 @@ public class DatasetFile extends _DatasetFile {
     }
 
     public static List<DatasetFile> findForOrderLine(ObjectContext ctxt, OrderLine orderLine) {
+        if (orderLine.hasCoordinates()) {
+            return Collections.emptyList();
+        }
         Dataset dataset = Dataset.forMetadataUUID(ctxt, orderLine.getMetadataUuid());
         if (dataset == null) {
             return Collections.emptyList();

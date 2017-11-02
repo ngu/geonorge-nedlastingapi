@@ -118,6 +118,8 @@ public abstract class FMEClient extends External {
     }
 
     public abstract String getProjectionParameterName();
+    
+    public abstract String getCoordinatesParameterName();
 
     public List<Format> getFormats() throws IOException {
         List<Format> formats = new ArrayList<>();
@@ -141,13 +143,8 @@ public abstract class FMEClient extends External {
 
     /**
      * submitJob submits an order to FME DataDownload service
-     * 
-     * @param repository
-     * @param workspace
-     * @param parameters
-     * @return jobID for reference
      */
-    public String submitJob(Format format, Projection projection) throws IOException {
+    public String submitJob(Format format, Projection projection, String email, String coordinates) throws IOException {
         String url = urlPrefix + "/fmedatadownload/" + repository + "/" + workspace + "?accept=json&token="
                 + getToken();
 
@@ -157,6 +154,10 @@ public abstract class FMEClient extends External {
         postParameters.put("opt_responseformat", "json");
         postParameters.put("opt_showresult", "false");
         postParameters.put("opt_servicemode", "async");
+        
+        if (email != null) {
+            postParameters.put("opt_requesteremail", "email");
+        }
 
         postParameters.put(getFormatParameterName(), format.getName());
 
@@ -166,6 +167,19 @@ public abstract class FMEClient extends External {
         }
 
         postParameters.put(getProjectionParameterName(), projectionValue);
+        
+        if (coordinates != null) {
+            /*
+             * GeoNorge example: 
+             * "coordinates": "212062 7057635 323090 7057635 314966 6968271 152486 6966917 210708 7054927 212062 7057635"
+             */
+            
+            /*
+             * NGU example:
+             * "koordinatListe":"269530.625 6657173.718749999 269530.625 6642829.781249999 254001.9375 6642829.781249999 254001.9375 6657173.718749999 269530.625 6657173.718749999"
+             */
+            postParameters.put(getCoordinatesParameterName(), coordinates);
+        }
 
         StringBuilder postData = new StringBuilder();
         for (Map.Entry<String, String> e : postParameters.entrySet()) {

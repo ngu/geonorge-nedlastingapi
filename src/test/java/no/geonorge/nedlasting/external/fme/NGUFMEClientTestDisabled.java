@@ -54,7 +54,7 @@ public class NGUFMEClientTestDisabled extends TestCase {
         FMEClient fme = fme();
         List<Format> formats = fme.getFormats();
         List<Projection> projections = fme.getProjections();
-        String jobId = fme.submitJob(formats.get(0), projections.get(0));
+        String jobId = fme.submitJob(formats.get(0), projections.get(0), null, null);
         assertNotNull(jobId);
 
         JobResult jr = null;

@@ -38,6 +38,13 @@
 		<db-attribute name="SRID" type="INTEGER" isMandatory="true"/>
 		<db-attribute name="URL" type="VARCHAR" length="2048"/>
 	</db-entity>
+	<db-entity name="DOWNLOAD_EXTERNAL_JOB">
+		<db-attribute name="COORDINATES" type="CLOB"/>
+		<db-attribute name="FORMAT" type="VARCHAR" length="64"/>
+		<db-attribute name="JOB_ID" type="VARCHAR" isPrimaryKey="true" isMandatory="true" length="1024"/>
+		<db-attribute name="ORDER_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="SRID" type="INTEGER"/>
+	</db-entity>
 	<db-entity name="DOWNLOAD_ITEM">
 		<db-attribute name="FILE_ID" type="VARCHAR" isMandatory="true" length="64"/>
 		<db-attribute name="FILE_NAME" type="VARCHAR" length="1024"/>
@@ -83,6 +90,12 @@
 		<obj-attribute name="formatVersion" type="java.lang.String" db-attribute-path="FORMAT_VERSION"/>
 		<obj-attribute name="url" type="java.lang.String" db-attribute-path="URL"/>
 	</obj-entity>
+	<obj-entity name="DownloadExternalJob" className="no.geonorge.nedlasting.data.DownloadExternalJob" dbEntityName="DOWNLOAD_EXTERNAL_JOB">
+		<obj-attribute name="coordinates" type="java.lang.String" db-attribute-path="COORDINATES"/>
+		<obj-attribute name="format" type="java.lang.String" db-attribute-path="FORMAT"/>
+		<obj-attribute name="jobId" type="java.lang.String" db-attribute-path="JOB_ID"/>
+		<obj-attribute name="srid" type="java.lang.Integer" db-attribute-path="SRID"/>
+	</obj-entity>
 	<obj-entity name="DownloadItem" className="no.geonorge.nedlasting.data.DownloadItem" dbEntityName="DOWNLOAD_ITEM">
 		<obj-attribute name="fileId" type="java.lang.String" db-attribute-path="FILE_ID"/>
 		<obj-attribute name="fileName" type="java.lang.String" db-attribute-path="FILE_NAME"/>
@@ -117,11 +130,17 @@
 	<db-relationship name="to_dataset" source="DATASET_FILE" target="DATASET" toMany="false">
 		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
 	</db-relationship>
+	<db-relationship name="toOrder" source="DOWNLOAD_EXTERNAL_JOB" target="DOWNLOAD_ORDER" toMany="false">
+		<db-attribute-pair source="ORDER_ID" target="ORDER_ID"/>
+	</db-relationship>
 	<db-relationship name="toOrder" source="DOWNLOAD_ITEM" target="DOWNLOAD_ORDER" toMany="false">
 		<db-attribute-pair source="ORDER_ID" target="ORDER_ID"/>
 	</db-relationship>
 	<db-relationship name="toProjection" source="DOWNLOAD_ITEM" target="PROJECTION" toMany="false">
 		<db-attribute-pair source="SRID" target="SRID"/>
+	</db-relationship>
+	<db-relationship name="toExternalJob" source="DOWNLOAD_ORDER" target="DOWNLOAD_EXTERNAL_JOB" toMany="true">
+		<db-attribute-pair source="ORDER_ID" target="ORDER_ID"/>
 	</db-relationship>
 	<db-relationship name="toItems" source="DOWNLOAD_ORDER" target="DOWNLOAD_ITEM" toMany="true">
 		<db-attribute-pair source="ORDER_ID" target="ORDER_ID"/>
@@ -137,8 +156,10 @@
 	<obj-relationship name="dataset" source="DatasetExternalParameter" target="Dataset" deleteRule="Nullify" db-relationship-path="to_dataset"/>
 	<obj-relationship name="dataset" source="DatasetFile" target="Dataset" deleteRule="Nullify" db-relationship-path="to_dataset"/>
 	<obj-relationship name="projection" source="DatasetFile" target="Projection" deleteRule="Nullify" db-relationship-path="toProjection"/>
+	<obj-relationship name="order" source="DownloadExternalJob" target="DownloadOrder" deleteRule="Nullify" db-relationship-path="toOrder"/>
 	<obj-relationship name="order" source="DownloadItem" target="DownloadOrder" deleteRule="Deny" db-relationship-path="toOrder"/>
 	<obj-relationship name="projection" source="DownloadItem" target="Projection" deleteRule="Nullify" db-relationship-path="toProjection"/>
+	<obj-relationship name="externalJobs" source="DownloadOrder" target="DownloadExternalJob" deleteRule="Cascade" db-relationship-path="toExternalJob"/>
 	<obj-relationship name="items" source="DownloadOrder" target="DownloadItem" deleteRule="Cascade" db-relationship-path="toItems"/>
 	<obj-relationship name="files" source="Projection" target="DatasetFile" deleteRule="Deny" db-relationship-path="toFile"/>
 </data-map>

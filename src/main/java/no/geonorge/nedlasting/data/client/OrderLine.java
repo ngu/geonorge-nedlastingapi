@@ -29,6 +29,10 @@ public class OrderLine {
     public void setCoordinates(String coordinates) {
         this.coordinates = coordinates;
     }
+    
+    public boolean hasCoordinates() {
+        return getCoordinates() != null && getCoordinates().length() > 0;
+    }
 
     public String getCoordinatesystem() {
         return coordinatesystem;

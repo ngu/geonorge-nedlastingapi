@@ -2,7 +2,6 @@ package no.geonorge.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -33,6 +32,7 @@ import com.google.gson.GsonBuilder;
 import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.Dataset;
 import no.geonorge.nedlasting.data.DatasetFile;
+import no.geonorge.nedlasting.data.DownloadExternalJob;
 import no.geonorge.nedlasting.data.DownloadItem;
 import no.geonorge.nedlasting.data.DownloadOrder;
 import no.geonorge.nedlasting.data.client.Area;
@@ -42,6 +42,7 @@ import no.geonorge.nedlasting.data.client.Capabilities;
 import no.geonorge.nedlasting.data.client.File;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Order;
+import no.geonorge.nedlasting.data.client.OrderArea;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.OrderReceipt;
 import no.geonorge.nedlasting.data.client.Projection;
@@ -265,6 +266,10 @@ public class DownloadService {
         downloadOrder.setStartTime(new Date());
 
         for (OrderLine orderLine : order.getOrderLines()) {
+            
+            Dataset dataset = Dataset.forMetadataUUID(ctxt, orderLine.getMetadataUuid());
+
+            boolean foundForOrderLine = false;
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
                 File file = datasetFile.forClient();
                 file.setStatus("ReadyForDownload");
@@ -277,7 +282,31 @@ public class DownloadService {
                 downloadItem.setFileName(datasetFile.getFileName());
                 downloadItem.setMetadataUuid(datasetFile.getDataset().getMetadataUuid());
                 downloadOrder.addToItems(downloadItem);
+                foundForOrderLine = true;
             }
+            
+            if (!foundForOrderLine && dataset.isExternal()) {
+                for (Format format : orderLine.getFormats()) {
+                    for (Projection projection : orderLine.getProjections()) {
+                        for (OrderArea area : orderLine.getAreas()) {
+                            if (area.isTypePolygonSelection() && orderLine.hasCoordinates()) {
+                                area = null;
+                            }
+                            External external = dataset.getExternal();
+                            String jobId = external.submitJob(format, projection, order.getEmail(),
+                                    orderLine.getCoordinates());
+                            
+                            DownloadExternalJob downloadExternalJob = ctxt.newObject(DownloadExternalJob.class);
+                            downloadExternalJob.setJobId(jobId);
+                            downloadExternalJob.setCoordinates(orderLine.getCoordinates());
+                            downloadExternalJob.setFormat(format.getName());
+                            downloadExternalJob.setSrid(projection.getSrid());
+                            downloadOrder.addToExternalJobs(downloadExternalJob);
+                        }
+                    }
+                }
+            }
+
         }
 
         ctxt.commitChanges();

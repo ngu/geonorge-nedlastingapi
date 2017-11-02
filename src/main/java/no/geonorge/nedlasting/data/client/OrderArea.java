@@ -23,6 +23,14 @@ public class OrderArea {
     public void setType(String type) {
         this.type = type;
     }
+    
+    public boolean isTypePolygonSelection() {
+        /*
+         * { "code": "Kart", "name": "Valgt fra kart", "type": "polygon",
+         * "_links": [] }
+         */
+        return "polygon".equals(type);
+    }
 
     public String getName() {
         return name;
