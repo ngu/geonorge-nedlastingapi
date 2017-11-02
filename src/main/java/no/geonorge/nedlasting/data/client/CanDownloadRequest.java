@@ -30,4 +30,12 @@ public class CanDownloadRequest {
         this.coordinateSystem = coordinateSystem;
     }
 
+    public Integer getSrid() {
+        return Integer.decode(getCoordinateSystem());
+    }
+    
+    public boolean hasCoordinates() {
+        return getCoordinates() != null && getCoordinates().length() > 0;
+    }
+
 }

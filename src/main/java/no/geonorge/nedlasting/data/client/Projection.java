@@ -30,6 +30,10 @@ public class Projection {
         this.codespace = codespace;
     }
 
+    public Integer getSrid() {
+        return Integer.decode(getCode());
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

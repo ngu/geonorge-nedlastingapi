@@ -194,8 +194,8 @@ public class DownloadService {
         log.info("can-download request: " + jsonRequest);
         /*
          * Sample JSON HTTP-POST
-         * {"metadataUuid":"73f863ba-628f-48af-b7fa-30d3ab331b8d",
-         * "coordinates":"344754 7272921 404330 7187619 304134 7156477 344754 7272921"
+         * {"metadataUuid":"18777cf4-1f06-4cb0-803d-d6382b76681f",
+         * "coordinates":"189044 7043418 321736 6979780 244558 6893124 76662 6886354 65830 7013630 191752 7040710 190398 7046126 189044 7043418"
          * ,"coordinateSystem":"32633"}
          */
         CanDownloadRequest req = gson().fromJson(jsonRequest, CanDownloadRequest.class);
@@ -203,19 +203,23 @@ public class DownloadService {
         ObjectContext ctxt = Config.getObjectContext();
         Dataset dataset = Dataset.forMetadataUUID(ctxt, req.getMetadataUuid());
         if (dataset == null) {
-            CanDownloadResponse canDownload = new CanDownloadResponse();
-            canDownload.setCanDownload(false);
-            return gson().toJson(canDownload);
+            log.info("could not find dataset");
+            return gson().toJson(new CanDownloadResponse(false));
         }
 
-        // FIXME: Parse JSON-string and generate a Polygon object
-        // FIXME: Calculate Polygon area and validate against dataset
-        // configuration.
-        // Possibly even a system default in /etc/geonorge.conf if always
-        // enabled.
-        CanDownloadResponse canDownload = new CanDownloadResponse();
-        canDownload.setCanDownload(false);
-        return gson().toJson(canDownload);
+        // check if can select area
+        if (req.hasCoordinates() && !dataset.isSupportsPolygonSelection()) {
+            log.info("trying to select polygon, but dataset does not support it");
+            return gson().toJson(new CanDownloadResponse(false));
+        }
+        
+        // check srid
+        if (!dataset.supportSrid(req.getSrid())) {
+            log.info("unsupported srid");
+            return gson().toJson(new CanDownloadResponse(false));
+        }
+
+        return gson().toJson(new CanDownloadResponse(true));
     }
 
     /**

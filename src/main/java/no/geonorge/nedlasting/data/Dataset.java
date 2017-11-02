@@ -118,6 +118,24 @@ public class Dataset extends _Dataset {
         
         return Collections.unmodifiableCollection(projections);
     }
+    
+    public boolean supportSrid(Integer srid) throws IOException {
+        for (DatasetFile file : getFiles()) {
+            if (srid.equals(file.getProjection().getSrid())) {
+                return true;
+            }
+        }
+        
+        if (isExternal()) {
+            for (Projection projection : getExternal().getProjections()) {
+                if (srid.equals(projection.getSrid())) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
 
     public List<Area> getAreas() {
         Map<String, Area> areaTypeByAreaKey = new HashMap<>();
