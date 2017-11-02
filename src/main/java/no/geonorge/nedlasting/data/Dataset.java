@@ -184,10 +184,10 @@ public class Dataset extends _Dataset {
             }
         }
         for (Map.Entry<String, String> e : rest.entrySet()) {
-            DatasetExternalParameter ep = getObjectContext().newObject(DatasetExternalParameter.class);
-            if (ep.getKey().toLowerCase().contains("pass")) {
+            if (e.getKey().toLowerCase().contains("pass")) {
                 continue;
             }
+            DatasetExternalParameter ep = getObjectContext().newObject(DatasetExternalParameter.class);
             ep.setKey(e.getKey());
             ep.setValue(e.getValue());
             ep.setDataset(this);
