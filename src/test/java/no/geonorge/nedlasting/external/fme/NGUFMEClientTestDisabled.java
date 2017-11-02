@@ -1,7 +1,9 @@
 package no.geonorge.nedlasting.external.fme;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 import no.geonorge.nedlasting.data.client.Format;
@@ -35,6 +37,12 @@ public class NGUFMEClientTestDisabled extends TestCase {
     public void testProjections() throws IOException {
         List<Projection> projections = fme().getProjections();
         assertFalse(projections.isEmpty());
+        Set<Integer> srids = new HashSet<>();
+        for (Projection projection : projections) {
+            srids.add(projection.getSrid());
+        }
+        assertFalse(srids.isEmpty());
+        assertTrue(srids.contains(Integer.valueOf(32633)));
     }
 
     public void testFormats() throws IOException {
@@ -54,7 +62,7 @@ public class NGUFMEClientTestDisabled extends TestCase {
             Thread.sleep(5000);
 
             JobInfo r = fme.status(jobId);
-            assertEquals(jobId, r.getId());
+            assertEquals(jobId, r.getId().toString());
 
             jr = r.getResult();
             if (jr != null) {
@@ -64,7 +72,7 @@ public class NGUFMEClientTestDisabled extends TestCase {
         }
 
         assertNotNull(jr);
-        assertEquals(jobId, jr.getId());
+        assertEquals(jobId, jr.getId().toString());
         assertTrue(jr.getStatusMessage().contains("Successful"));
         assertNotNull(jr.getResultDatasetDownloadUrl());
     }
