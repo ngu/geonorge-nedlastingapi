@@ -139,7 +139,7 @@
 	<db-relationship name="toProjection" source="DOWNLOAD_ITEM" target="PROJECTION" toMany="false">
 		<db-attribute-pair source="SRID" target="SRID"/>
 	</db-relationship>
-	<db-relationship name="toExternalJob" source="DOWNLOAD_ORDER" target="DOWNLOAD_EXTERNAL_JOB" toMany="true">
+	<db-relationship name="toExternalJob" source="DOWNLOAD_ORDER" target="DOWNLOAD_EXTERNAL_JOB" toDependentPK="true" toMany="true">
 		<db-attribute-pair source="ORDER_ID" target="ORDER_ID"/>
 	</db-relationship>
 	<db-relationship name="toItems" source="DOWNLOAD_ORDER" target="DOWNLOAD_ITEM" toMany="true">
