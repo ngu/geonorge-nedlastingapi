@@ -156,7 +156,7 @@ public abstract class FMEClient extends External {
         postParameters.put("opt_servicemode", "async");
         
         if (email != null) {
-            postParameters.put("opt_requesteremail", "email");
+            postParameters.put("opt_requesteremail", email);
         }
 
         postParameters.put(getFormatParameterName(), format.getName());
