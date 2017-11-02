@@ -2,6 +2,7 @@ package no.geonorge.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -215,7 +216,7 @@ public class DownloadService {
         
         // check srid
         if (!dataset.supportSrid(req.getSrid())) {
-            log.info("unsupported srid");
+            log.info("unsupported srid " + req.getSrid() + ". only support " + dataset.getSrids());
             return gson().toJson(new CanDownloadResponse(false));
         }
 

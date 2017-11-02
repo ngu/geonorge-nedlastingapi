@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.cayenne.Cayenne;
 import org.apache.cayenne.ObjectContext;
@@ -117,6 +118,22 @@ public class Dataset extends _Dataset {
         }
         
         return Collections.unmodifiableCollection(projections);
+    }
+    
+    public Collection<Integer> getSrids() throws IOException {
+        Set<Integer> srids = new TreeSet<>();
+        
+        for (DatasetFile file : getFiles()) {
+            srids.add(file.getProjection().getSrid());
+        }
+        
+        if (isExternal()) {
+            for (Projection projection : getExternal().getProjections()) {
+                srids.add(projection.getSrid());
+            }
+        }
+        
+        return Collections.unmodifiableCollection(srids);
     }
     
     public boolean supportSrid(Integer srid) throws IOException {
