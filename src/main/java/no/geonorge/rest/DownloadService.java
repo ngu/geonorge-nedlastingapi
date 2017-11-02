@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -264,6 +265,7 @@ public class DownloadService {
         DownloadOrder downloadOrder = ctxt.newObject(DownloadOrder.class);
         downloadOrder.setEmail(order.getEmail());
         downloadOrder.setStartTime(new Date());
+        downloadOrder.setReferenceNumber(UUID.randomUUID().toString());
 
         for (OrderLine orderLine : order.getOrderLines()) {
             
@@ -311,7 +313,7 @@ public class DownloadService {
 
         ctxt.commitChanges();
         
-        orderReceipt.setReferenceNumber(downloadOrder.getOrderId().toString());
+        orderReceipt.setReferenceNumber(downloadOrder.getReferenceNumber());
 
         String json = gson().toJson(orderReceipt);
         return Response.ok(json, MediaType.APPLICATION_JSON).build();

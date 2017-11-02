@@ -1,20 +1,20 @@
 package no.geonorge.nedlasting.data;
 
-import org.apache.cayenne.Cayenne;
+import java.util.List;
+
 import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.exp.Expression;
+import org.apache.cayenne.exp.ExpressionFactory;
+import org.apache.cayenne.query.SelectQuery;
 
 import no.geonorge.nedlasting.data.auto._DownloadOrder;
 import no.geonorge.nedlasting.data.client.OrderReceipt;
 
 public class DownloadOrder extends _DownloadOrder {
 
-    public Integer getOrderId() {
-        return Cayenne.intPKForObject(this);
-    }
-
     public OrderReceipt getOrderReceipt() {
         OrderReceipt orderReceipt = new OrderReceipt();
-        orderReceipt.setReferenceNumber(getOrderId().toString());
+        orderReceipt.setReferenceNumber(getReferenceNumber());
         orderReceipt.setEmail(getEmail());
         orderReceipt.setOrderDate(getStartTime());
 
@@ -25,16 +25,21 @@ public class DownloadOrder extends _DownloadOrder {
         return orderReceipt;
     }
 
-    public static DownloadOrder get(ObjectContext ctxt, Integer orderId) {
-        return Cayenne.objectForPK(ctxt, DownloadOrder.class, orderId);
-    }
-
     public static DownloadOrder get(ObjectContext ctxt, String referenceNumber) {
-        try {
-            return get(ctxt, Integer.valueOf(referenceNumber));
-        } catch (RuntimeException e) {
+        if (referenceNumber == null) {
             return null;
         }
+        Expression qual = ExpressionFactory.matchExp(REFERENCE_NUMBER_PROPERTY, referenceNumber);
+        SelectQuery query = new SelectQuery(DownloadOrder.class, qual);
+        @SuppressWarnings("unchecked")
+        List<DownloadOrder> downloads = ctxt.performQuery(query);
+        if (downloads.isEmpty()) {
+            return null;
+        }
+        if (downloads.size() > 1) {
+            throw new IllegalStateException("multiple downloads with reference number " + referenceNumber);
+        }
+        return downloads.get(0);
     }
 
 }

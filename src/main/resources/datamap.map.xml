@@ -57,6 +57,7 @@
 	<db-entity name="DOWNLOAD_ORDER">
 		<db-attribute name="EMAIL" type="VARCHAR" length="512"/>
 		<db-attribute name="ORDER_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="REFERENCE_NUMBER" type="VARCHAR" isMandatory="true" length="64"/>
 		<db-attribute name="START_TIME" type="TIMESTAMP" isMandatory="true"/>
 	</db-entity>
 	<db-entity name="PROJECTION">
@@ -104,6 +105,7 @@
 	</obj-entity>
 	<obj-entity name="DownloadOrder" className="no.geonorge.nedlasting.data.DownloadOrder" dbEntityName="DOWNLOAD_ORDER">
 		<obj-attribute name="email" type="java.lang.String" db-attribute-path="EMAIL"/>
+		<obj-attribute name="referenceNumber" type="java.lang.String" db-attribute-path="REFERENCE_NUMBER"/>
 		<obj-attribute name="startTime" type="java.util.Date" db-attribute-path="START_TIME"/>
 	</obj-entity>
 	<obj-entity name="Projection" className="no.geonorge.nedlasting.data.Projection" dbEntityName="PROJECTION">
