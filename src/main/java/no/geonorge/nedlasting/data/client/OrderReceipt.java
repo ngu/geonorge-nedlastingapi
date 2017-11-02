@@ -8,7 +8,7 @@ import java.util.List;
 public class OrderReceipt {
 
     private String referenceNumber;
-    private List<File> files;
+    private List<File> files = new ArrayList<>();
     private String email;
     private Date orderDate;
     private List<Link> _links;
