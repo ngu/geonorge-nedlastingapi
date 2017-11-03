@@ -13,6 +13,8 @@ import no.geonorge.nedlasting.data.Projection;
  */
 public abstract class _DownloadItem extends CayenneDataObject {
 
+    public static final String COORDINATES_PROPERTY = "coordinates";
+    public static final String EXTERNAL_JOB_ID_PROPERTY = "externalJobId";
     public static final String FILE_ID_PROPERTY = "fileId";
     public static final String FILE_NAME_PROPERTY = "fileName";
     public static final String METADATA_UUID_PROPERTY = "metadataUuid";
@@ -21,6 +23,20 @@ public abstract class _DownloadItem extends CayenneDataObject {
     public static final String PROJECTION_PROPERTY = "projection";
 
     public static final String ORDER_ITEM_ID_PK_COLUMN = "ORDER_ITEM_ID";
+
+    public void setCoordinates(String coordinates) {
+        writeProperty(COORDINATES_PROPERTY, coordinates);
+    }
+    public String getCoordinates() {
+        return (String)readProperty(COORDINATES_PROPERTY);
+    }
+
+    public void setExternalJobId(String externalJobId) {
+        writeProperty(EXTERNAL_JOB_ID_PROPERTY, externalJobId);
+    }
+    public String getExternalJobId() {
+        return (String)readProperty(EXTERNAL_JOB_ID_PROPERTY);
+    }
 
     public void setFileId(String fileId) {
         writeProperty(FILE_ID_PROPERTY, fileId);

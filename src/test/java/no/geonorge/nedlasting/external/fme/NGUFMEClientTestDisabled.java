@@ -8,6 +8,7 @@ import java.util.Set;
 import junit.framework.TestCase;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Projection;
+import no.geonorge.nedlasting.external.ExternalStatus;
 import no.geonorge.nedlasting.external.fme.FMEClient;
 import no.geonorge.nedlasting.external.fme.NGUFMEClient;
 import no.geonorge.nedlasting.external.fme.data.JobInfo;
@@ -49,7 +50,7 @@ public class NGUFMEClientTestDisabled extends TestCase {
         List<Format> formats = fme().getFormats();
         assertFalse(formats.isEmpty());
     }
-
+    
     public void testSubmitJob() throws IOException, InterruptedException {
         FMEClient fme = fme();
         List<Format> formats = fme.getFormats();
@@ -57,24 +58,20 @@ public class NGUFMEClientTestDisabled extends TestCase {
         String jobId = fme.submitJob(formats.get(0), projections.get(0), null, null);
         assertNotNull(jobId);
 
-        JobResult jr = null;
+        ExternalStatus r = null;
         for (int i = 0; i < 100; i++) {
             Thread.sleep(5000);
 
-            JobInfo r = fme.status(jobId);
-            assertEquals(jobId, r.getId().toString());
-
-            jr = r.getResult();
-            if (jr != null) {
+            r = fme.status(jobId);
+            assertNotNull(r);
+            if (r.getDownloadUrl() != null) {
                 break;
             }
-
         }
 
-        assertNotNull(jr);
-        assertEquals(jobId, jr.getId().toString());
-        assertTrue(jr.getStatusMessage().contains("Successful"));
-        assertNotNull(jr.getResultDatasetDownloadUrl());
+        assertNotNull(r);
+        assertTrue(r.getStatusMessage().contains("Successful"));
+        assertNotNull(r.getDownloadUrl());
     }
 
 }

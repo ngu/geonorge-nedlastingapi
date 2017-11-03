@@ -1,5 +1,6 @@
 package no.geonorge.nedlasting.data;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.cayenne.ObjectContext;
@@ -12,7 +13,7 @@ import no.geonorge.nedlasting.data.client.OrderReceipt;
 
 public class DownloadOrder extends _DownloadOrder {
 
-    public OrderReceipt getOrderReceipt() {
+    public OrderReceipt getOrderReceipt() throws IOException {
         OrderReceipt orderReceipt = new OrderReceipt();
         orderReceipt.setReferenceNumber(getReferenceNumber());
         orderReceipt.setEmail(getEmail());

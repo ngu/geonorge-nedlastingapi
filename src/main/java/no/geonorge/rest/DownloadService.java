@@ -33,7 +33,6 @@ import com.google.gson.GsonBuilder;
 import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.Dataset;
 import no.geonorge.nedlasting.data.DatasetFile;
-import no.geonorge.nedlasting.data.DownloadExternalJob;
 import no.geonorge.nedlasting.data.DownloadItem;
 import no.geonorge.nedlasting.data.DownloadOrder;
 import no.geonorge.nedlasting.data.client.Area;
@@ -45,7 +44,6 @@ import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Order;
 import no.geonorge.nedlasting.data.client.OrderArea;
 import no.geonorge.nedlasting.data.client.OrderLine;
-import no.geonorge.nedlasting.data.client.OrderReceipt;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.External;
 
@@ -258,7 +256,6 @@ public class DownloadService {
         /* https://nedlasting.geonorge.no/Help/Api/POST-api-v2-order */
         log.info("order request: " + jsonRequest);
         Order order = gson().fromJson(jsonRequest, Order.class);
-        OrderReceipt orderReceipt = new OrderReceipt();
 
         ObjectContext ctxt = Config.getObjectContext();
 
@@ -273,10 +270,6 @@ public class DownloadService {
 
             boolean foundForOrderLine = false;
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
-                File file = datasetFile.forClient();
-                file.setStatus("ReadyForDownload");
-                orderReceipt.addFile(file);
-
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
                 downloadItem.setProjection(datasetFile.getProjection());
                 downloadItem.setUrl(datasetFile.getUrl());
@@ -298,12 +291,13 @@ public class DownloadService {
                             String jobId = external.submitJob(format, projection, order.getEmail(),
                                     orderLine.getCoordinates());
                             
-                            DownloadExternalJob downloadExternalJob = ctxt.newObject(DownloadExternalJob.class);
-                            downloadExternalJob.setJobId(jobId);
-                            downloadExternalJob.setCoordinates(orderLine.getCoordinates());
-                            downloadExternalJob.setFormat(format.getName());
-                            downloadExternalJob.setSrid(projection.getSrid());
-                            downloadOrder.addToExternalJobs(downloadExternalJob);
+                            DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
+                            downloadItem.setProjection(no.geonorge.nedlasting.data.Projection.getForSrid(ctxt, projection.getSrid()));
+                            downloadItem.setFileId(UUID.randomUUID().toString());
+                            downloadItem.setMetadataUuid(dataset.getMetadataUuid());
+                            downloadItem.setExternalJobId(jobId);
+                            downloadItem.setCoordinates(orderLine.getCoordinates());
+                            downloadOrder.addToItems(downloadItem);
                         }
                     }
                 }
@@ -313,9 +307,7 @@ public class DownloadService {
 
         ctxt.commitChanges();
         
-        orderReceipt.setReferenceNumber(downloadOrder.getReferenceNumber());
-
-        String json = gson().toJson(orderReceipt);
+        String json = gson().toJson(downloadOrder.getOrderReceipt());
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 

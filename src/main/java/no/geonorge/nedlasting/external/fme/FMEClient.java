@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.External;
+import no.geonorge.nedlasting.external.ExternalStatus;
 import no.geonorge.nedlasting.external.fme.data.DataDownloadResponse;
 import no.geonorge.nedlasting.external.fme.data.JobInfo;
 import no.geonorge.nedlasting.external.fme.data.ListOption;
@@ -198,11 +199,17 @@ public abstract class FMEClient extends External {
         return ddr == null ? null : ddr.getServiceResponse().getJobID().toString();
     }
 
-    public JobInfo status(String jobId) throws IOException {
+    public ExternalStatus status(String jobId) throws IOException {
         String url = urlPrefix + "/fmerest/v3/transformations/jobs/id/" + jobId;// +
                                                                                 // "/result";//?token="+getToken();
         String r = httpGET(url);
-        return new Gson().fromJson(r, JobInfo.class);
+        JobInfo jobInfo = new Gson().fromJson(r, JobInfo.class);
+        ExternalStatus status = new ExternalStatus();
+        if (jobInfo != null && jobInfo.getResult() != null) {
+            status.setStatusMessage(jobInfo.getResult().getStatusMessage());
+            status.setDownloadUrl(jobInfo.getResult().getResultDatasetDownloadUrl());
+        }
+        return status;
     }
 
     private String httpGET(String url) throws IOException {

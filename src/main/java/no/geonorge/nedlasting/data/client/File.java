@@ -18,6 +18,31 @@ public class File {
     private String format;
     private String status;
     private String metadataName;
+    
+    public static final String STATUS_READY_FOR_DOWNLOAD = "ReadyForDownload";
+    public static final String STATUS_WAITING_FOR_PROCESSING = "WaitingForProcessing";
+    
+    /*
+    {
+
+        "fileId": "e7782d3f-1499-4512-a93b-4a787d5e9402",
+
+        "metadataUuid": "73f863ba-628f-48af-b7fa-30d3ab331b8d",
+
+        "coordinates": "344754 7272921 404330 7187619 304134 7156477 344754 7272921",
+
+        "projection": "25832",
+
+        "projectionName": "EUREF89 UTM sone 32, 2d",
+
+        "format": "GML 3.2.1",
+
+        "status": "WaitingForProcessing",
+
+        "metadataName": "Brannsmitteomrader"
+
+      }
+      */
 
     private List<Link> _links;
 

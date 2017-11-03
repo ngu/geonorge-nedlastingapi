@@ -7,7 +7,6 @@ import java.util.Map;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.fme.NGUFMEClient;
-import no.geonorge.nedlasting.external.fme.data.JobInfo;
 
 public abstract class External {
 
@@ -19,7 +18,7 @@ public abstract class External {
 
     public abstract String submitJob(Format format, Projection projection, String email, String coordinates) throws IOException;
 
-    public abstract JobInfo status(String jobId) throws IOException;
+    public abstract ExternalStatus status(String jobId) throws IOException;
 
     public static External create(Map<String, String> parameters) {
         String type = getRequiredParameter(parameters, PARAMETER_TYPE);
