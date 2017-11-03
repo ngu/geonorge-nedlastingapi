@@ -292,7 +292,7 @@ public class DownloadService {
                                     orderLine.getCoordinates());
                             
                             DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
-                            downloadItem.setProjection(no.geonorge.nedlasting.data.Projection.getForSrid(ctxt, projection.getSrid()));
+                            downloadItem.setSrid(projection.getSrid());
                             downloadItem.setFileId(UUID.randomUUID().toString());
                             downloadItem.setMetadataUuid(dataset.getMetadataUuid());
                             downloadItem.setExternalJobId(jobId);

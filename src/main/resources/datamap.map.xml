@@ -92,6 +92,7 @@
 		<obj-attribute name="fileId" type="java.lang.String" db-attribute-path="FILE_ID"/>
 		<obj-attribute name="fileName" type="java.lang.String" db-attribute-path="FILE_NAME"/>
 		<obj-attribute name="metadataUuid" type="java.lang.String" db-attribute-path="METADATA_UUID"/>
+		<obj-attribute name="srid" type="java.lang.Integer" db-attribute-path="SRID"/>
 		<obj-attribute name="url" type="java.lang.String" db-attribute-path="URL"/>
 	</obj-entity>
 	<obj-entity name="DownloadOrder" className="no.geonorge.nedlasting.data.DownloadOrder" dbEntityName="DOWNLOAD_ORDER">
@@ -126,9 +127,6 @@
 	<db-relationship name="toOrder" source="DOWNLOAD_ITEM" target="DOWNLOAD_ORDER" toMany="false">
 		<db-attribute-pair source="ORDER_ID" target="ORDER_ID"/>
 	</db-relationship>
-	<db-relationship name="toProjection" source="DOWNLOAD_ITEM" target="PROJECTION" toMany="false">
-		<db-attribute-pair source="SRID" target="SRID"/>
-	</db-relationship>
 	<db-relationship name="toItems" source="DOWNLOAD_ORDER" target="DOWNLOAD_ITEM" toMany="true">
 		<db-attribute-pair source="ORDER_ID" target="ORDER_ID"/>
 	</db-relationship>
@@ -144,7 +142,6 @@
 	<obj-relationship name="dataset" source="DatasetFile" target="Dataset" deleteRule="Nullify" db-relationship-path="to_dataset"/>
 	<obj-relationship name="projection" source="DatasetFile" target="Projection" deleteRule="Nullify" db-relationship-path="toProjection"/>
 	<obj-relationship name="order" source="DownloadItem" target="DownloadOrder" deleteRule="Deny" db-relationship-path="toOrder"/>
-	<obj-relationship name="projection" source="DownloadItem" target="Projection" deleteRule="Nullify" db-relationship-path="toProjection"/>
 	<obj-relationship name="items" source="DownloadOrder" target="DownloadItem" deleteRule="Cascade" db-relationship-path="toItems"/>
 	<obj-relationship name="files" source="Projection" target="DatasetFile" deleteRule="Deny" db-relationship-path="toFile"/>
 </data-map>

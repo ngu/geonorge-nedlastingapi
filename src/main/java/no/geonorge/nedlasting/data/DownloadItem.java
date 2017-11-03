@@ -25,8 +25,10 @@ public class DownloadItem extends _DownloadItem {
         file.setMetadataUuid(getMetadataUuid());
         file.setDownloadUrl(getUrl());
         file.setStatus(File.STATUS_READY_FOR_DOWNLOAD);
-        file.setProjection(getProjection().getSrid().toString());
-        file.setProjectionName(getProjection().getName());
+        file.setProjection(getSrid().toString());
+        if (getProjection() != null) {
+            file.setProjectionName(getProjection().getName());
+        }
         file.setName(getFileName());
         file.setCoordinates(getCoordinates());
 
@@ -73,6 +75,14 @@ public class DownloadItem extends _DownloadItem {
 
     public Dataset getDataset() {
         return Dataset.forMetadataUUID(getObjectContext(), getMetadataUuid());
+    }
+
+    public void setProjection(Projection projection) {
+        setSrid(projection == null ? null : projection.getSrid());
+    }
+
+    private Projection getProjection() {
+        return Projection.getForSrid(getObjectContext(), getSrid());
     }
 
 }
