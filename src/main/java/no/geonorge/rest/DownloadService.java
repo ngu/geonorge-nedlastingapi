@@ -203,24 +203,31 @@ public class DownloadService {
 
         ObjectContext ctxt = Config.getObjectContext();
         Dataset dataset = Dataset.forMetadataUUID(ctxt, req.getMetadataUuid());
+        CanDownloadResponse canDownload = new CanDownloadResponse();
         if (dataset == null) {
             log.info("could not find dataset");
-            return gson().toJson(new CanDownloadResponse(false));
+            canDownload.setCanDownload(false);
+            canDownload.setMessage("could not find dataset");
+            return gson().toJson(canDownload);
         }
 
         // check if can select area
         if (req.hasCoordinates() && !dataset.isSupportsPolygonSelection()) {
             log.info("trying to select polygon, but dataset does not support it");
-            return gson().toJson(new CanDownloadResponse(false));
+            canDownload.setCanDownload(false);
+            canDownload.setMessage("trying to select polygon, but dataset does not support it");
+            return gson().toJson(canDownload);
         }
         
         // check srid
         if (!dataset.supportSrid(req.getSrid())) {
             log.info("unsupported srid " + req.getSrid() + ". only support " + dataset.getSrids());
-            return gson().toJson(new CanDownloadResponse(false));
+            canDownload.setCanDownload(false);
+            canDownload.setMessage("unsupported srid " + req.getSrid() + ". only support " + dataset.getSrids());
+            return gson().toJson(canDownload);
         }
-
-        return gson().toJson(new CanDownloadResponse(true));
+        canDownload.setCanDownload(true)
+        return gson().toJson(canDownload);
     }
 
     /**
