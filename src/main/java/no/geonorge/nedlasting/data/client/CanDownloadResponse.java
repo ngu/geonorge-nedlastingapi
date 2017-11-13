@@ -3,6 +3,7 @@ package no.geonorge.nedlasting.data.client;
 public class CanDownloadResponse {
 
     private boolean canDownload;
+    private String message;
 
     public CanDownloadResponse() {
 
@@ -19,5 +20,13 @@ public class CanDownloadResponse {
     public void setCanDownload(boolean canDownload) {
         this.canDownload = canDownload;
     }
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
 
 }
