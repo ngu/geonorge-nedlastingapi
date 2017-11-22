@@ -115,6 +115,11 @@
         <artifactId>rome</artifactId>
         <version>1.7.0</version>
     </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-jdk14</artifactId>
+        <version>1.7.25</version>
+    </dependency>
 
       <!-- Open Source SQLServer JDBC library
         <dependency>
