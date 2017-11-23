@@ -32,7 +32,23 @@
                 <td>GET api/atom/{metadataUuid}</td><td>List all files for a given dataset as Atom Feed</td>
             </tr>
         </table>
-
+        <p><h3>Example with api/atomfeeds</h3></p>
+        <pre>
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;feed xmlns=&quot;http://www.w3.org/2005/Atom&quot;&gt;
+      &lt;title&gt;GEONORGE DATASET ATOM FEEDS&lt;/title&gt;
+      &lt;link rel=&quot;alternate&quot; href=&quot;https://myserver.mydomain.com:443/api/atomfeeds&quot; /&gt;
+      &lt;subtitle&gt;ATOM Feeds for Datasets&lt;/subtitle&gt;
+      &lt;entry&gt;
+        &lt;title&gt;My dataset title&lt;/title&gt;
+        &lt;link rel=&quot;alternate&quot; href=&quot;https://myserver.mydomain.com:443/api/atom/6aba5993-94bd-48f9-91d4-3a5f4ba7d9a7&quot; /&gt;
+        &lt;author&gt;
+          &lt;name /&gt;
+        &lt;/author&gt;
+        &lt;summary type=&quot;text/plain&quot;&gt;Dataset ATOM Feed&lt;/summary&gt;
+      &lt;/entry&gt;
+    &lt;/feed&gt;
+        </pre>
         <p>
 
         <h2>Internal Dataset API</h2>
