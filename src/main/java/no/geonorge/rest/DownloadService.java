@@ -30,6 +30,15 @@ import org.apache.cayenne.query.SelectQuery;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import com.rometools.rome.feed.synd.SyndContent;
+import com.rometools.rome.feed.synd.SyndContentImpl;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndEntryImpl;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.feed.synd.SyndFeedImpl;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedOutput;
+
 import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.Dataset;
 import no.geonorge.nedlasting.data.DatasetFile;
@@ -226,7 +235,7 @@ public class DownloadService {
             canDownload.setMessage("unsupported srid " + req.getSrid() + ". only support " + dataset.getSrids());
             return gson().toJson(canDownload);
         }
-        canDownload.setCanDownload(true)
+        canDownload.setCanDownload(true);
         return gson().toJson(canDownload);
     }
 
@@ -433,6 +442,90 @@ public class DownloadService {
         ctxt.deleteObject(dataset);
         ctxt.commitChanges();
         return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @GET
+    @Path("atomfeeds")
+    public Response getAtomFeeds() {
+        ObjectContext ctxt = Config.getObjectContext();
+
+        SyndFeed feed = new SyndFeedImpl();
+        feed.setFeedType("atom_1.0");
+        feed.setTitle("GEONORGE DATASET ATOM FEEDS ");
+        feed.setDescription("ATOM Feeds for Datasets");
+        feed.setLink(getUrlPrefix().concat("atomfeeds"));
+
+        List entries = new ArrayList();
+        SyndEntry entry;
+        SyndContent description;
+
+        for (Dataset dataset : Dataset.getAll(ctxt)) {
+            // Do not add entry when dataset has no files
+            List<DatasetFile> files = dataset.getFiles();
+            if (files.size() > 0) {
+                entry = new SyndEntryImpl();
+                entry.setTitle(dataset.getTitle());
+                entry.setLink(getUrlPrefix().concat("atom/".concat(dataset.getMetadataUuid())));
+                description = new SyndContentImpl();
+                description.setType(MediaType.TEXT_PLAIN);
+                description.setValue("Dataset ATOM Feed");
+                entry.setDescription(description);
+                entries.add(entry);
+            }
+        }
+        feed.setEntries(entries);
+        String atom = "";
+        try {
+            String atom = new SyndFeedOutput().outputString(feed);
+            return Response.ok(atom,MediaType.APPLICATION_ATOM_XML).build();
+        } catch (FeedException e) {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
+    }
+    @GET
+    @Path("atom/{metadataUuid}")
+    public Response getAtomFeed(@PathParam("metadataUuid") String metadataUuid) {
+        ObjectContext ctxt = Config.getObjectContext();
+        Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
+        if (dataset == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        SyndFeed feed = new SyndFeedImpl();
+        feed.setFeedType("atom_1.0");
+        feed.setTitle(dataset.getTitle());
+        feed.setDescription(dataset.getTitle() + " ATOM Feed");
+        feed.setLink(getUrlPrefix()+"atom/"+metadataUuid);
+
+        List<SyndEntry> entries = new ArrayList();
+        List<DatasetFile> datasetFiles = dataset.getFiles();
+
+        for (DatasetFile datasetFile:datasetFiles) {
+            SyndEntry entry = new SyndEntryImpl();
+            StringBuilder sb = new StringBuilder();
+            sb.append(dataset.getTitle());
+            sb.append("-"+datasetFile.getAreaType());
+            sb.append("-"+datasetFile.getAreaName());
+            sb.append("-"+datasetFile.getProjection().getName());
+            sb.append("-"+datasetFile.getFormat().getName());
+            String title = sb.toString();
+            entry.setTitle(title);
+            entry.setLink(datasetFile.getUrl());
+            /* <summary />*/
+            SyndContent description = new SyndContentImpl();
+            description.setType(MediaType.TEXT_PLAIN);
+            description.setValue("Lorem ipsum..");
+            entry.setDescription(description);
+            entries.add(entry);
+        }
+        feed.setEntries(entries);
+        try {
+            String atom = new SyndFeedOutput().outputString(feed);
+            return Response.ok(atom,MediaType.APPLICATION_ATOM_XML).build();
+        } catch (FeedException e) {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
     }
     
 }
