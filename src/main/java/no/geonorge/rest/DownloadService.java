@@ -450,10 +450,10 @@ public class DownloadService {
         ObjectContext ctxt = Config.getObjectContext();
 
         SyndFeed feed = new SyndFeedImpl();
-        feed.setFeedType("atom-1.0");
-        feed.setTitle("NGU DATASET ATOM FEEDS ");
-        feed.setDescription("ATOM Feeds for Datasets from NGU");
-        feed.setLink(getUrlPrefix()+"/atomfeeds");
+        feed.setFeedType("atom_1.0");
+        feed.setTitle("GEONORGE DATASET ATOM FEEDS ");
+        feed.setDescription("ATOM Feeds for Datasets");
+        feed.setLink(getUrlPrefix().concat("atomfeeds"));
 
         List entries = new ArrayList();
         SyndEntry entry;
@@ -465,7 +465,7 @@ public class DownloadService {
             if (files.size() > 0) {
                 entry = new SyndEntryImpl();
                 entry.setTitle(dataset.getTitle());
-                entry.setLink(getUrlPrefix() + "/atom/" + dataset.getMetadataUuid());
+                entry.setLink(getUrlPrefix().concat("atom/".concat(dataset.getMetadataUuid())));
                 description = new SyndContentImpl();
                 description.setType(MediaType.APPLICATION_ATOM_XML);
                 description.setValue("ATOM Feed 1.0");
@@ -491,42 +491,40 @@ public class DownloadService {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         SyndFeed feed = new SyndFeedImpl();
-        feed.setFeedType("atom-1.0");
-
+        feed.setFeedType("atom_1.0");
         feed.setTitle(dataset.getTitle());
-        feed.setDescription(dataset.getTitle() + " ATOM Feed from NGU");
+        feed.setDescription(dataset.getTitle() + " ATOM Feed");
         feed.setLink(getUrlPrefix()+"/atomfeed/"+metadataUuid);
 
-        List entries = new ArrayList();
-        SyndEntry entry;
-        SyndContent description;
-
+        List<SyndEntry> entries = new ArrayList();
         List<DatasetFile> datasetFiles = dataset.getFiles();
+
         for (DatasetFile datasetFile:datasetFiles) {
-            entry = new SyndEntryImpl();
-            String title = dataset.getTitle() + "-" + datasetFile.getAreaType() + datasetFile.getAreaName() + datasetFile.getFormat() + datasetFile.getFormatVersion();
+            SyndEntry entry = new SyndEntryImpl();
+            StringBuilder sb = new StringBuilder();
+            sb.append(dataset.getTitle());
+            sb.append("-"+datasetFile.getAreaType());
+            sb.append("-"+datasetFile.getAreaName());
+            sb.append("-"+datasetFile.getFormat());
+            sb.append("-"+datasetFile.getFormatVersion());
+            String title = sb.toString();
             entry.setTitle(title);
             entry.setLink(datasetFile.getUrl());
-            description = new SyndContentImpl();
-            description.setType(MediaType.APPLICATION_ATOM_XML);
+            /* <summary />*/
+            SyndContent description = new SyndContentImpl();
+            description.setType(MediaType.TEXT_PLAIN);
             description.setValue("Lorem ipsum..");
             entry.setDescription(description);
             entries.add(entry);
         }
-
         feed.setEntries(entries);
-        log.finest("Found " + entries.size() + " entries");
-        String atom = "";
         try {
-            atom = new SyndFeedOutput().outputString(feed);
+            String atom = new SyndFeedOutput().outputString(feed);
+            return Response.ok(atom,MediaType.APPLICATION_ATOM_XML).build();
         } catch (FeedException e) {
-            log.finer(e.getMessage());
-            log.finest(String.valueOf(e.getStackTrace()));
             e.printStackTrace();
+            return Response.serverError().build();
         }
-        log.finest("Found " + entries.size() + " entries");
-        return Response.ok(atom,MediaType.APPLICATION_ATOM_XML).build();
-
     }
     
 }
