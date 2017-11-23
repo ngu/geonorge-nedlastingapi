@@ -505,7 +505,7 @@ public class DownloadService {
             sb.append(dataset.getTitle());
             sb.append("-"+datasetFile.getAreaType());
             sb.append("-"+datasetFile.getAreaName());
-            sb.append("-"+datasetFile.getFormat());
+            sb.append("-"+datasetFile.getFormat().getName());
             sb.append("-"+datasetFile.getFormatVersion());
             String title = sb.toString();
             entry.setTitle(title);
