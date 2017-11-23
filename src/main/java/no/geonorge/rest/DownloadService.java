@@ -467,8 +467,8 @@ public class DownloadService {
                 entry.setTitle(dataset.getTitle());
                 entry.setLink(getUrlPrefix().concat("atom/".concat(dataset.getMetadataUuid())));
                 description = new SyndContentImpl();
-                description.setType(MediaType.APPLICATION_ATOM_XML);
-                description.setValue("ATOM Feed 1.0");
+                description.setType(MediaType.TEXT_PLAIN);
+                description.setValue("Dataset ATOM Feed");
                 entry.setDescription(description);
                 entries.add(entry);
             }
@@ -494,7 +494,7 @@ public class DownloadService {
         feed.setFeedType("atom_1.0");
         feed.setTitle(dataset.getTitle());
         feed.setDescription(dataset.getTitle() + " ATOM Feed");
-        feed.setLink(getUrlPrefix()+"/atomfeed/"+metadataUuid);
+        feed.setLink(getUrlPrefix()+"atom/"+metadataUuid);
 
         List<SyndEntry> entries = new ArrayList();
         List<DatasetFile> datasetFiles = dataset.getFiles();
@@ -505,8 +505,8 @@ public class DownloadService {
             sb.append(dataset.getTitle());
             sb.append("-"+datasetFile.getAreaType());
             sb.append("-"+datasetFile.getAreaName());
+            sb.append("-"+datasetFile.getProjection().getName());
             sb.append("-"+datasetFile.getFormat().getName());
-            sb.append("-"+datasetFile.getFormatVersion());
             String title = sb.toString();
             entry.setTitle(title);
             entry.setLink(datasetFile.getUrl());
