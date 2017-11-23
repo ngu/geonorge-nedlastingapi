@@ -476,11 +476,12 @@ public class DownloadService {
         feed.setEntries(entries);
         String atom = "";
         try {
-            atom = new SyndFeedOutput().outputString(feed);
+            String atom = new SyndFeedOutput().outputString(feed);
+            return Response.ok(atom,MediaType.APPLICATION_ATOM_XML).build();
         } catch (FeedException e) {
             e.printStackTrace();
+            return Response.serverError().build();
         }
-        return Response.ok(atom,MediaType.APPLICATION_ATOM_XML).build();
     }
     @GET
     @Path("atom/{metadataUuid}")
