@@ -1,31 +1,23 @@
 package no.geonorge.rest;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.logging.Logger;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.*;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.query.SelectQuery;
+import org.apache.commons.io.FilenameUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -67,7 +59,9 @@ public class DownloadService {
     UriInfo uri;
     
     private static final Logger log = Logger.getLogger(DownloadService.class.getName());
-    
+    private List<String> allowedFiletypes = Arrays.asList("zip", "sosi", "gml","gz","tgz","tar");
+    private List<String> allowedHosts = Arrays.asList("www.ngu.no","geo.ngu.no","localhost");
+
     private String getUrlPrefix() {
         if (uri == null) {
             return "";
@@ -328,6 +322,133 @@ public class DownloadService {
     }
 
     @GET
+    @Path("v2/download/order/{orderUuid}/{fileId}")
+    public Response getFileForOrder(@PathParam("orderUuid") String orderUuid,@PathParam("fileId") String fileId) {
+        ObjectContext ctxt = Config.getObjectContext();
+
+        DownloadOrder order = DownloadOrder.get(ctxt, orderUuid);
+        if (order == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        try {
+            Date orderDate = order.getOrderReceipt().getOrderDate();
+            LocalDate then = orderDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate now = LocalDate.now();
+            long days = ChronoUnit.DAYS.between(then, now);
+            if (days > 5) {
+                // Fetch your file within a working week please
+                Response.status(Response.Status.GONE).build();
+            }
+        } catch (IOException ignored) {
+            Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        List<DownloadItem> items = order.getItems();
+
+        for (DownloadItem item: items) {
+            if (item.getFileId().equals(fileId)) {
+                // We have correct file
+                // FIXME: Check access constraints
+                URL redirect;
+                try {
+                    redirect = new URL(item.getUrl());
+                } catch (MalformedURLException ue) {
+                    ue.printStackTrace();
+                    return Response.status(Response.Status.EXPECTATION_FAILED).build();
+                }
+                return createResponseFromRemoteFile(item.getUrl());
+            }
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    @GET
+    @Path("fileproxy/{metadataUuid}/{fileId}")
+    //@Path("fileproxy/{metadataUuid}/{fileId}/{baseName}.{format}") ??
+    public Response getFileForDownload(@PathParam("metadataUuid") String metadataUuid,@PathParam("fileId") String fileId){
+            ObjectContext ctxt = Config.getObjectContext();
+            Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
+            if (dataset == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            List<DatasetFile> datasetFiles = dataset.getFiles();
+            for (DatasetFile datasetFile: datasetFiles) {
+                if (datasetFile.getFileId().equals(fileId)) {
+                    return createResponseFromRemoteFile(datasetFile.getUrl());
+                }
+            }
+            return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+
+    private Response createResponseFromRemoteFile(String urlString) {
+        // Check if fileType is allowed
+        String extension = FilenameUtils.getExtension(urlString);
+        String baseName = FilenameUtils.getBaseName(urlString);
+        String fileName = baseName.concat(".").concat(extension);
+        URL url;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException ue) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        boolean isValidSuffix = false;
+
+        // Check if filetype is allowed
+        for (String suffix:allowedFiletypes) {
+            if (extension.toLowerCase().equals(suffix.toLowerCase())) {
+                isValidSuffix = true;
+            }
+        }
+        if (!isValidSuffix) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        boolean isAllowedHost = false;
+
+        // Check if Url is allowed
+        for (String allowedHost: allowedHosts) {
+            if (url.getHost().equalsIgnoreCase(allowedHost)) {
+                isAllowedHost = true;
+            }
+        }
+        if (!isAllowedHost) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        // Return file proxied by this API
+        URLConnection uc;
+        try {
+            uc = url.openConnection();
+        } catch (IOException ie) {
+            ie.printStackTrace();
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        Client client = ClientBuilder.newClient();
+        final InputStream responseStream = client.target(urlString).request().get(InputStream.class);
+        StreamingOutput output = new StreamingOutput() {
+            @Override
+            public void write(OutputStream out) throws IOException, WebApplicationException  {
+                try {
+                    int length;
+                    byte[] data = new byte[1024];
+                    while((length = responseStream.read(data)) != -1) {
+                        out.write(data,0,length);
+                    }
+                    out.flush();
+                    responseStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new WebApplicationException ("File not found");
+                }
+            }
+        };
+
+
+        return Response.ok(output,MediaType.APPLICATION_OCTET_STREAM).header(
+                "Content-Disposition","attachment, filename=\"" + fileName + "\"").build();
+    }
+
+    @GET
     @Path("internal/dataset")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDatasets() {
@@ -474,7 +595,6 @@ public class DownloadService {
             }
         }
         feed.setEntries(entries);
-        String atom = "";
         try {
             String atom = new SyndFeedOutput().outputString(feed);
             return Response.ok(atom,MediaType.APPLICATION_ATOM_XML).build();
@@ -529,3 +649,5 @@ public class DownloadService {
     }
     
 }
+
+
