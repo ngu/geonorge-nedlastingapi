@@ -1,19 +1,40 @@
 package no.geonorge.rest;
 
-import java.io.*;
-import java.net.MalformedURLException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.query.SelectQuery;
@@ -21,7 +42,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndContentImpl;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -47,6 +67,7 @@ import no.geonorge.nedlasting.data.client.OrderArea;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.External;
+import no.geonorge.nedlasting.utils.IOUtils;
 
 /**
  * This REST api implements the Norway Digital (Geonorge) Download API
@@ -343,98 +364,66 @@ public class DownloadService {
             Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        List<DownloadItem> items = order.getItems();
-
-        for (DownloadItem item: items) {
-            if (item.getFileId().equals(fileId)) {
-                // We have correct file
-                // FIXME: Check access constraints
-                URL redirect;
-                try {
-                    redirect = new URL(item.getUrl());
-                } catch (MalformedURLException ue) {
-                    ue.printStackTrace();
-                    return Response.status(Response.Status.EXPECTATION_FAILED).build();
-                }
-                return createResponseFromRemoteFile(item.getUrl());
-            }
+        DownloadItem item = order.getItemForFileId(fileId);
+        if (item == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.status(Response.Status.NOT_FOUND).build();
+
+        try {
+            return createResponseFromRemoteFile(item.getUrl());
+        } catch (IOException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }        
     }
 
     @GET
     @Path("fileproxy/{metadataUuid}/{fileId}")
-    //@Path("fileproxy/{metadataUuid}/{fileId}/{baseName}.{format}") ??
     public Response getFileForDownload(@PathParam("metadataUuid") String metadataUuid,@PathParam("fileId") String fileId){
             ObjectContext ctxt = Config.getObjectContext();
             Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
             if (dataset == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-            List<DatasetFile> datasetFiles = dataset.getFiles();
-            for (DatasetFile datasetFile: datasetFiles) {
-                if (datasetFile.getFileId().equals(fileId)) {
-                    return createResponseFromRemoteFile(datasetFile.getUrl());
-                }
+            DatasetFile datasetFile = dataset.getFile(fileId);
+            if (datasetFile == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
             }
-            return Response.status(Response.Status.NOT_FOUND).build();
+            try {
+                return createResponseFromRemoteFile(datasetFile.getUrl());
+            } catch (IOException e) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }        
     }
 
 
-    private Response createResponseFromRemoteFile(String urlString) {
+    private Response createResponseFromRemoteFile(String urlString) throws IOException {
         // Check if fileType is allowed
         String extension = FilenameUtils.getExtension(urlString);
         String baseName = FilenameUtils.getBaseName(urlString);
         String fileName = baseName.concat(".").concat(extension);
-        URL url;
-        try {
-            url = new URL(urlString);
-        } catch (MalformedURLException ue) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+        
+        URL url = new URL(urlString);
+        
+        if (!allowedFiletypes.contains(extension.toLowerCase())) {
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
-        boolean isValidSuffix = false;
-
-        // Check if filetype is allowed
-        for (String suffix:allowedFiletypes) {
-            if (extension.toLowerCase().equals(suffix.toLowerCase())) {
-                isValidSuffix = true;
-            }
-        }
-        if (!isValidSuffix) {
+        if (!allowedHosts.contains(url.getHost().toLowerCase())) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        boolean isAllowedHost = false;
-
-        // Check if Url is allowed
-        for (String allowedHost: allowedHosts) {
-            if (url.getHost().equalsIgnoreCase(allowedHost)) {
-                isAllowedHost = true;
-            }
-        }
-        if (!isAllowedHost) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
         // Return file proxied by this API
-        URLConnection uc;
-        try {
-            uc = url.openConnection();
-        } catch (IOException ie) {
-            ie.printStackTrace();
+        HttpURLConnection uc = (HttpURLConnection) url.openConnection();
+        if (uc.getResponseCode() != 200) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
         Client client = ClientBuilder.newClient();
         final InputStream responseStream = client.target(urlString).request().get(InputStream.class);
         StreamingOutput output = new StreamingOutput() {
             @Override
             public void write(OutputStream out) throws IOException, WebApplicationException  {
                 try {
-                    int length;
-                    byte[] data = new byte[1024];
-                    while((length = responseStream.read(data)) != -1) {
-                        out.write(data,0,length);
-                    }
-                    out.flush();
+                    IOUtils.copy(responseStream, out);
                     responseStream.close();
                 } catch (Exception e) {
                     e.printStackTrace();

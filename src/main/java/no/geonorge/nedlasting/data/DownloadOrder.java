@@ -25,6 +25,15 @@ public class DownloadOrder extends _DownloadOrder {
 
         return orderReceipt;
     }
+    
+    public DownloadItem getItemForFileId(String fileId) {
+        for (DownloadItem item : getItems()) {
+            if (item.getFileId().equals(fileId)) {
+                return item;
+            }
+        }
+        return item;
+    }
 
     public static DownloadOrder get(ObjectContext ctxt, String referenceNumber) {
         if (referenceNumber == null) {
@@ -42,5 +51,5 @@ public class DownloadOrder extends _DownloadOrder {
         }
         return downloads.get(0);
     }
-
+    
 }
