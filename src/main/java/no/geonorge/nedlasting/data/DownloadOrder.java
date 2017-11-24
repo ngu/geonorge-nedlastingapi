@@ -32,7 +32,7 @@ public class DownloadOrder extends _DownloadOrder {
                 return item;
             }
         }
-        return item;
+        return null;
     }
 
     public static DownloadOrder get(ObjectContext ctxt, String referenceNumber) {
