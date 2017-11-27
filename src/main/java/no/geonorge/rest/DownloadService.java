@@ -303,9 +303,10 @@ public class DownloadService {
 
             boolean foundForOrderLine = false;
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
+                String _fileUuid = UuidUtils.getUuid(dataset.getTitle(),datasetFile.getFileId());
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
                 downloadItem.setProjection(datasetFile.getProjection());
-                downloadItem.setUrl(getUrlPrefix()+"v2/download/order/"+downloadOrder.getReferenceNumber()+"/"+datasetFile.getFileId());
+                downloadItem.setUrl(getUrlPrefix()+"v2/download/order/"+downloadOrder.getReferenceNumber()+"/"+_fileUuid);
                 downloadItem.setFileId(datasetFile.getFileId());
                 downloadItem.setFileName(datasetFile.getFileName());
                 downloadItem.setMetadataUuid(datasetFile.getDataset().getMetadataUuid());
@@ -345,8 +346,8 @@ public class DownloadService {
     }
 
     @GET
-    @Path("v2/download/order/{orderUuid}/{fileId}")
-    public Response getFileForOrder(@PathParam("orderUuid") String orderUuid,@PathParam("fileId") String fileId) {
+    @Path("v2/download/order/{orderUuid}/{fileUuid}")
+    public Response getFileForOrder(@PathParam("orderUuid") String orderUuid,@PathParam("fileUuid") String fileUuid) {
         ObjectContext ctxt = Config.getObjectContext();
 
         DownloadOrder order = DownloadOrder.get(ctxt, orderUuid);
@@ -365,8 +366,21 @@ public class DownloadService {
         } catch (IOException ignored) {
             Response.status(Response.Status.NOT_FOUND).build();
         }
+        String _fileId = null;
+        try {
+            List<File> orderFiles = order.getOrderReceipt().getFiles();
+            orderFiles.get(0).getFileId()
+            for (File orderFile:orderFiles) {
+                if (fileUuid.equals(UuidUtils.getUuid(orderFile.getMetadataName(),orderFile.getFileId()))) {
+                    _fileId = orderFile.getFileId();
+                }
+                break; // stop on first match
+            }
+        } catch (IOException ie) {
+            ie.printStackTrace();
+        }
 
-        DownloadItem item = order.getItemForFileId(fileId);
+        DownloadItem item = order.getItemForFileId(_fileId);
         if (item == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
