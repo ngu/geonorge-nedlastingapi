@@ -434,7 +434,7 @@ public class DownloadService {
 
 
         return Response.ok(output,MediaType.APPLICATION_OCTET_STREAM).header(
-                "Content-Disposition","attachment, filename=\"" + fileName + "\"").build();
+                "Content-Disposition","attachment; filename=\"" + fileName + "\"").build();
     }
 
     @GET
