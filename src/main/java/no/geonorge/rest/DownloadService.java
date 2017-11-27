@@ -3,6 +3,7 @@ package no.geonorge.rest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
@@ -68,6 +69,7 @@ import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.External;
 import no.geonorge.nedlasting.utils.IOUtils;
+import no.geonorge.nedlasting.utils.UuidUtils;
 
 /**
  * This REST api implements the Norway Digital (Geonorge) Download API
@@ -256,7 +258,7 @@ public class DownloadService {
 
     /**
      * 
-     * @param metadataUuid
+     * @param referenceNumber
      * @return json of valid projections of a given metadataUuid
      * @throws Exception
      */
@@ -303,7 +305,7 @@ public class DownloadService {
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
                 downloadItem.setProjection(datasetFile.getProjection());
-                downloadItem.setUrl(datasetFile.getUrl());
+                downloadItem.setUrl(getUrlPrefix()+"v2/download/order/"+downloadOrder.getReferenceNumber()+"/"+datasetFile.getFileId());
                 downloadItem.setFileId(datasetFile.getFileId());
                 downloadItem.setFileName(datasetFile.getFileName());
                 downloadItem.setMetadataUuid(datasetFile.getDataset().getMetadataUuid());
@@ -377,14 +379,27 @@ public class DownloadService {
     }
 
     @GET
-    @Path("fileproxy/{metadataUuid}/{fileId}")
-    public Response getFileForDownload(@PathParam("metadataUuid") String metadataUuid,@PathParam("fileId") String fileId){
+    @Path("fileproxy/{metadataUuid}/{fileUuid}")
+    public Response getFileForDownload(@PathParam("metadataUuid") String metadataUuid,@PathParam("fileUuid") String fileUuid){
             ObjectContext ctxt = Config.getObjectContext();
             Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
             if (dataset == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-            DatasetFile datasetFile = dataset.getFile(fileId);
+            Set<String> fileIds = dataset.getFileIds();
+            String _fileId = null;
+            for (String fileId:fileIds) {
+                try {
+                    if (fileUuid.equals(UuidUtils.getUuid(dataset.getTitle(),fileId))) {
+                        _fileId = fileId;
+                        break; // return on first match
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                }
+            }
+            DatasetFile datasetFile = dataset.getFile(_fileId);
             if (datasetFile == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -395,15 +410,14 @@ public class DownloadService {
             }        
     }
 
-
     private Response createResponseFromRemoteFile(String urlString) throws IOException {
-        // Check if fileType is allowed
+
         String extension = FilenameUtils.getExtension(urlString);
         String baseName = FilenameUtils.getBaseName(urlString);
         String fileName = baseName.concat(".").concat(extension);
         
         URL url = new URL(urlString);
-        
+        // Check if fileType and remote host is allowed
         if (!allowedFiletypes.contains(extension.toLowerCase())) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
@@ -431,7 +445,6 @@ public class DownloadService {
                 }
             }
         };
-
 
         return Response.ok(output,MediaType.APPLICATION_OCTET_STREAM).header(
                 "Content-Disposition","attachment; filename=\"" + fileName + "\"").build();
@@ -619,11 +632,18 @@ public class DownloadService {
             sb.append("-"+datasetFile.getFormat().getName());
             String title = sb.toString();
             entry.setTitle(title);
-            entry.setLink(datasetFile.getUrl());
+            try {
+                String fileUuid = UuidUtils.getUuid(dataset.getTitle(), datasetFile.getFileId());
+                entry.setLink(getUrlPrefix().concat("fileproxy/").concat(dataset.getMetadataUuid()).concat("/"+fileUuid));
+            } catch (UnsupportedEncodingException ee) {
+                ee.printStackTrace();
+                return Response.serverError().build();
+            }
+
             /* <summary />*/
             SyndContent description = new SyndContentImpl();
             description.setType(MediaType.TEXT_PLAIN);
-            description.setValue("Lorem ipsum..");
+            description.setValue(dataset.getTitle().concat("-").concat(datasetFile.getFileName()));
             entry.setDescription(description);
             entries.add(entry);
         }
