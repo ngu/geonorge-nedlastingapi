@@ -336,7 +336,6 @@ public class DownloadService {
                     }
                 }
             }
-
         }
 
         ctxt.commitChanges();
@@ -369,7 +368,7 @@ public class DownloadService {
         String _fileId = null;
         try {
             List<File> orderFiles = order.getOrderReceipt().getFiles();
-            orderFiles.get(0).getFileId()
+            orderFiles.get(0).getFileId();
             for (File orderFile:orderFiles) {
                 if (fileUuid.equals(UuidUtils.getUuid(orderFile.getMetadataName(),orderFile.getFileId()))) {
                     _fileId = orderFile.getFileId();
@@ -396,6 +395,12 @@ public class DownloadService {
     @Path("fileproxy/{metadataUuid}/{fileUuid}")
     public Response getFileForDownload(@PathParam("metadataUuid") String metadataUuid,@PathParam("fileUuid") String fileUuid){
             ObjectContext ctxt = Config.getObjectContext();
+
+            /* Store downloads for statistical use */
+            DownloadOrder downloadOrder = ctxt.newObject(DownloadOrder.class);
+            downloadOrder.setStartTime(new Date());
+            downloadOrder.setReferenceNumber(UUID.randomUUID().toString());
+
             Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
             if (dataset == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -418,6 +423,14 @@ public class DownloadService {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             try {
+                DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
+                downloadItem.setProjection(datasetFile.getProjection());
+                downloadItem.setFileId(fileUuid);
+                downloadItem.setFileName(datasetFile.getFileName());
+                downloadItem.setMetadataUuid(dataset.getMetadataUuid());
+                downloadOrder.addToItems(downloadItem);
+                ctxt.commitChanges();
+
                 return createResponseFromRemoteFile(datasetFile.getUrl());
             } catch (IOException e) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
