@@ -1,7 +1,15 @@
 package no.geonorge.rest;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -19,17 +27,21 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.query.SelectQuery;
+import org.apache.commons.io.FilenameUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndContentImpl;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -55,6 +67,7 @@ import no.geonorge.nedlasting.data.client.OrderArea;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.External;
+import no.geonorge.nedlasting.utils.IOUtils;
 
 /**
  * This REST api implements the Norway Digital (Geonorge) Download API
@@ -67,7 +80,9 @@ public class DownloadService {
     UriInfo uri;
     
     private static final Logger log = Logger.getLogger(DownloadService.class.getName());
-    
+    private List<String> allowedFiletypes = Arrays.asList("zip", "sosi", "gml","gz","tgz","tar");
+    private List<String> allowedHosts = Arrays.asList("www.ngu.no","geo.ngu.no","localhost");
+
     private String getUrlPrefix() {
         if (uri == null) {
             return "";
@@ -241,7 +256,7 @@ public class DownloadService {
 
     /**
      * 
-     * @param metadataUuid
+     * @param referenceNumber
      * @return json of valid projections of a given metadataUuid
      * @throws Exception
      */
@@ -288,7 +303,8 @@ public class DownloadService {
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
                 downloadItem.setProjection(datasetFile.getProjection());
-                downloadItem.setUrl(datasetFile.getUrl());
+                downloadItem.setUrl(getUrlPrefix() + "v2/download/order/" + downloadOrder.getReferenceNumber() + "/"
+                        + datasetFile.getFileId());
                 downloadItem.setFileId(datasetFile.getFileId());
                 downloadItem.setFileName(datasetFile.getFileName());
                 downloadItem.setMetadataUuid(datasetFile.getDataset().getMetadataUuid());
@@ -318,13 +334,119 @@ public class DownloadService {
                     }
                 }
             }
-
         }
 
         ctxt.commitChanges();
         
         String json = gson().toJson(downloadOrder.getOrderReceipt());
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
+    }
+
+    @GET
+    @Path("v2/download/order/{orderUuid}/{fileId}")
+    public Response getFileForOrder(@PathParam("orderUuid") String orderUuid,@PathParam("fileId") String fileId) {
+        ObjectContext ctxt = Config.getObjectContext();
+
+        DownloadOrder order = DownloadOrder.get(ctxt, orderUuid);
+        if (order == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        try {
+            Date orderDate = order.getOrderReceipt().getOrderDate();
+            LocalDate then = orderDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate now = LocalDate.now();
+            long days = ChronoUnit.DAYS.between(then, now);
+            if (days > 5) {
+                // Fetch your file within a working week please
+                Response.status(Response.Status.GONE).build();
+            }
+        } catch (IOException ignored) {
+            Response.status(Response.Status.NOT_FOUND).build();
+        }
+        
+        DownloadItem item = order.getItemForFileId(fileId);
+        if (item == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        try {
+            return createResponseFromRemoteFile(item.getUrl());
+        } catch (IOException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }        
+    }
+
+    @GET
+    @Path("fileproxy/{metadataUuid}/{fileId}")
+    public Response getFileForDownload(@PathParam("metadataUuid") String metadataUuid,@PathParam("fileId") String fileId){
+            ObjectContext ctxt = Config.getObjectContext();
+
+            /* Store downloads for statistical use */
+            DownloadOrder downloadOrder = ctxt.newObject(DownloadOrder.class);
+            downloadOrder.setStartTime(new Date());
+            downloadOrder.setReferenceNumber(UUID.randomUUID().toString());
+
+            Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
+            if (dataset == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            DatasetFile datasetFile = dataset.getFile(fileId);
+            if (datasetFile == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            try {
+                DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
+                downloadItem.setProjection(datasetFile.getProjection());
+                downloadItem.setFileId(datasetFile.getFileId());
+                downloadItem.setFileName(datasetFile.getFileName());
+                downloadItem.setMetadataUuid(dataset.getMetadataUuid());
+                downloadOrder.addToItems(downloadItem);
+                ctxt.commitChanges();
+
+                return createResponseFromRemoteFile(datasetFile.getUrl());
+            } catch (IOException e) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }        
+    }
+
+    private Response createResponseFromRemoteFile(String urlString) throws IOException {
+
+        String extension = FilenameUtils.getExtension(urlString);
+        String baseName = FilenameUtils.getBaseName(urlString);
+        String fileName = baseName.concat(".").concat(extension);
+        
+        URL url = new URL(urlString);
+        // Check if fileType and remote host is allowed
+        if (!allowedFiletypes.contains(extension.toLowerCase())) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        if (!allowedHosts.contains(url.getHost().toLowerCase())) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        // Return file proxied by this API
+        HttpURLConnection uc = (HttpURLConnection) url.openConnection();
+        if (uc.getResponseCode() != 200) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        Client client = ClientBuilder.newClient();
+        final InputStream responseStream = client.target(urlString).request().get(InputStream.class);
+        StreamingOutput output = new StreamingOutput() {
+            @Override
+            public void write(OutputStream out) throws IOException, WebApplicationException  {
+                try {
+                    IOUtils.copy(responseStream, out);
+                    responseStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new WebApplicationException ("File not found");
+                }
+            }
+        };
+
+        return Response.ok(output,MediaType.APPLICATION_OCTET_STREAM).header(
+                "Content-Disposition","attachment; filename=\"" + fileName + "\"").build();
     }
 
     @GET
@@ -455,18 +577,15 @@ public class DownloadService {
         feed.setDescription("ATOM Feeds for Datasets");
         feed.setLink(getUrlPrefix().concat("atomfeeds"));
 
-        List entries = new ArrayList();
-        SyndEntry entry;
-        SyndContent description;
-
+        List<SyndEntry> entries = new ArrayList<>();
         for (Dataset dataset : Dataset.getAll(ctxt)) {
             // Do not add entry when dataset has no files
             List<DatasetFile> files = dataset.getFiles();
             if (files.size() > 0) {
-                entry = new SyndEntryImpl();
+                SyndEntry entry = new SyndEntryImpl();
                 entry.setTitle(dataset.getTitle());
                 entry.setLink(getUrlPrefix().concat("atom/".concat(dataset.getMetadataUuid())));
-                description = new SyndContentImpl();
+                SyndContent description = new SyndContentImpl();
                 description.setType(MediaType.TEXT_PLAIN);
                 description.setValue("Dataset ATOM Feed");
                 entry.setDescription(description);
@@ -474,7 +593,7 @@ public class DownloadService {
             }
         }
         feed.setEntries(entries);
-        String atom = "";
+
         try {
             String atom = new SyndFeedOutput().outputString(feed);
             return Response.ok(atom,MediaType.APPLICATION_ATOM_XML).build();
@@ -497,24 +616,26 @@ public class DownloadService {
         feed.setDescription(dataset.getTitle() + " ATOM Feed");
         feed.setLink(getUrlPrefix()+"atom/"+metadataUuid);
 
-        List<SyndEntry> entries = new ArrayList();
+        List<SyndEntry> entries = new ArrayList<>();
         List<DatasetFile> datasetFiles = dataset.getFiles();
 
         for (DatasetFile datasetFile:datasetFiles) {
             SyndEntry entry = new SyndEntryImpl();
             StringBuilder sb = new StringBuilder();
             sb.append(dataset.getTitle());
-            sb.append("-"+datasetFile.getAreaType());
-            sb.append("-"+datasetFile.getAreaName());
-            sb.append("-"+datasetFile.getProjection().getName());
-            sb.append("-"+datasetFile.getFormat().getName());
-            String title = sb.toString();
-            entry.setTitle(title);
-            entry.setLink(datasetFile.getUrl());
+            sb.append("-").append(datasetFile.getAreaType());
+            sb.append("-").append(datasetFile.getAreaName());
+            sb.append("-").append(datasetFile.getProjection().getName());
+            sb.append("-").append(datasetFile.getFormat().getName());
+            entry.setTitle(sb.toString());
+            entry.setLink(getUrlPrefix().concat("fileproxy/").concat(dataset.getMetadataUuid())
+                    .concat("/" + datasetFile.getFileId()));
+
             /* <summary />*/
             SyndContent description = new SyndContentImpl();
             description.setType(MediaType.TEXT_PLAIN);
-            description.setValue("Lorem ipsum..");
+            description.setValue(dataset.getTitle().concat("-").concat(datasetFile.getFileName()));
+
             entry.setDescription(description);
             entries.add(entry);
         }
@@ -529,3 +650,5 @@ public class DownloadService {
     }
     
 }
+
+
