@@ -605,18 +605,15 @@ public class DownloadService {
         feed.setDescription("ATOM Feeds for Datasets");
         feed.setLink(getUrlPrefix().concat("atomfeeds"));
 
-        List entries = new ArrayList();
-        SyndEntry entry;
-        SyndContent description;
-
+        List<SyndEntry> entries = new ArrayList<>();
         for (Dataset dataset : Dataset.getAll(ctxt)) {
             // Do not add entry when dataset has no files
             List<DatasetFile> files = dataset.getFiles();
             if (files.size() > 0) {
-                entry = new SyndEntryImpl();
+                SyndEntry entry = new SyndEntryImpl();
                 entry.setTitle(dataset.getTitle());
                 entry.setLink(getUrlPrefix().concat("atom/".concat(dataset.getMetadataUuid())));
-                description = new SyndContentImpl();
+                SyndContent description = new SyndContentImpl();
                 description.setType(MediaType.TEXT_PLAIN);
                 description.setValue("Dataset ATOM Feed");
                 entry.setDescription(description);
@@ -624,6 +621,7 @@ public class DownloadService {
             }
         }
         feed.setEntries(entries);
+
         try {
             String atom = new SyndFeedOutput().outputString(feed);
             return Response.ok(atom,MediaType.APPLICATION_ATOM_XML).build();
@@ -646,7 +644,7 @@ public class DownloadService {
         feed.setDescription(dataset.getTitle() + " ATOM Feed");
         feed.setLink(getUrlPrefix()+"atom/"+metadataUuid);
 
-        List<SyndEntry> entries = new ArrayList();
+        List<SyndEntry> entries = new ArrayList<>();
         List<DatasetFile> datasetFiles = dataset.getFiles();
 
         for (DatasetFile datasetFile:datasetFiles) {
@@ -659,6 +657,7 @@ public class DownloadService {
             sb.append("-"+datasetFile.getFormat().getName());
             String title = sb.toString();
             entry.setTitle(title);
+            
             try {
                 String fileUuid = UuidUtils.getUuid(dataset.getTitle(), datasetFile.getFileId());
                 entry.setLink(getUrlPrefix().concat("fileproxy/").concat(dataset.getMetadataUuid()).concat("/"+fileUuid));
@@ -671,6 +670,7 @@ public class DownloadService {
             SyndContent description = new SyndContentImpl();
             description.setType(MediaType.TEXT_PLAIN);
             description.setValue(dataset.getTitle().concat("-").concat(datasetFile.getFileName()));
+
             entry.setDescription(description);
             entries.add(entry);
         }
