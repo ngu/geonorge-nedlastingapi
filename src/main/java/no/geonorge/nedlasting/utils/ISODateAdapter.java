@@ -3,7 +3,6 @@ package no.geonorge.nedlasting.utils;
 import java.lang.reflect.Type;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.text.ParseException;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -21,10 +20,6 @@ import com.google.gson.JsonSyntaxException;
  * @see https://gist.github.com/bbirec/5748489
  */
 public final class ISODateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
-
-    public Date deserialize(String value) throws ParseException {
-        return Date.valueOf(value);
-    }
 
     public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
         return new JsonPrimitive(src.toString());
