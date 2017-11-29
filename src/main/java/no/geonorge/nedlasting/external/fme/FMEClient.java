@@ -31,6 +31,7 @@ import no.geonorge.nedlasting.external.fme.data.DataDownloadResponse;
 import no.geonorge.nedlasting.external.fme.data.JobInfo;
 import no.geonorge.nedlasting.external.fme.data.ListOption;
 import no.geonorge.nedlasting.external.fme.data.Parameter;
+import no.geonorge.nedlasting.utils.GsonCreator;
 import no.geonorge.nedlasting.utils.IOUtils;
 
 public abstract class FMEClient extends External {
@@ -139,7 +140,7 @@ public abstract class FMEClient extends External {
         String url = urlPrefix + "/fmerest/v2/repositories/" + repository + "/items/" + workspace + "/parameters/"
                 + parameter + "?accept=json&details=low";
         String s = httpGET(url);
-        return new Gson().fromJson(s, Parameter.class);
+        return GsonCreator.create().fromJson(s, Parameter.class);
     }
 
     /**
@@ -194,7 +195,7 @@ public abstract class FMEClient extends External {
 
         String r = httpPOST(url, "application/x-www-form-urlencoded", postData.toString());
 
-        DataDownloadResponse ddr = new Gson().fromJson(r, DataDownloadResponse.class);
+        DataDownloadResponse ddr = GsonCreator.create().fromJson(r, DataDownloadResponse.class);
 
         return ddr == null ? null : ddr.getServiceResponse().getJobID().toString();
     }
@@ -203,7 +204,7 @@ public abstract class FMEClient extends External {
         String url = urlPrefix + "/fmerest/v3/transformations/jobs/id/" + jobId;// +
                                                                                 // "/result";//?token="+getToken();
         String r = httpGET(url);
-        JobInfo jobInfo = new Gson().fromJson(r, JobInfo.class);
+        JobInfo jobInfo = GsonCreator.create().fromJson(r, JobInfo.class);
         ExternalStatus status = new ExternalStatus();
         if (jobInfo != null && jobInfo.getResult() != null) {
             status.setStatusMessage(jobInfo.getResult().getStatusMessage());
