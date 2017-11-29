@@ -3,7 +3,6 @@ package no.geonorge.rest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
@@ -69,7 +68,6 @@ import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.External;
 import no.geonorge.nedlasting.utils.IOUtils;
-import no.geonorge.nedlasting.utils.UuidUtils;
 
 /**
  * This REST api implements the Norway Digital (Geonorge) Download API
@@ -303,10 +301,10 @@ public class DownloadService {
 
             boolean foundForOrderLine = false;
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
-                String _fileUuid = UuidUtils.getUuid(dataset.getTitle(),datasetFile.getFileId());
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
                 downloadItem.setProjection(datasetFile.getProjection());
-                downloadItem.setUrl(getUrlPrefix()+"v2/download/order/"+downloadOrder.getReferenceNumber()+"/"+_fileUuid);
+                downloadItem.setUrl(getUrlPrefix() + "v2/download/order/" + downloadOrder.getReferenceNumber() + "/"
+                        + datasetFile.getFileId());
                 downloadItem.setFileId(datasetFile.getFileId());
                 downloadItem.setFileName(datasetFile.getFileName());
                 downloadItem.setMetadataUuid(datasetFile.getDataset().getMetadataUuid());
@@ -345,8 +343,8 @@ public class DownloadService {
     }
 
     @GET
-    @Path("v2/download/order/{orderUuid}/{fileUuid}")
-    public Response getFileForOrder(@PathParam("orderUuid") String orderUuid,@PathParam("fileUuid") String fileUuid) {
+    @Path("v2/download/order/{orderUuid}/{fileId}")
+    public Response getFileForOrder(@PathParam("orderUuid") String orderUuid,@PathParam("fileId") String fileId) {
         ObjectContext ctxt = Config.getObjectContext();
 
         DownloadOrder order = DownloadOrder.get(ctxt, orderUuid);
@@ -365,21 +363,8 @@ public class DownloadService {
         } catch (IOException ignored) {
             Response.status(Response.Status.NOT_FOUND).build();
         }
-        String _fileId = null;
-        try {
-            List<File> orderFiles = order.getOrderReceipt().getFiles();
-            orderFiles.get(0).getFileId();
-            for (File orderFile:orderFiles) {
-                if (fileUuid.equals(UuidUtils.getUuid(orderFile.getMetadataName(),orderFile.getFileId()))) {
-                    _fileId = orderFile.getFileId();
-                }
-                break; // stop on first match
-            }
-        } catch (IOException ie) {
-            ie.printStackTrace();
-        }
-
-        DownloadItem item = order.getItemForFileId(_fileId);
+        
+        DownloadItem item = order.getItemForFileId(fileId);
         if (item == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -392,8 +377,8 @@ public class DownloadService {
     }
 
     @GET
-    @Path("fileproxy/{metadataUuid}/{fileUuid}")
-    public Response getFileForDownload(@PathParam("metadataUuid") String metadataUuid,@PathParam("fileUuid") String fileUuid){
+    @Path("fileproxy/{metadataUuid}/{fileId}")
+    public Response getFileForDownload(@PathParam("metadataUuid") String metadataUuid,@PathParam("fileId") String fileId){
             ObjectContext ctxt = Config.getObjectContext();
 
             /* Store downloads for statistical use */
@@ -405,27 +390,14 @@ public class DownloadService {
             if (dataset == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-            Set<String> fileIds = dataset.getFileIds();
-            String _fileId = null;
-            for (String fileId:fileIds) {
-                try {
-                    if (fileUuid.equals(UuidUtils.getUuid(dataset.getTitle(),fileId))) {
-                        _fileId = fileId;
-                        break; // return on first match
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-                }
-            }
-            DatasetFile datasetFile = dataset.getFile(_fileId);
+            DatasetFile datasetFile = dataset.getFile(fileId);
             if (datasetFile == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             try {
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
                 downloadItem.setProjection(datasetFile.getProjection());
-                downloadItem.setFileId(fileUuid);
+                downloadItem.setFileId(datasetFile.getFileId());
                 downloadItem.setFileName(datasetFile.getFileName());
                 downloadItem.setMetadataUuid(dataset.getMetadataUuid());
                 downloadOrder.addToItems(downloadItem);
@@ -651,20 +623,13 @@ public class DownloadService {
             SyndEntry entry = new SyndEntryImpl();
             StringBuilder sb = new StringBuilder();
             sb.append(dataset.getTitle());
-            sb.append("-"+datasetFile.getAreaType());
-            sb.append("-"+datasetFile.getAreaName());
-            sb.append("-"+datasetFile.getProjection().getName());
-            sb.append("-"+datasetFile.getFormat().getName());
-            String title = sb.toString();
-            entry.setTitle(title);
-            
-            try {
-                String fileUuid = UuidUtils.getUuid(dataset.getTitle(), datasetFile.getFileId());
-                entry.setLink(getUrlPrefix().concat("fileproxy/").concat(dataset.getMetadataUuid()).concat("/"+fileUuid));
-            } catch (UnsupportedEncodingException ee) {
-                ee.printStackTrace();
-                return Response.serverError().build();
-            }
+            sb.append("-").append(datasetFile.getAreaType());
+            sb.append("-").append(datasetFile.getAreaName());
+            sb.append("-").append(datasetFile.getProjection().getName());
+            sb.append("-").append(datasetFile.getFormat().getName());
+            entry.setTitle(sb.toString());
+            entry.setLink(getUrlPrefix().concat("fileproxy/").concat(dataset.getMetadataUuid())
+                    .concat("/" + datasetFile.getFileId()));
 
             /* <summary />*/
             SyndContent description = new SyndContentImpl();

@@ -191,7 +191,7 @@ public class Dataset extends _Dataset {
         pk.put(DatasetFile.FILE_ID_PK_COLUMN, fileId);
         return Cayenne.objectForPK(getObjectContext(), DatasetFile.class, pk);
     }
-
+    
     public Set<String> getFileIds() {
         Set<String> fileIds = new HashSet<>();
         for (DatasetFile file : getFiles()) {
