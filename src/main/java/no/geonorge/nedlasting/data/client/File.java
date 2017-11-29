@@ -1,6 +1,7 @@
 package no.geonorge.nedlasting.data.client;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class File {
@@ -18,6 +19,7 @@ public class File {
     private String format;
     private String status;
     private String metadataName;
+    private Date fileDate;
     
     public static final String STATUS_READY_FOR_DOWNLOAD = "ReadyForDownload";
     public static final String STATUS_WAITING_FOR_PROCESSING = "WaitingForProcessing";
@@ -148,6 +150,14 @@ public class File {
 
     public void setMetadataName(String metadataName) {
         this.metadataName = metadataName;
+    }
+
+    public Date getFileDate() {
+        return fileDate;
+    }
+
+    public void setFileDate(Date fileDate) {
+        this.fileDate = fileDate;
     }
 
     public List<Link> getLinks() {

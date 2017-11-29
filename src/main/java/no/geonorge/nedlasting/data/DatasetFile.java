@@ -64,6 +64,7 @@ public class DatasetFile extends _DatasetFile {
         file.setProjectionName(getProjection().getName());
         file.setArea(getAreaCode());
         file.setAreaName(getAreaName());
+        file.setFileDate(getFileDate());
         return file;
     }
 

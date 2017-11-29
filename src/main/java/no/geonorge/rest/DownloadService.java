@@ -67,6 +67,7 @@ import no.geonorge.nedlasting.data.client.OrderArea;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.External;
+import no.geonorge.nedlasting.utils.GsonCreator;
 import no.geonorge.nedlasting.utils.IOUtils;
 
 /**
@@ -101,7 +102,7 @@ public class DownloadService {
     }
     
     private Gson gson() {
-        GsonBuilder b = new GsonBuilder();
+        GsonBuilder b = GsonCreator.builder();
         if (isPretty()) {
             b = b.setPrettyPrinting();
         }
@@ -521,6 +522,7 @@ public class DownloadService {
                         Integer.parseInt(file.getProjection())));
                 datasetFile.setFormatName(file.getFormat());
                 datasetFile.setFileName(file.getName());
+                datasetFile.setFileDate(file.getFileDate() == null ? new Date() : file.getFileDate());
             }
             for (String fileId : restFileIds) {
                 DatasetFile file = dataset.getFile(fileId);

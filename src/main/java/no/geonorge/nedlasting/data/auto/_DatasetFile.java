@@ -1,5 +1,7 @@
 package no.geonorge.nedlasting.data.auto;
 
+import java.util.Date;
+
 import org.apache.cayenne.CayenneDataObject;
 
 import no.geonorge.nedlasting.data.Dataset;
@@ -16,6 +18,7 @@ public abstract class _DatasetFile extends CayenneDataObject {
     public static final String AREA_CODE_PROPERTY = "areaCode";
     public static final String AREA_NAME_PROPERTY = "areaName";
     public static final String AREA_TYPE_PROPERTY = "areaType";
+    public static final String FILE_DATE_PROPERTY = "fileDate";
     public static final String FILE_ID_PROPERTY = "fileId";
     public static final String FILE_NAME_PROPERTY = "fileName";
     public static final String FORMAT_NAME_PROPERTY = "formatName";
@@ -46,6 +49,13 @@ public abstract class _DatasetFile extends CayenneDataObject {
     }
     public String getAreaType() {
         return (String)readProperty(AREA_TYPE_PROPERTY);
+    }
+
+    public void setFileDate(Date fileDate) {
+        writeProperty(FILE_DATE_PROPERTY, fileDate);
+    }
+    public Date getFileDate() {
+        return (Date)readProperty(FILE_DATE_PROPERTY);
     }
 
     public void setFileId(String fileId) {

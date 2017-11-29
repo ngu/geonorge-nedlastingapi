@@ -2,6 +2,7 @@ package no.geonorge.rest;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile.setFormatName("SOSI");
         datasetFile.setUrl("http://a.url.com");
         datasetFile.setProjection(createOrFind(ctxt, 4326));
+        datasetFile.setFileDate(new Date());
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnFormats(uuid).getStatus());
@@ -83,6 +85,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile.setFormatName("SOSI");
         datasetFile.setUrl("http://a.url.com");
         datasetFile.setProjection(createOrFind(ctxt, 4326));
+        datasetFile.setFileDate(new Date());
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnProjections(uuid).getStatus());
@@ -117,23 +120,27 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile1.setFormatName("SOSI");
         datasetFile1.setUrl("http://a.url.com/1");
         datasetFile1.setProjection(p1);
+        datasetFile1.setFileDate(new Date());
         DatasetFile datasetFile2 = ctxt.newObject(DatasetFile.class);
         datasetFile2.setArea("fylke", "02", "Akershus");
         datasetFile2.setDataset(dataset);
         datasetFile2.setFormatName("GML");
         datasetFile2.setUrl("http://a.url.com/2");
         datasetFile2.setProjection(p1);
+        datasetFile2.setFileDate(new Date());
         DatasetFile datasetFile3 = ctxt.newObject(DatasetFile.class);
         datasetFile3.setArea("fylke", "02", "Akershus");
         datasetFile3.setDataset(dataset);
         datasetFile3.setFormatName("SOSI");
         datasetFile3.setUrl("http://a.url.com/3");
         datasetFile3.setProjection(p1);
+        datasetFile3.setFileDate(new Date());
         DatasetFile datasetFile4 = ctxt.newObject(DatasetFile.class);
         datasetFile4.setArea("fylke", "02", "Akershus");
         datasetFile4.setDataset(dataset);
         datasetFile4.setFormatName("GML");
         datasetFile4.setUrl("http://a.url.com/4");
+        datasetFile4.setFileDate(new Date());
         datasetFile4.setProjection(p2);
         DatasetFile datasetFile5 = ctxt.newObject(DatasetFile.class);
         datasetFile5.setArea("fylke", "03", "Whatever");
@@ -141,6 +148,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile5.setFormatName("GML");
         datasetFile5.setUrl("http://a.url.com/5");
         datasetFile5.setProjection(p2);
+        datasetFile5.setFileDate(new Date());
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnAreas(uuid).getStatus());
@@ -189,6 +197,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile1.setFormatName("SOSI");
         datasetFile1.setUrl("http://a.url.com/1");
         datasetFile1.setProjection(p1);
+        datasetFile1.setFileDate(new Date());
         ctxt.commitChanges();
 
         Order order = new Order();
