@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -198,6 +199,20 @@ public class Dataset extends _Dataset {
             fileIds.add(file.getFileId());
         }
         return Collections.unmodifiableSet(fileIds);
+    }
+
+    public Date getMaxFileDate() {
+        Date maxFileDate = null;
+        for (DatasetFile file : getFiles()) {
+            Date fileDate = file.getFileDate();
+            if (fileDate == null) {
+                continue;
+            }
+            if (maxFileDate == null || maxFileDate.before(fileDate)) {
+                maxFileDate = fileDate;
+            }
+        }
+        return maxFileDate;
     }
 
     public boolean isExternal() {

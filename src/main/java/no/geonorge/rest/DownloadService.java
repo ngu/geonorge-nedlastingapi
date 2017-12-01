@@ -582,17 +582,25 @@ public class DownloadService {
         List<SyndEntry> entries = new ArrayList<>();
         for (Dataset dataset : Dataset.getAll(ctxt)) {
             // Do not add entry when dataset has no files
-            List<DatasetFile> files = dataset.getFiles();
-            if (files.size() > 0) {
-                SyndEntry entry = new SyndEntryImpl();
-                entry.setTitle(dataset.getTitle());
-                entry.setLink(getUrlPrefix().concat("atom/".concat(dataset.getMetadataUuid())));
-                SyndContent description = new SyndContentImpl();
-                description.setType(MediaType.TEXT_PLAIN);
-                description.setValue("Dataset ATOM Feed");
-                entry.setDescription(description);
-                entries.add(entry);
+            if (dataset.getFiles().isEmpty()) {
+                continue;
             }
+
+            SyndEntry entry = new SyndEntryImpl();
+            entry.setTitle(dataset.getTitle());
+            
+            Date maxFileDate = dataset.getMaxFileDate();
+            if (maxFileDate != null) {
+                entry.setPublishedDate(maxFileDate);
+                entry.setUpdatedDate(maxFileDate);
+            }
+            
+            entry.setLink(getUrlPrefix().concat("atom/".concat(dataset.getMetadataUuid())));
+            SyndContent description = new SyndContentImpl();
+            description.setType(MediaType.TEXT_PLAIN);
+            description.setValue("Dataset ATOM Feed");
+            entry.setDescription(description);
+            entries.add(entry);
         }
         feed.setEntries(entries);
 
@@ -630,6 +638,10 @@ public class DownloadService {
             sb.append("-").append(datasetFile.getProjection().getName());
             sb.append("-").append(datasetFile.getFormat().getName());
             entry.setTitle(sb.toString());
+            if (datasetFile.getFileDate() != null) {
+                entry.setPublishedDate(datasetFile.getFileDate());
+                entry.setUpdatedDate(datasetFile.getFileDate());
+            }
             entry.setLink(getUrlPrefix().concat("fileproxy/").concat(dataset.getMetadataUuid())
                     .concat("/" + datasetFile.getFileId()));
 
