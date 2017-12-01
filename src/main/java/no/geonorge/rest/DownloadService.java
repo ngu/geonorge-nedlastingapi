@@ -578,6 +578,8 @@ public class DownloadService {
         feed.setTitle("GEONORGE DATASET ATOM FEEDS ");
         feed.setDescription("ATOM Feeds for Datasets");
         feed.setLink(getUrlPrefix().concat("atomfeeds"));
+        
+        Date lastDate = null;
 
         List<SyndEntry> entries = new ArrayList<>();
         for (Dataset dataset : Dataset.getAll(ctxt)) {
@@ -589,10 +591,13 @@ public class DownloadService {
             SyndEntry entry = new SyndEntryImpl();
             entry.setTitle(dataset.getTitle());
             
-            Date maxFileDate = dataset.getMaxFileDate();
-            if (maxFileDate != null) {
-                entry.setPublishedDate(maxFileDate);
-                entry.setUpdatedDate(maxFileDate);
+            Date lastFileDate = dataset.getLastFileDate();
+            if (lastFileDate != null) {
+                entry.setPublishedDate(lastFileDate);
+                entry.setUpdatedDate(lastFileDate);
+                if (lastDate == null || lastDate.before(lastFileDate)) {
+                    lastDate = lastFileDate;
+                }
             }
             
             entry.setLink(getUrlPrefix().concat("atom/".concat(dataset.getMetadataUuid())));
@@ -603,6 +608,10 @@ public class DownloadService {
             entries.add(entry);
         }
         feed.setEntries(entries);
+        
+        if (lastDate != null) {
+            feed.setPublishedDate(lastDate);
+        }
 
         try {
             String atom = new SyndFeedOutput().outputString(feed);
@@ -625,6 +634,11 @@ public class DownloadService {
         feed.setTitle(dataset.getTitle());
         feed.setDescription(dataset.getTitle() + " ATOM Feed");
         feed.setLink(getUrlPrefix()+"atom/"+metadataUuid);
+        
+        Date lastFileDate = dataset.getLastFileDate();
+        if (lastFileDate != null) {
+            feed.setPublishedDate(lastFileDate);
+        }
 
         List<SyndEntry> entries = new ArrayList<>();
         List<DatasetFile> datasetFiles = dataset.getFiles();

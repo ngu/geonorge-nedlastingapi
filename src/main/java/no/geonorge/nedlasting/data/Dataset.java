@@ -201,18 +201,18 @@ public class Dataset extends _Dataset {
         return Collections.unmodifiableSet(fileIds);
     }
 
-    public Date getMaxFileDate() {
-        Date maxFileDate = null;
+    public Date getLastFileDate() {
+        Date last = null;
         for (DatasetFile file : getFiles()) {
             Date fileDate = file.getFileDate();
             if (fileDate == null) {
                 continue;
             }
-            if (maxFileDate == null || maxFileDate.before(fileDate)) {
-                maxFileDate = fileDate;
+            if (last == null || last.before(fileDate)) {
+                last = fileDate;
             }
         }
-        return maxFileDate;
+        return last;
     }
 
     public boolean isExternal() {
