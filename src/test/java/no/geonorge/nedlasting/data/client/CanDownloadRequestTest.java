@@ -22,7 +22,6 @@ public class CanDownloadRequestTest extends TestCase {
 
         Geometry geom = req.getGeometry();
         assertNotNull(geom);
-        System.out.println(geom.toText());
         assertTrue(geom instanceof Polygon);
         assertFalse(geom.isValid());
     }

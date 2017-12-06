@@ -7,8 +7,6 @@ import java.util.StringTokenizer;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.simplify.VWSimplifier;
 
 public class CanDownloadRequest {
 
@@ -74,15 +72,7 @@ public class CanDownloadRequest {
             coordinates[i] = coordinate;
         }
 
-        Geometry geom = new GeometryFactory().createPolygon(coordinates);
-        System.out.println(geom);
-        
-        if (!geom.isValid()) {
-            //geom = VWSimplifier.simplify(geom, 0.0d);
-            geom = geom.norm();
-        }
-        
-        return geom;
+        return new GeometryFactory().createPolygon(coordinates);
     }
 
 }
