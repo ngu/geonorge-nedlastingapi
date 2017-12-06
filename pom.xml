@@ -139,6 +139,11 @@
         <artifactId>gt-main</artifactId>
         <version>${geotools.version}</version>
     </dependency>
+    <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-epsg-hsql</artifactId>
+        <version>${geotools.version}</version>
+    </dependency>
 
       <!-- Open Source SQLServer JDBC library
         <dependency>

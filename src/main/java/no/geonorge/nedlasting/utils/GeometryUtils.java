@@ -19,17 +19,22 @@ import com.vividsolutions.jts.geom.Point;
 public class GeometryUtils {
 
     public static final Measure<Double, Area> calculateArea(Geometry geom, int srid) {
-        Point centroid = geom.getCentroid();
         try {
-            CoordinateReferenceSystem pcrs = CRS.decode("EPSG:" + srid);
-            // TODO: oups, this is not good for UTM type zones
-            String code = "AUTO:42001," + centroid.getX() + "," + centroid.getY();
-            CoordinateReferenceSystem auto = CRS.decode(code);
+            CoordinateReferenceSystem originalCrs = CRS.decode("EPSG:" + srid, true);
 
-            MathTransform transform = CRS.findMathTransform(pcrs, auto);
+            // convert to lat lon to find center lat lon
+            CoordinateReferenceSystem ll = CRS.decode("EPSG:4326", true);
+            MathTransform originalToLl = CRS.findMathTransform(originalCrs, ll);
+            Geometry geomLl = JTS.transform(geom, originalToLl);
+            Point centerLl = geomLl.getCentroid();
 
-            Geometry projected = JTS.transform(geom, transform);
-            return Measure.valueOf(projected.getArea(), SI.SQUARE_METRE);
+            // convert to a crs with meter based based coordinates
+            String code = "AUTO:42001," + centerLl.getX() + "," + centerLl.getY();
+            CoordinateReferenceSystem meterCrs = CRS.decode(code);
+            MathTransform transform = CRS.findMathTransform(originalCrs, meterCrs);
+            Geometry geomMeter = JTS.transform(geom, transform);
+
+            return Measure.valueOf(geomMeter.getArea(), SI.SQUARE_METRE);
         } catch (MismatchedDimensionException | TransformException | FactoryException e) {
             throw new RuntimeException(e);
         }
