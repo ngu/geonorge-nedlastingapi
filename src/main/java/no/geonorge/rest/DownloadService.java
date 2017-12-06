@@ -540,6 +540,7 @@ public class DownloadService {
         }
 
         dataset.setTitle(requestDataset.getTitle());
+        dataset.setMaxArea(requestDataset.getMaxArea());
 
         if (!requestDataset.ignoreFiles()) {
             Set<String> restFileIds = new HashSet<>(dataset.getFileIds());
