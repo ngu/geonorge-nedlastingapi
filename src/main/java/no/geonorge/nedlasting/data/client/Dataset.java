@@ -12,6 +12,7 @@ public class Dataset {
     private String metadataUuid;
     private String title;
     private List<File> files;
+    private Integer maxArea;
 
     private Map<String, String> external;
 
@@ -92,6 +93,14 @@ public class Dataset {
             external = new HashMap<>();
         }
         external.put(key, value);
+    }
+
+    public Integer getMaxArea() {
+        return maxArea;
+    }
+
+    public void setMaxArea(Integer maxArea) {
+        this.maxArea = maxArea;
     }
 
 }

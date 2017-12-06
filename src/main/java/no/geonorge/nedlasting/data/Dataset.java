@@ -76,6 +76,7 @@ public class Dataset extends _Dataset {
         no.geonorge.nedlasting.data.client.Dataset d = new no.geonorge.nedlasting.data.client.Dataset();
         d.setMetadataUuid(getMetadataUuid());
         d.setTitle(getTitle());
+        d.setMaxArea(getMaxArea());
         for (DatasetFile file : getFiles()) {
             d.addFile(file.forClient());
         }
@@ -92,6 +93,7 @@ public class Dataset extends _Dataset {
         no.geonorge.nedlasting.data.client.Dataset d = new no.geonorge.nedlasting.data.client.Dataset();
         d.setMetadataUuid(getMetadataUuid());
         d.setTitle(getTitle());
+        d.setMaxArea(getMaxArea());
         return d;
     }
 
