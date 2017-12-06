@@ -50,6 +50,7 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedOutput;
+import com.vividsolutions.jts.geom.Geometry;
 
 import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.Dataset;
@@ -67,6 +68,7 @@ import no.geonorge.nedlasting.data.client.OrderArea;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.External;
+import no.geonorge.nedlasting.utils.GeometryUtils;
 import no.geonorge.nedlasting.utils.GsonCreator;
 import no.geonorge.nedlasting.utils.IOUtils;
 
@@ -236,12 +238,46 @@ public class DownloadService {
             return gson().toJson(canDownload);
         }
 
-        // check if can select area
+        // check if can select polygon
         if (req.hasCoordinates() && !dataset.isSupportsPolygonSelection()) {
             log.info("trying to select polygon, but dataset does not support it");
             canDownload.setCanDownload(false);
             canDownload.setMessage("trying to select polygon, but dataset does not support it");
             return gson().toJson(canDownload);
+        }
+        
+        // check coordinates
+        if (req.hasCoordinates() && dataset.isSupportsPolygonSelection()) {
+            Geometry geom = null;
+            try {
+                geom = req.getGeometry();
+                if (geom == null || geom.isEmpty() || !geom.isValid()) {
+                    canDownload.setCanDownload(false);
+                    canDownload.setMessage("coordinates is not valid polygon");
+                    return gson().toJson(canDownload);
+                }
+            } catch (RuntimeException e) {
+                canDownload.setCanDownload(false);
+                canDownload.setMessage("not able to parse coordinates. " + e.getMessage());
+                return gson().toJson(canDownload);
+            }
+            
+            // check if selected polygon is too large
+            if (dataset.getMaxArea() != null) {
+                try {
+                    double selectedSquareKvm = GeometryUtils.calculateAreaSquareKilometer(geom,
+                            req.getSrid().intValue());
+                    if (selectedSquareKvm > dataset.getMaxArea().doubleValue()) {
+                        canDownload.setCanDownload(false);
+                        canDownload.setMessage("too large area");
+                        return gson().toJson(canDownload);
+                    }
+                } catch (RuntimeException e) {
+                    canDownload.setCanDownload(false);
+                    canDownload.setMessage("not able to calculate area. " + e.getMessage());
+                    return gson().toJson(canDownload);
+                }
+            }
         }
         
         // check srid
