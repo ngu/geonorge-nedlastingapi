@@ -33,18 +33,21 @@ import no.geonorge.nedlasting.utils.IOUtils;
 
 public class Config implements DataSourceFactory {
 
-    public static final String KEY_SERVER_PORT = "server.port";
-    public static final String KEY_JETTY_PORT = "jetty.port";
+    private static final String KEY_SERVER_PORT = "server.port";
+    private static final String KEY_JETTY_PORT = "jetty.port";
 
-    public static final String KEY_DATABASE_DRIVER = "database.driver";
-    public static final String KEY_DATABASE_URL = "database.url";
-    public static final String KEY_DATABASE_USERNAME = "database.username";
-    public static final String KEY_DATABASE_PASSWORD = "database.password";
+    private static final String KEY_DATABASE_DRIVER = "database.driver";
+    private static final String KEY_DATABASE_URL = "database.url";
+    private static final String KEY_DATABASE_USERNAME = "database.username";
+    private static final String KEY_DATABASE_PASSWORD = "database.password";
+    
+    private static final String KEY_CORS = "cors";
 
     private static ServerRuntime runtime;
     private static boolean inited = false;
     private static int serverPort = 10000;
     private static DataSource dataSource;
+    private static String cors;
 
     private static final Logger log = Logger.getLogger(Config.class.getName());
 
@@ -77,6 +80,8 @@ public class Config implements DataSourceFactory {
         // https://github.com/ElectronicChartCentre/deploy-scripts
         Config.serverPort = getProperty(prop, KEY_SERVER_PORT, Config.serverPort);
         Config.serverPort = getProperty(prop, KEY_JETTY_PORT, Config.serverPort);
+        
+        Config.cors = getProperty(prop, KEY_CORS, "*");
 
         BasicDataSource nds = new BasicDataSource();
         nds.setUrl(getRequiredProperty(prop, KEY_DATABASE_URL));
@@ -175,9 +180,18 @@ public class Config implements DataSourceFactory {
         String v = getProperty(prop, key);
         return v == null ? defaultValue : Integer.parseInt(v);
     }
+    
+    private static String getProperty(Properties prop, String key, String defaultValue) {
+        String v = getProperty(prop, key);
+        return v == null ? defaultValue : v;
+    }
 
     public DataSource getDataSource(DataNodeDescriptor desc) throws Exception {
         return dataSource;
+    }
+    
+    public static String getCors() {
+        return cors;
     }
 
 }
