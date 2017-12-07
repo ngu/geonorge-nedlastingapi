@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response;
 
 import org.apache.cayenne.ObjectContext;
 
@@ -210,8 +211,9 @@ public class DownloadServiceTest extends DbTestCase {
         order.addOrderLine(orderLine);
 
         Gson gson = GsonCreator.create();
-        OrderReceipt orderReceipt = gson.fromJson(ds.orderDownload(gson.toJson(order)).getEntity().toString(),
-                OrderReceipt.class);
+        Response response = ds.orderDownload(gson.toJson(order));
+        assertEquals(200, response.getStatus());
+        OrderReceipt orderReceipt = gson.fromJson(response.getEntity().toString(), OrderReceipt.class);
         assertNotNull(orderReceipt);
 
         assertEquals(1, orderReceipt.getFiles().size());

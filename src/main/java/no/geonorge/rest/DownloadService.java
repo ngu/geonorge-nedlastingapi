@@ -61,6 +61,7 @@ import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.nedlasting.data.client.CanDownloadRequest;
 import no.geonorge.nedlasting.data.client.CanDownloadResponse;
 import no.geonorge.nedlasting.data.client.Capabilities;
+import no.geonorge.nedlasting.data.client.DownloadErrorResponse;
 import no.geonorge.nedlasting.data.client.File;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Order;
@@ -220,12 +221,6 @@ public class DownloadService {
     @Consumes(MediaType.APPLICATION_JSON)
     public String canDownload(String jsonRequest) throws IOException {
         log.info("can-download request: " + jsonRequest);
-        /*
-         * Sample JSON HTTP-POST
-         * {"metadataUuid":"18777cf4-1f06-4cb0-803d-d6382b76681f",
-         * "coordinates":"189044 7043418 321736 6979780 244558 6893124 76662 6886354 65830 7013630 191752 7040710 190398 7046126 189044 7043418"
-         * ,"coordinateSystem":"32633"}
-         */
         CanDownloadRequest req = gson().fromJson(jsonRequest, CanDownloadRequest.class);
 
         ObjectContext ctxt = Config.getObjectContext();
@@ -287,6 +282,7 @@ public class DownloadService {
             canDownload.setMessage("unsupported srid " + req.getSrid() + ". only support " + dataset.getSrids());
             return gson().toJson(canDownload);
         }
+        
         canDownload.setCanDownload(true);
         return gson().toJson(canDownload);
     }
@@ -334,9 +330,12 @@ public class DownloadService {
 
         for (OrderLine orderLine : order.getOrderLines()) {
             
+            List<OrderArea> areaRest = new ArrayList<>(orderLine.getAreas());
+            List<Format> formatRest = new ArrayList<>(orderLine.getFormats());
+            List<Projection> projectionRest = new ArrayList<>(orderLine.getProjections());
+            
             Dataset dataset = Dataset.forMetadataUUID(ctxt, orderLine.getMetadataUuid());
 
-            boolean foundForOrderLine = false;
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
                 downloadItem.setProjection(datasetFile.getProjection());
@@ -346,10 +345,13 @@ public class DownloadService {
                 downloadItem.setFileName(datasetFile.getFileName());
                 downloadItem.setMetadataUuid(datasetFile.getDataset().getMetadataUuid());
                 downloadOrder.addToItems(downloadItem);
-                foundForOrderLine = true;
+                
+                areaRest.remove(datasetFile.getOrderArea());
+                formatRest.remove(datasetFile.getFormat());
+                projectionRest.remove(datasetFile.getProjection().forClient());
             }
             
-            if (!foundForOrderLine && dataset.isExternal()) {
+            if (!areaRest.isEmpty() && !formatRest.isEmpty() && !projectionRest.isEmpty() && dataset.isExternal()) {
                 for (Format format : orderLine.getFormats()) {
                     for (Projection projection : orderLine.getProjections()) {
                         for (OrderArea area : orderLine.getAreas()) {
@@ -367,10 +369,24 @@ public class DownloadService {
                             downloadItem.setExternalJobId(jobId);
                             downloadItem.setCoordinates(orderLine.getCoordinates());
                             downloadOrder.addToItems(downloadItem);
+                            
+                            areaRest.remove(area);
+                            formatRest.remove(format);
+                            projectionRest.remove(projection);
                         }
                     }
                 }
             }
+            
+            DownloadErrorResponse r = new DownloadErrorResponse(orderLine);
+            r.setAreaRest(areaRest);
+            r.setFormatRest(formatRest);
+            r.setProjectionRest(projectionRest);
+            if (r.hasRest()) {
+                return Response.status(Response.Status.BAD_REQUEST).entity(gson().toJson(r))
+                        .type(MediaType.APPLICATION_JSON).build();
+            }
+            
         }
 
         ctxt.commitChanges();
