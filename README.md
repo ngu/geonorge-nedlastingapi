@@ -88,15 +88,16 @@ cors=*
 
 We welcome contributions, as code preferrable as pull request here on Github. 
 
-..* Fork our codebase
-..* make a branch for your contribution
-..* commit and push your changes to your branch
-..* make a pull request for your change. 
+1. Fork our codebase
+2. Make a branch for your contribution
+3. Commit changes and push your changes to your branch
+4. Make a pull request for your change. 
 
 Example contributions: 
-⋅⋅* Extend and add support for more backends
-⋅⋅* File bugs or feature requests using [Issue Tracker](https://github.com/ngu/geonorge-nedlastingapi/issues/new)
-⋅⋅* Improve on API documentation and/or suite of unit tests.
+
+  * Extend and add support for more backends
+  * File bugs or feature requests using [Issue Tracker](https://github.com/ngu/geonorge-nedlastingapi/issues/new)
+  * Improve on API documentation and/or suite of unit tests.
 
 ## License and credit
 
