@@ -87,10 +87,11 @@ cors=*
 ## Contributions accepted
 
 We welcome contributions, as code preferrable as pull request here on Github. 
-⋅⋅* Fork our codebase
-⋅⋅* make a branch for your contribution
-⋅⋅* commit and push your changes to your branch
-⋅⋅* make a pull request for your change. 
+
+..* Fork our codebase
+..* make a branch for your contribution
+..* commit and push your changes to your branch
+..* make a pull request for your change. 
 
 Example contributions: 
 ⋅⋅* Extend and add support for more backends
