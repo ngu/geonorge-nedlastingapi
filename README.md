@@ -50,7 +50,9 @@ The REST-api is autoconfigured with Jersey annotations at no.geonorge.rest.Downl
 ## Example usage
 
 When running the embedded webserver (Jetty), the API will expose itself on your computer default port 10000:
-http://<server>:10000/api
+The main endpoint would then be http://yourserver:10000/api and consequtive endpoints are generated after adding datasets using one or both of the following
+  * Internal REST API
+  * Dataset and Fileset tables in your RDBMS of choice
 
 ## Set up dev environment
 
@@ -68,7 +70,30 @@ Maven comes with support for multiple IDEs. You can tell Maven to generate proje
 
 ## Configuration
 
-Configuration can be done using environment variables, java VM arguments *or* a properties file
+Configuration can be done using environment variables, java VM arguments *or* a properties file.
+This API supports multiple RDBMS using JDBC. It has been tested with PostgreSQL, Apache Derby and Oracle and it should also work with SQLServer from Microsoft. 
+
+### Oracle RDBMS
+
+The license agreement for [Oracle JDBC](http://www.oracle.com/technetwork/database/features/jdbc/index-091264.html)  has such restrictions that we cannot ship this project or the releases with the ojdbc jar-file. You can add in ojdbc by multiple methods. 
+
+1. Add ojdbc-version.jar to your classpath when starting geonorge-nedlastingapi.jar
+2. Install ojdbc into your local Maven archive as described below
+
+````
+mvn install:install-file -Dfile={Path/to/your/ojdbc7.jar}
+      -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0 -Dpackaging=jar
+````
+
+And then add the following to pom.xml:
+````
+<!-- ojdbc7.jar example -->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc7</artifactId>
+            <version>12.1.0</version>
+        </dependency>
+````
 
 Here are example parameters as java VM arguments.
 ````
