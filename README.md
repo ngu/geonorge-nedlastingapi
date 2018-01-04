@@ -101,9 +101,12 @@ Example contributions:
 
 ## License and credit
 
-License of this code is MIT - meaning you can do pretty much what you want with it. Full license-clause found in file LICENSE
+License of this code is MIT - meaning you can do pretty much what you want with it. Full license-clause found in file [LICENSE](LICENSE)
+This API is developed at the Geological survey of Norway
+
 Contact: Bjorn.Ove.Grotan AT ngu.no
 
-This API is developed at the Geological survey of Norway
-with help from [@halset](https://www.github.com/halset) from Electronic Chart Centre. 
-Thanks also goes to Dag-Olav at [Arkitektum](http://www.arkitektum.no) for help during development.
+### Thanks 
+  * [@halset](https://www.github.com/halset) from Electronic Chart Centre. 
+  * Dag-Olav at [Arkitektum](http://www.arkitektum.no) for help during development.
+  * Kartverket (Norwegian Mapping Authority)
