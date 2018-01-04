@@ -1,11 +1,10 @@
-# geonorge-nedlastingapi
+# What is Geonorge Nedlasting-api
 
-An implementation in Java of the Geonorge Download API 
+It's an implementation in Java of the Geonorge Download API 
 Geonorge Download API enables seemless integration of distributes downloadable geographic datasets
 from data owners (mostly governmental agencies, municipalities etc) into the geonorge portal.
 
 The official API documentation available at https://nedlasting.geonorge.no/Help
-
 
 
 With this download api you can integrate download and query a dataset for
@@ -18,10 +17,12 @@ With this download api you can integrate download and query a dataset for
   
   - Order the dataset in a chosen format/projection
 
+## Install and run
 
-This API-implementation is developed using Java, Maven and JUnit.
+This API-implementation is developed using Java, Maven and JUnit. 
 
-Checkout the source code and build from source using Maven:
+### From Source
+Checkout the source code from Github and build from source using Maven:
 ```
 sh
 $ mvn package 
@@ -29,6 +30,16 @@ $ java -jar target/geonorge-nedlastingapi-<version>.jar
 $ 
 ```
 
+### From releases
+
+Download a [release](https://github.com/ngu/geonorge-nedlastingapi/releases) and run using Java
+
+```
+sh
+$ 
+$ java -jar geonorge-nedlastingapi-<version>.jar
+$ 
+```
 
 This will start an embedded webserver running Jetty from a jar file. 
 You can also change packaging in pom.xml from jar to war, and deploy war-file to Tomcat,JBoss etc.
@@ -36,12 +47,22 @@ You can also change packaging in pom.xml from jar to war, and deploy war-file to
 The webserver (CORS-enabled) is running at no.geonorge.download.httpd.DownloadWebServer
 The REST-api is autoconfigured with Jersey annotations at no.geonorge.rest.DownloadService
 
+## Example usage
 
+When running the embedded webserver (Jetty), the API will expose itself on your computer default port 10000:
+http://<server>:10000/api
 
-Use with your favourite IDE:
+## Set up dev environment
+
+Since this API is developed using Java and Maven, you have a range of possibilities.
+The code is follows the convensions of Maven and is ignorant to specific Integrated Development Environments.
+All you need to start develop is a a recent version of Java Develope Kit and Maven.
+
+### Development using Eclipse, IntelliJ IDEA etc
+
+Maven comes with support for multiple IDEs. You can tell Maven to generate project files and setup classpaths:
 
 - Eclipse: mvn eclipse:eclipse
-
 - IntelliJ IDEA: mvn idea:idea
 
 
@@ -63,4 +84,24 @@ database.password=pass
 cors=*
 ````
 
+## Contributions accepted
+
+We welcome contributions, as code preferrable as pull request here on Github. 
+⋅⋅* Fork our codebase
+⋅⋅* make a branch for your contribution
+⋅⋅* commit and push your changes to your branch
+⋅⋅* make a pull request for your change. 
+
+Example contributions: 
+⋅⋅* Extend and add support for more backends
+⋅⋅* File bugs or feature requests using [Issue Tracker](https://github.com/ngu/geonorge-nedlastingapi/issues/new)
+⋅⋅* Improve on API documentation and/or suite of unit tests.
+
+## License and credit
+
+License of this code is MIT - meaning you can do pretty much what you want with it. Full license-clause found in file LICENSE
 Contact: Bjorn.Ove.Grotan AT ngu.no
+
+This API is developed at the Geological survey of Norway
+with help from [@halset](https://www.github.com/halset) from Electronic Chart Centre. 
+Thanks also goes to Dag-Olav at [Arkitektum](http://www.arkitektum.no) for help during development.
