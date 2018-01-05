@@ -51,7 +51,7 @@ The REST-api is autoconfigured with Jersey annotations at no.geonorge.rest.Downl
 
 When running the embedded webserver (Jetty), the API will expose itself on your computer default port 10000:
 The main endpoint would then be http://yourserver:10000/api and consequtive endpoints are generated after adding datasets using one or both of the following
-  * Internal REST API
+  * Internal REST API. Se documentation at http://yourserver:10000/api/docs/
   * Dataset and Fileset tables in your RDBMS of choice
 
 ## Set up dev environment
@@ -108,6 +108,10 @@ database.username=user
 database.password=pass
 cors=*
 ````
+
+## API Documentation
+
+After starting the API server, it has a built in API Documentation available at `/api/docs`. The latest one from GitHUB is also available [here](https://rawgit.com/ngu/geonorge-nedlastingapi/master/src/main/resources/webroot/api/docs/index.html).
 
 ## Contributions accepted
 
