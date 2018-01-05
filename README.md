@@ -64,9 +64,16 @@ All you need to start develop is a a recent version of Java Develope Kit and Mav
 
 Maven comes with support for multiple IDEs. You can tell Maven to generate project files and setup classpaths:
 
-- Eclipse: mvn eclipse:eclipse
-- IntelliJ IDEA: mvn idea:idea
-
+- Eclipse: 
+````
+cd {/Path/to/your/git/clone}
+mvn eclipse:eclipse
+````
+- IntelliJ IDEA: 
+````
+cd {/Path/to/your/git/clone}
+mvn idea:idea
+````
 
 ## Configuration
 
