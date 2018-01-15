@@ -302,7 +302,7 @@ public class DownloadService {
         if (order == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        String json = gson().toJson(order.getOrderReceipt());
+        String json = gson().toJson(order.getOrderReceipt(getUrlPrefix()));
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
@@ -339,8 +339,7 @@ public class DownloadService {
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
                 downloadItem.setProjection(datasetFile.getProjection());
-                downloadItem.setUrl(getUrlPrefix() + "v2/download/order/" + downloadOrder.getReferenceNumber() + "/"
-                        + datasetFile.getFileId());
+                downloadItem.setUrl(datasetFile.getUrl());
                 downloadItem.setFileId(datasetFile.getFileId());
                 downloadItem.setFileName(datasetFile.getFileName());
                 downloadItem.setMetadataUuid(datasetFile.getDataset().getMetadataUuid());
@@ -391,7 +390,7 @@ public class DownloadService {
 
         ctxt.commitChanges();
         
-        String json = gson().toJson(downloadOrder.getOrderReceipt());
+        String json = gson().toJson(downloadOrder.getOrderReceipt(getUrlPrefix()));
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 
@@ -405,7 +404,7 @@ public class DownloadService {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         try {
-            Date orderDate = order.getOrderReceipt().getOrderDate();
+            Date orderDate = order.getOrderReceipt(getUrlPrefix()).getOrderDate();
             LocalDate then = orderDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate now = LocalDate.now();
             long days = ChronoUnit.DAYS.between(then, now);

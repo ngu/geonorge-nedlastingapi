@@ -13,14 +13,14 @@ import no.geonorge.nedlasting.data.client.OrderReceipt;
 
 public class DownloadOrder extends _DownloadOrder {
 
-    public OrderReceipt getOrderReceipt() throws IOException {
+    public OrderReceipt getOrderReceipt(String urlPrefix) throws IOException {
         OrderReceipt orderReceipt = new OrderReceipt();
         orderReceipt.setReferenceNumber(getReferenceNumber());
         orderReceipt.setEmail(getEmail());
         orderReceipt.setOrderDate(getStartTime());
 
         for (DownloadItem item : getItems()) {
-            orderReceipt.addFile(item.toFile());
+            orderReceipt.addFile(item.toOrderReceiptFile(urlPrefix));
         }
 
         return orderReceipt;

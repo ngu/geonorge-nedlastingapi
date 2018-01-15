@@ -9,7 +9,7 @@ import no.geonorge.nedlasting.external.ExternalStatus;
 
 public class DownloadItem extends _DownloadItem {
 
-    public File toFile() throws IOException {
+    public File toOrderReceiptFile(String urlPrefix) throws IOException {
         Dataset dataset = getDataset();
 
         // see if external status should be fetched
@@ -23,7 +23,8 @@ public class DownloadItem extends _DownloadItem {
         File file = new File();
         file.setFileId(getFileId());
         file.setMetadataUuid(getMetadataUuid());
-        file.setDownloadUrl(getUrl());
+        file.setDownloadUrl(urlPrefix + "v2/download/order/" + getOrder().getReferenceNumber() + "/"
+                        + getFileId());
         file.setStatus(File.STATUS_READY_FOR_DOWNLOAD);
         file.setProjection(getSrid().toString());
         if (getProjection() != null) {
