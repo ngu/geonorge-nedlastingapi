@@ -471,7 +471,8 @@ public class DownloadService {
         URL url = new URL(urlString);
         // Check if fileType and remote host is allowed
         if (!allowedFiletypes.contains(extension.toLowerCase())) {
-            log.info("extension is '" + extension + "', but allowed extensions are " + allowedFiletypes);
+            log.info("url '" + urlString + "' has extension '" + extension + "', but allowed extensions are "
+                    + allowedFiletypes);
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         if (!allowedHosts.contains(url.getHost().toLowerCase())) {
