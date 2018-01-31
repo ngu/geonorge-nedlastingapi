@@ -84,8 +84,8 @@ public class DownloadService {
     UriInfo uri;
     
     private static final Logger log = Logger.getLogger(DownloadService.class.getName());
-    private List<String> allowedFiletypes = Arrays.asList("zip", "sosi", "gml","gz","tgz","tar");
-    private List<String> allowedHosts = Arrays.asList("www.ngu.no","geo.ngu.no","localhost");
+    //private List<String> allowedFiletypes = new ArrayList<>();
+    //private List<String> allowedHosts = new ArrayList<>();
 
     private String getUrlPrefix() {
         if (uri == null) {
@@ -470,10 +470,10 @@ public class DownloadService {
         
         URL url = new URL(urlString);
         // Check if fileType and remote host is allowed
-        if (!allowedFiletypes.contains(extension.toLowerCase())) {
+        if (!Config.getAllowedFiletypes.isEmpty() && !Config.getAllowedFiletypes.contains(extension.toLowerCase())) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
-        if (!allowedHosts.contains(url.getHost().toLowerCase())) {
+        if (!Config.getAllowedHosts.isEmpty() && !Config.getAllowedHosts.contains(url.getHost().toLowerCase())) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 

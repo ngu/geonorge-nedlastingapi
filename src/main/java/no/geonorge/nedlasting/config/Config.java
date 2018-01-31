@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -40,6 +37,8 @@ public class Config implements DataSourceFactory {
     private static final String KEY_DATABASE_URL = "database.url";
     private static final String KEY_DATABASE_USERNAME = "database.username";
     private static final String KEY_DATABASE_PASSWORD = "database.password";
+    private static final String KEY_ALLOWED_FILETYPES = "allowed_filetypes";
+    private static final String KEY_ALLOWED_HOSTS = "allowed_hosts";
     
     private static final String KEY_CORS = "cors";
 
@@ -48,6 +47,9 @@ public class Config implements DataSourceFactory {
     private static int serverPort = 10000;
     private static DataSource dataSource;
     private static String cors;
+    private static boolean enableFileProxy = true; // default true. Override in property-file: fileproxy.enable=false
+    private static List<String> allowedHosts = new ArrayList<>();
+    private static List<String> allowedFiletypes = new ArrayList<>();
 
     private static final Logger log = Logger.getLogger(Config.class.getName());
 
@@ -82,6 +84,22 @@ public class Config implements DataSourceFactory {
         Config.serverPort = getProperty(prop, KEY_JETTY_PORT, Config.serverPort);
         
         Config.cors = getProperty(prop, KEY_CORS, "*");
+        String _allowedHosts = getProperty(prop,KEY_ALLOWED_HOSTS,null);
+        if (_allowedHosts != null) {
+            String[] _hosts = _allowedHosts.split(",");
+            for (String _host:_hosts) {
+                allowedHosts.add(_host);
+            }
+        }
+        String _allowedFiletypes = getProperty(prop,KEY_ALLOWED_FILETYPES,null);
+        if (_allowedFiletypes != null) {
+            String[] _filetypes = _allowedFiletypes.split(",");
+            for (String _filetype:_filetypes) {
+                allowedFiletypes.add(_filetype);
+            }
+        } else {
+            Collections.addAll(allowedFiletypes, new String[]{"zip", "sos", "fgdb", "gz", "tar.gz", "tgz"});
+        }
 
         BasicDataSource nds = new BasicDataSource();
         nds.setUrl(getRequiredProperty(prop, KEY_DATABASE_URL));
@@ -89,6 +107,10 @@ public class Config implements DataSourceFactory {
         nds.setUsername(getProperty(prop, KEY_DATABASE_USERNAME));
         nds.setPassword(getProperty(prop, KEY_DATABASE_PASSWORD));
         setDataSource(nds);
+
+    }
+    public List<String> getAllowedHosts() {
+
     }
 
     public static int getServerPort() {
