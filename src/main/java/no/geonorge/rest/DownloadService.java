@@ -84,8 +84,6 @@ public class DownloadService {
     UriInfo uri;
     
     private static final Logger log = Logger.getLogger(DownloadService.class.getName());
-    //private List<String> allowedFiletypes = new ArrayList<>();
-    //private List<String> allowedHosts = new ArrayList<>();
 
     private String getUrlPrefix() {
         if (uri == null) {
@@ -339,8 +337,12 @@ public class DownloadService {
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
                 downloadItem.setProjection(datasetFile.getProjection());
-                downloadItem.setUrl(getUrlPrefix() + "v2/download/order/" + downloadOrder.getReferenceNumber() + "/"
-                        + datasetFile.getFileId());
+                if (Config.isEnableFileProxy()) {
+                    downloadItem.setUrl(getUrlPrefix() + "v2/download/order/" + downloadOrder.getReferenceNumber() + "/"
+                            + datasetFile.getFileId());
+                } else {
+                    downloadItem.setUrl(datasetFile.getUrl());
+                }
                 downloadItem.setFileId(datasetFile.getFileId());
                 downloadItem.setFileName(datasetFile.getFileName());
                 downloadItem.setMetadataUuid(datasetFile.getDataset().getMetadataUuid());
@@ -426,7 +428,7 @@ public class DownloadService {
             return createResponseFromRemoteFile(item.getUrl());
         } catch (IOException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }        
+        }
     }
 
     @GET
@@ -470,10 +472,10 @@ public class DownloadService {
         
         URL url = new URL(urlString);
         // Check if fileType and remote host is allowed
-        if (!Config.getAllowedFiletypes.isEmpty() && !Config.getAllowedFiletypes.contains(extension.toLowerCase())) {
+        if (!Config.getAllowedFiletypes().isEmpty() && !Config.getAllowedFiletypes().contains(extension.toLowerCase())) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
-        if (!Config.getAllowedHosts.isEmpty() && !Config.getAllowedHosts.contains(url.getHost().toLowerCase())) {
+        if (!Config.getAllowedHosts().isEmpty() && !Config.getAllowedHosts().contains(url.getHost().toLowerCase())) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
@@ -709,9 +711,12 @@ public class DownloadService {
                 entry.setPublishedDate(datasetFile.getFileDate());
                 entry.setUpdatedDate(datasetFile.getFileDate());
             }
-            entry.setLink(getUrlPrefix().concat("fileproxy/").concat(dataset.getMetadataUuid())
-                    .concat("/" + datasetFile.getFileId()));
-
+            if (Config.isEnableFileProxy()) {
+                entry.setLink(getUrlPrefix().concat("fileproxy/").concat(dataset.getMetadataUuid())
+                        .concat("/" + datasetFile.getFileId()));
+            } else {
+                entry.setLink(datasetFile.getUrl());
+            }
             /* <summary />*/
             SyndContent description = new SyndContentImpl();
             description.setType(MediaType.TEXT_PLAIN);

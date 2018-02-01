@@ -52,6 +52,7 @@ public class Config implements DataSourceFactory {
     private static List<String> allowedFiletypes = new ArrayList<>();
 
     private static final Logger log = Logger.getLogger(Config.class.getName());
+    public static List<String> getAllowedFiletypes;
 
     static {
         log.info("setting up cayenne ServerRuntime");
@@ -88,17 +89,17 @@ public class Config implements DataSourceFactory {
         if (_allowedHosts != null) {
             String[] _hosts = _allowedHosts.split(",");
             for (String _host:_hosts) {
-                allowedHosts.add(_host);
+                getAllowedHosts().add(_host);
             }
         }
         String _allowedFiletypes = getProperty(prop,KEY_ALLOWED_FILETYPES,null);
         if (_allowedFiletypes != null) {
             String[] _filetypes = _allowedFiletypes.split(",");
             for (String _filetype:_filetypes) {
-                allowedFiletypes.add(_filetype);
+                getAllowedFiletypes().add(_filetype);
             }
         } else {
-            Collections.addAll(allowedFiletypes, new String[]{"zip", "sos", "fgdb", "gz", "tar.gz", "tgz"});
+            Collections.addAll(getAllowedFiletypes(), new String[]{"zip", "sos", "fgdb", "gz", "tar.gz", "tgz"});
         }
 
         BasicDataSource nds = new BasicDataSource();
@@ -109,8 +110,17 @@ public class Config implements DataSourceFactory {
         setDataSource(nds);
 
     }
-    public List<String> getAllowedHosts() {
 
+    public static boolean isEnableFileProxy() {
+        return enableFileProxy;
+    }
+
+    public static List<String> getAllowedFiletypes() {
+        return allowedFiletypes;
+    }
+
+    public static List<String> getAllowedHosts() {
+        return allowedHosts;
     }
 
     public static int getServerPort() {
