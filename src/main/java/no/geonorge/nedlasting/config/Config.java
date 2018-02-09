@@ -83,6 +83,13 @@ public class Config implements DataSourceFactory {
         // https://github.com/ElectronicChartCentre/deploy-scripts
         Config.serverPort = getProperty(prop, KEY_SERVER_PORT, Config.serverPort);
         Config.serverPort = getProperty(prop, KEY_JETTY_PORT, Config.serverPort);
+        String _enableFileproxy = getProperty(prop,"fileproxy.enable","true");
+        if (_enableFileproxy.equalsIgnoreCase("true")) {
+            Config.enableFileProxy = true;
+        }
+        if (_enableFileproxy.equalsIgnoreCase("false")) {
+            Config.enableFileProxy = false;
+        }
         
         Config.cors = getProperty(prop, KEY_CORS, "*");
         String _allowedHosts = getProperty(prop,KEY_ALLOWED_HOSTS,null);
