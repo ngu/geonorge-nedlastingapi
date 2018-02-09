@@ -31,6 +31,7 @@
 		<db-attribute name="AREA_NAME" type="VARCHAR" length="1024"/>
 		<db-attribute name="AREA_TYPE" type="VARCHAR" length="256"/>
 		<db-attribute name="DATASET_ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="FILE_DATE" type="TIMESTAMP" isMandatory="true"/>
 		<db-attribute name="FILE_ID" type="VARCHAR" isPrimaryKey="true" isMandatory="true" length="64"/>
 		<db-attribute name="FILE_NAME" type="VARCHAR" length="1024"/>
 		<db-attribute name="FORMAT_NAME" type="VARCHAR" length="1024"/>
@@ -80,6 +81,7 @@
 		<obj-attribute name="areaCode" type="java.lang.String" db-attribute-path="AREA_CODE"/>
 		<obj-attribute name="areaName" type="java.lang.String" db-attribute-path="AREA_NAME"/>
 		<obj-attribute name="areaType" type="java.lang.String" db-attribute-path="AREA_TYPE"/>
+		<obj-attribute name="fileDate" type="java.util.Date" db-attribute-path="FILE_DATE"/>
 		<obj-attribute name="fileId" type="java.lang.String" db-attribute-path="FILE_ID"/>
 		<obj-attribute name="fileName" type="java.lang.String" db-attribute-path="FILE_NAME"/>
 		<obj-attribute name="formatName" type="java.lang.String" db-attribute-path="FORMAT_NAME"/>

@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -33,20 +30,29 @@ import no.geonorge.nedlasting.utils.IOUtils;
 
 public class Config implements DataSourceFactory {
 
-    public static final String KEY_SERVER_PORT = "server.port";
-    public static final String KEY_JETTY_PORT = "jetty.port";
+    private static final String KEY_SERVER_PORT = "server.port";
+    private static final String KEY_JETTY_PORT = "jetty.port";
 
-    public static final String KEY_DATABASE_DRIVER = "database.driver";
-    public static final String KEY_DATABASE_URL = "database.url";
-    public static final String KEY_DATABASE_USERNAME = "database.username";
-    public static final String KEY_DATABASE_PASSWORD = "database.password";
+    private static final String KEY_DATABASE_DRIVER = "database.driver";
+    private static final String KEY_DATABASE_URL = "database.url";
+    private static final String KEY_DATABASE_USERNAME = "database.username";
+    private static final String KEY_DATABASE_PASSWORD = "database.password";
+    private static final String KEY_ALLOWED_FILETYPES = "allowed_filetypes";
+    private static final String KEY_ALLOWED_HOSTS = "allowed_hosts";
+    
+    private static final String KEY_CORS = "cors";
 
     private static ServerRuntime runtime;
     private static boolean inited = false;
     private static int serverPort = 10000;
     private static DataSource dataSource;
+    private static String cors;
+    private static boolean enableFileProxy = true; // default true. Override in property-file: fileproxy.enable=false
+    private static List<String> allowedHosts = new ArrayList<>();
+    private static List<String> allowedFiletypes = new ArrayList<>();
 
     private static final Logger log = Logger.getLogger(Config.class.getName());
+    public static List<String> getAllowedFiletypes;
 
     static {
         log.info("setting up cayenne ServerRuntime");
@@ -77,6 +83,24 @@ public class Config implements DataSourceFactory {
         // https://github.com/ElectronicChartCentre/deploy-scripts
         Config.serverPort = getProperty(prop, KEY_SERVER_PORT, Config.serverPort);
         Config.serverPort = getProperty(prop, KEY_JETTY_PORT, Config.serverPort);
+        
+        Config.cors = getProperty(prop, KEY_CORS, "*");
+        String _allowedHosts = getProperty(prop,KEY_ALLOWED_HOSTS,null);
+        if (_allowedHosts != null) {
+            String[] _hosts = _allowedHosts.split(",");
+            for (String _host:_hosts) {
+                getAllowedHosts().add(_host);
+            }
+        }
+        String _allowedFiletypes = getProperty(prop,KEY_ALLOWED_FILETYPES,null);
+        if (_allowedFiletypes != null) {
+            String[] _filetypes = _allowedFiletypes.split(",");
+            for (String _filetype:_filetypes) {
+                getAllowedFiletypes().add(_filetype);
+            }
+        } else {
+            Collections.addAll(getAllowedFiletypes(), new String[]{"zip", "sos", "fgdb", "gz", "tar.gz", "tgz"});
+        }
 
         BasicDataSource nds = new BasicDataSource();
         nds.setUrl(getRequiredProperty(prop, KEY_DATABASE_URL));
@@ -84,6 +108,19 @@ public class Config implements DataSourceFactory {
         nds.setUsername(getProperty(prop, KEY_DATABASE_USERNAME));
         nds.setPassword(getProperty(prop, KEY_DATABASE_PASSWORD));
         setDataSource(nds);
+
+    }
+
+    public static boolean isEnableFileProxy() {
+        return enableFileProxy;
+    }
+
+    public static List<String> getAllowedFiletypes() {
+        return allowedFiletypes;
+    }
+
+    public static List<String> getAllowedHosts() {
+        return allowedHosts;
     }
 
     public static int getServerPort() {
@@ -175,9 +212,18 @@ public class Config implements DataSourceFactory {
         String v = getProperty(prop, key);
         return v == null ? defaultValue : Integer.parseInt(v);
     }
+    
+    private static String getProperty(Properties prop, String key, String defaultValue) {
+        String v = getProperty(prop, key);
+        return v == null ? defaultValue : v;
+    }
 
     public DataSource getDataSource(DataNodeDescriptor desc) throws Exception {
         return dataSource;
+    }
+    
+    public static String getCors() {
+        return cors;
     }
 
 }

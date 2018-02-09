@@ -2,12 +2,14 @@ package no.geonorge.rest;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response;
 
 import org.apache.cayenne.ObjectContext;
 
@@ -25,6 +27,7 @@ import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Order;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.OrderReceipt;
+import no.geonorge.nedlasting.utils.GsonCreator;
 
 public class DownloadServiceTest extends DbTestCase {
 
@@ -56,13 +59,14 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile.setFormatName("SOSI");
         datasetFile.setUrl("http://a.url.com");
         datasetFile.setProjection(createOrFind(ctxt, 4326));
+        datasetFile.setFileDate(new Date());
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnFormats(uuid).getStatus());
 
         Type type = new TypeToken<List<Format>>() {
         }.getType();
-        List<Format> formats = new Gson().fromJson(ds.returnFormats(uuid).getEntity().toString(), type);
+        List<Format> formats = GsonCreator.create().fromJson(ds.returnFormats(uuid).getEntity().toString(), type);
         assertNotNull(formats);
         assertEquals(1, formats.size());
         Format format = formats.get(0);
@@ -83,13 +87,14 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile.setFormatName("SOSI");
         datasetFile.setUrl("http://a.url.com");
         datasetFile.setProjection(createOrFind(ctxt, 4326));
+        datasetFile.setFileDate(new Date());
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnProjections(uuid).getStatus());
 
         Type type = new TypeToken<List<no.geonorge.nedlasting.data.client.Projection>>() {
         }.getType();
-        List<no.geonorge.nedlasting.data.client.Projection> projections = new Gson()
+        List<no.geonorge.nedlasting.data.client.Projection> projections = GsonCreator.create()
                 .fromJson(ds.returnProjections(uuid).getEntity().toString(), type);
         assertNotNull(projections);
         assertEquals(1, projections.size());
@@ -117,23 +122,27 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile1.setFormatName("SOSI");
         datasetFile1.setUrl("http://a.url.com/1");
         datasetFile1.setProjection(p1);
+        datasetFile1.setFileDate(new Date());
         DatasetFile datasetFile2 = ctxt.newObject(DatasetFile.class);
         datasetFile2.setArea("fylke", "02", "Akershus");
         datasetFile2.setDataset(dataset);
         datasetFile2.setFormatName("GML");
         datasetFile2.setUrl("http://a.url.com/2");
         datasetFile2.setProjection(p1);
+        datasetFile2.setFileDate(new Date());
         DatasetFile datasetFile3 = ctxt.newObject(DatasetFile.class);
         datasetFile3.setArea("fylke", "02", "Akershus");
         datasetFile3.setDataset(dataset);
         datasetFile3.setFormatName("SOSI");
         datasetFile3.setUrl("http://a.url.com/3");
         datasetFile3.setProjection(p1);
+        datasetFile3.setFileDate(new Date());
         DatasetFile datasetFile4 = ctxt.newObject(DatasetFile.class);
         datasetFile4.setArea("fylke", "02", "Akershus");
         datasetFile4.setDataset(dataset);
         datasetFile4.setFormatName("GML");
         datasetFile4.setUrl("http://a.url.com/4");
+        datasetFile4.setFileDate(new Date());
         datasetFile4.setProjection(p2);
         DatasetFile datasetFile5 = ctxt.newObject(DatasetFile.class);
         datasetFile5.setArea("fylke", "03", "Whatever");
@@ -141,13 +150,14 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile5.setFormatName("GML");
         datasetFile5.setUrl("http://a.url.com/5");
         datasetFile5.setProjection(p2);
+        datasetFile5.setFileDate(new Date());
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnAreas(uuid).getStatus());
 
         Type type = new TypeToken<List<Area>>() {
         }.getType();
-        List<Area> areas = new Gson().fromJson(ds.returnAreas(uuid).getEntity().toString(), type);
+        List<Area> areas = GsonCreator.create().fromJson(ds.returnAreas(uuid).getEntity().toString(), type);
         assertNotNull(areas);
         assertEquals(2, areas.size());
 
@@ -189,6 +199,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile1.setFormatName("SOSI");
         datasetFile1.setUrl("http://a.url.com/1");
         datasetFile1.setProjection(p1);
+        datasetFile1.setFileDate(new Date());
         ctxt.commitChanges();
 
         Order order = new Order();
@@ -199,9 +210,10 @@ public class DownloadServiceTest extends DbTestCase {
         orderLine.setMetadataUuid(dataset.getMetadataUuid());
         order.addOrderLine(orderLine);
 
-        Gson gson = new Gson();
-        OrderReceipt orderReceipt = gson.fromJson(ds.orderDownload(gson.toJson(order)).getEntity().toString(),
-                OrderReceipt.class);
+        Gson gson = GsonCreator.create();
+        Response response = ds.orderDownload(gson.toJson(order));
+        assertEquals(200, response.getStatus());
+        OrderReceipt orderReceipt = gson.fromJson(response.getEntity().toString(), OrderReceipt.class);
         assertNotNull(orderReceipt);
 
         assertEquals(1, orderReceipt.getFiles().size());
@@ -223,9 +235,9 @@ public class DownloadServiceTest extends DbTestCase {
         ds.addFile(dsf);
 
         DownloadService dls = new DownloadService();
-        dls.putDataset(ds.getMetadataUuid(), new Gson().toJson(ds));
+        dls.putDataset(ds.getMetadataUuid(), GsonCreator.create().toJson(ds));
 
-        no.geonorge.nedlasting.data.client.Dataset ds2 = new Gson().fromJson(
+        no.geonorge.nedlasting.data.client.Dataset ds2 = GsonCreator.create().fromJson(
                 dls.getDataset(ds.getMetadataUuid()).getEntity().toString(),
                 no.geonorge.nedlasting.data.client.Dataset.class);
         assertEquals(ds.getMetadataUuid(), ds2.getMetadataUuid());
@@ -243,8 +255,8 @@ public class DownloadServiceTest extends DbTestCase {
         dsf3.setProjection("4326");
         ds2.addFile(dsf3);
 
-        dls.putDataset(ds.getMetadataUuid(), new Gson().toJson(ds2));
-        no.geonorge.nedlasting.data.client.Dataset ds3 = new Gson().fromJson(
+        dls.putDataset(ds.getMetadataUuid(), GsonCreator.create().toJson(ds2));
+        no.geonorge.nedlasting.data.client.Dataset ds3 = GsonCreator.create().fromJson(
                 dls.getDataset(ds.getMetadataUuid()).getEntity().toString(),
                 no.geonorge.nedlasting.data.client.Dataset.class);
         assertEquals(ds.getMetadataUuid(), ds3.getMetadataUuid());
@@ -255,8 +267,8 @@ public class DownloadServiceTest extends DbTestCase {
         ds3.removeFile(dsf3.getFileId());
         assertEquals(1, ds3.getFiles().size());
 
-        dls.putDataset(ds.getMetadataUuid(), new Gson().toJson(ds3));
-        no.geonorge.nedlasting.data.client.Dataset ds4 = new Gson().fromJson(
+        dls.putDataset(ds.getMetadataUuid(), GsonCreator.create().toJson(ds3));
+        no.geonorge.nedlasting.data.client.Dataset ds4 = GsonCreator.create().fromJson(
                 dls.getDataset(ds.getMetadataUuid()).getEntity().toString(),
                 no.geonorge.nedlasting.data.client.Dataset.class);
         assertEquals(ds.getMetadataUuid(), ds4.getMetadataUuid());
@@ -268,8 +280,8 @@ public class DownloadServiceTest extends DbTestCase {
         ds4.setFiles(null);
         assertTrue(ds4.ignoreFiles());
 
-        dls.putDataset(ds.getMetadataUuid(), new Gson().toJson(ds4));
-        no.geonorge.nedlasting.data.client.Dataset ds5 = new Gson().fromJson(
+        dls.putDataset(ds.getMetadataUuid(), GsonCreator.create().toJson(ds4));
+        no.geonorge.nedlasting.data.client.Dataset ds5 = GsonCreator.create().fromJson(
                 dls.getDataset(ds.getMetadataUuid()).getEntity().toString(),
                 no.geonorge.nedlasting.data.client.Dataset.class);
         assertEquals(ds.getMetadataUuid(), ds5.getMetadataUuid());

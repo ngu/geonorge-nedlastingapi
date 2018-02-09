@@ -45,8 +45,22 @@ Use with your favourite IDE:
 - IntelliJ IDEA: mvn idea:idea
 
 
+## Configuration
 
+Configuration can be done using environment variables, java VM arguments *or* a properties file
 
+Here are example parameters as java VM arguments.
+````
+-Ddatabase.url=jdbc:postgresql://127.0.0.1/db -Ddatabase.driver=org.postgresql.Driver -Ddatabase.username=user -Ddatabase.password=pass
+````
 
+Here is an example properties file. It should be located in `./geonorge.properties` or `/etc/geonorge.properties`.
+````
+database.url=jdbc:postgresql://127.0.0.1/db
+database.driver=org.postgresql.Driver
+database.username=user
+database.password=pass
+cors=*
+````
 
 Contact: Bjorn.Ove.Grotan AT ngu.no

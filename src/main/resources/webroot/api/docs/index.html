@@ -19,7 +19,38 @@
         <p>
             GeoNorge Download API documented <a href="https://nedlasting.geonorge.no/Help">here</a>.
         </p>
-        
+
+        <h2>Geonorge ATOM Feed API</h2>
+        <table class="table">
+            <tr>
+                <th>Resource</th><th>Description</th>
+            </tr>
+            <tr>
+                <td>GET <a href="../../api/atomfeeds">api/atomfeeds</a></td><td>List all datasets available as Atom Feed</td>
+            </tr>
+            <tr>
+                <td>GET api/atom/{metadataUuid}</td><td>List all files for a given dataset as Atom Feed</td>
+            </tr>
+        </table>
+        <p><h3>Example with api/atomfeeds</h3></p>
+        <pre>
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;feed xmlns=&quot;http://www.w3.org/2005/Atom&quot;&gt;
+      &lt;title&gt;GEONORGE DATASET ATOM FEEDS&lt;/title&gt;
+      &lt;link rel=&quot;alternate&quot; href=&quot;https://myserver.mydomain.com:443/api/atomfeeds&quot; /&gt;
+      &lt;subtitle&gt;ATOM Feeds for Datasets&lt;/subtitle&gt;
+      &lt;entry&gt;
+        &lt;title&gt;My dataset title&lt;/title&gt;
+        &lt;link rel=&quot;alternate&quot; href=&quot;https://myserver.mydomain.com:443/api/atom/6aba5993-94bd-48f9-91d4-3a5f4ba7d9a7&quot; /&gt;
+        &lt;author&gt;
+          &lt;name /&gt;
+        &lt;/author&gt;
+        &lt;summary type=&quot;text/plain&quot;&gt;Dataset ATOM Feed&lt;/summary&gt;
+      &lt;/entry&gt;
+    &lt;/feed&gt;
+        </pre>
+        <p>
+
         <h2>Internal Dataset API</h2>
         
         <table class="table">
@@ -27,25 +58,25 @@
                 <th>Resource</th><th>Description</th>
             </tr>
             <tr>
-                <td>GET /api/internal/dataset</td>
+                <td>GET api/internal/dataset</td>
                 <td>
                     List some information on all available dataset.
                 </td>
             </tr>
             <tr>
-                <td>GET internal/dataset/{metadataUuid}</td>
+                <td>GET api/internal/dataset/{metadataUuid}</td>
                 <td>
                     Get information on the given dataset.
                 </td>
             </tr>
             <tr>
-                <td>POST/PUT internal/dataset/{metadataUuid}</td>
+                <td>POST/PUT api/internal/dataset/{metadataUuid}</td>
                 <td>
                     Update some information on the given dataset or store it as a new dataset.
                 </td>
             </tr>
             <tr>
-                <td>DELETE internal/dataset/{metadataUuid}</td>
+                <td>DELETE api/internal/dataset/{metadataUuid}</td>
                 <td>
                     Delete the given dataset.
                 </td>
@@ -69,13 +100,14 @@ $ cat new_dataset
         {
             "downloadUrl": "http://a.url/to/a/file.zip",
             "name": "file.zip",
-            "fileId": "33",
+            "fileId": "e7782d3f-1499-4512-a93b-4a787d5e9402",
             "metadataUuid": "6aba5993-94bd-48f9-91d4-3a5f4ba7d9a7",
             "area": "01",
             "areaName": "Østfold",
             "projection": "32632",
             "projectionName": "EPSG:WGS 84 / UTM zone 32N",
             "format": "SOSI",
+            "fileDate": "2017-11-29T10:33:27.176Z",
             "metadataName": "Grunnvannsborehull"
         }
     ]
@@ -89,13 +121,14 @@ $ curl --user username:password http://127.0.0.1:10000/api/internal/dataset/6aba
         {
             "downloadUrl": "http://a.url/to/a/file.zip",
             "name": "file.zip",
-            "fileId": "33",
+            "fileId": "e7782d3f-1499-4512-a93b-4a787d5e9403",
             "metadataUuid": "6aba5993-94bd-48f9-91d4-3a5f4ba7d9a7",
             "area": "01",
             "areaName": "Østfold",
             "projection": "32632",
             "projectionName": "EPSG:WGS 84 / UTM zone 32N",
             "format": "SOSI",
+            "fileDate": "2017-11-29T10:33:27.176Z",
             "metadataName": "Grunnvannsborehull"
         }
     ]

@@ -4,9 +4,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
-import com.google.gson.Gson;
-
 import junit.framework.TestCase;
+import no.geonorge.nedlasting.utils.GsonCreator;
 import no.geonorge.nedlasting.utils.IOUtils;
 
 public class OrderTest extends TestCase {
@@ -15,7 +14,7 @@ public class OrderTest extends TestCase {
         Reader reader = null;
         try {
             reader = new FileReader("src/test/resources/order.json");
-            Order order = new Gson().fromJson(reader, Order.class);
+            Order order = GsonCreator.create().fromJson(reader, Order.class);
             assertNotNull(order);
         } finally {
             IOUtils.close(reader);

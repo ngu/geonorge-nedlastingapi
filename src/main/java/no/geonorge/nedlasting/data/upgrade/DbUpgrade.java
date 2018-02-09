@@ -19,6 +19,7 @@ public class DbUpgrade {
     private static List<EntityUpgrade> getEntityUpgrades() {
         List<EntityUpgrade> eus = new ArrayList<>();
         eus.add(new ProjectionUpgrade());
+        eus.add(new DatasetFileUpgrade());
         return Collections.unmodifiableList(eus);
     }
 

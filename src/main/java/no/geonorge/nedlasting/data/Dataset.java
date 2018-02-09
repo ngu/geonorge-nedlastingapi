@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -75,6 +76,7 @@ public class Dataset extends _Dataset {
         no.geonorge.nedlasting.data.client.Dataset d = new no.geonorge.nedlasting.data.client.Dataset();
         d.setMetadataUuid(getMetadataUuid());
         d.setTitle(getTitle());
+        d.setMaxArea(getMaxArea());
         for (DatasetFile file : getFiles()) {
             d.addFile(file.forClient());
         }
@@ -91,6 +93,7 @@ public class Dataset extends _Dataset {
         no.geonorge.nedlasting.data.client.Dataset d = new no.geonorge.nedlasting.data.client.Dataset();
         d.setMetadataUuid(getMetadataUuid());
         d.setTitle(getTitle());
+        d.setMaxArea(getMaxArea());
         return d;
     }
 
@@ -191,13 +194,27 @@ public class Dataset extends _Dataset {
         pk.put(DatasetFile.FILE_ID_PK_COLUMN, fileId);
         return Cayenne.objectForPK(getObjectContext(), DatasetFile.class, pk);
     }
-
+    
     public Set<String> getFileIds() {
         Set<String> fileIds = new HashSet<>();
         for (DatasetFile file : getFiles()) {
             fileIds.add(file.getFileId());
         }
         return Collections.unmodifiableSet(fileIds);
+    }
+
+    public Date getLastFileDate() {
+        Date last = null;
+        for (DatasetFile file : getFiles()) {
+            Date fileDate = file.getFileDate();
+            if (fileDate == null) {
+                continue;
+            }
+            if (last == null || last.before(fileDate)) {
+                last = fileDate;
+            }
+        }
+        return last;
     }
 
     public boolean isExternal() {
