@@ -411,7 +411,7 @@ public class DownloadService {
             LocalDate then = orderDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate now = LocalDate.now();
             long days = ChronoUnit.DAYS.between(then, now);
-            if (days > 5) {
+            if (days > Config.getOrderDaysValid()) {
                 // Fetch your file within a working week please
                 Response.status(Response.Status.GONE).build();
             }

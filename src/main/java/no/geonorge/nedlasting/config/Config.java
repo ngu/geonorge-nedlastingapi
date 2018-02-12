@@ -41,6 +41,7 @@ public class Config implements DataSourceFactory {
     private static final String KEY_ALLOWED_HOSTS = "allowed_hosts";
     
     private static final String KEY_CORS = "cors";
+    private static final java.lang.String KEY_ORDER_VALID_DAYS = "order.days_valid";
 
     private static ServerRuntime runtime;
     private static boolean inited = false;
@@ -50,6 +51,7 @@ public class Config implements DataSourceFactory {
     private static boolean enableFileProxy = true; // default true. Override in property-file: fileproxy.enable=false
     private static List<String> allowedHosts = new ArrayList<>();
     private static List<String> allowedFiletypes = new ArrayList<>();
+    private static int orderValidDays = null;
 
     private static final Logger log = Logger.getLogger(Config.class.getName());
     public static List<String> getAllowedFiletypes;
@@ -109,6 +111,18 @@ public class Config implements DataSourceFactory {
             Collections.addAll(getAllowedFiletypes(), new String[]{"zip", "sos", "fgdb", "gz", "tar.gz", "tgz"});
         }
 
+        String _orderDaysValid = getProperty(prop,KEY_ORDER_VALID_DAYS,null);
+        if (_orderDaysValid != null) {
+            try {
+                orderValidDays = Integer.parseInt(_orderDaysValid);
+            } catch (Exception e) {
+                e.printStackTrace();
+                orderValidDays = 7;
+            }
+        } else {
+            orderValidDays = 7;
+        }
+
         BasicDataSource nds = new BasicDataSource();
         nds.setUrl(getRequiredProperty(prop, KEY_DATABASE_URL));
         nds.setDriverClassName(getRequiredProperty(prop, KEY_DATABASE_DRIVER));
@@ -128,6 +142,10 @@ public class Config implements DataSourceFactory {
 
     public static List<String> getAllowedHosts() {
         return allowedHosts;
+    }
+
+    public static int getOrderDaysValid() {
+        return orderValidDays;
     }
 
     public static int getServerPort() {
