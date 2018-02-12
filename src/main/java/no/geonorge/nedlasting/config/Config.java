@@ -51,7 +51,7 @@ public class Config implements DataSourceFactory {
     private static boolean enableFileProxy = true; // default true. Override in property-file: fileproxy.enable=false
     private static List<String> allowedHosts = new ArrayList<>();
     private static List<String> allowedFiletypes = new ArrayList<>();
-    private static int orderValidDays = null;
+    private static int orderValidDays = 7; // default value. Can be overridden by property order.days_valid
 
     private static final Logger log = Logger.getLogger(Config.class.getName());
     public static List<String> getAllowedFiletypes;
