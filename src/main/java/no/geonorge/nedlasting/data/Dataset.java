@@ -26,11 +26,14 @@ import no.geonorge.nedlasting.data.client.Link;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.External;
 
+import no.geonorge.nedlasting.config.Config;
+
 public class Dataset extends _Dataset {
 
     public Integer getDatasetId() {
         return Cayenne.intPKForObject(this);
     }
+    private boolean isExternal;
 
     public static List<Dataset> getAll(ObjectContext ctxt) {
         SelectQuery query = new SelectQuery(Dataset.class);
@@ -59,6 +62,9 @@ public class Dataset extends _Dataset {
         ct.setSupportsFormatSelection(isSupportsFormatSelection());
         ct.setSupportsPolygonSelection(isSupportsPolygonSelection());
         ct.setSupportsProjectionSelection(isSupportsProjectionSelection());
+        ct.setDistributedBy(Config.getKeyDistributedBy());
+        ct.setSupportsDownloadBundling(Config.isSupportsDownloadBundling());
+        ct.setDeliveryNotificationByEmail(isExternal());
 
         String p = urlPrefix;
         String u = getMetadataUuid();

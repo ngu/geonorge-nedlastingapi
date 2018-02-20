@@ -9,6 +9,9 @@ public class Capabilities {
     private boolean supportsFormatSelection;
     private boolean supportsPolygonSelection;
     private boolean supportsAreaSelection;
+    private boolean supportsDownloadBundling;
+    private String distributedBy;
+    private boolean deliveryNotificationByEmail;
 
     private List<Link> _links = new ArrayList<>();
 
@@ -42,6 +45,24 @@ public class Capabilities {
 
     public void setSupportsAreaSelection(boolean supportsAreaSelection) {
         this.supportsAreaSelection = supportsAreaSelection;
+    }
+
+    public boolean isSupportsDownloadBundling() { return supportsDownloadBundling;}
+
+    public void setSupportsDownloadBundling(boolean supportsDownloadBundling) {
+        this.supportsDownloadBundling = supportsDownloadBundling;
+    }
+
+    public String getDistributedBy() { return distributedBy; }
+
+    public void setDistributedBy(String distributedBy) {
+        this.distributedBy = distributedBy;
+    }
+
+    public boolean isDeliveryNotificationByEmail() { return deliveryNotificationByEmail; }
+
+    public void setDeliveryNotificationByEmail(boolean deliveryNotificationByEmail) {
+        this.deliveryNotificationByEmail = deliveryNotificationByEmail;
     }
 
     public void addLink(Link link) {

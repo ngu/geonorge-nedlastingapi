@@ -39,6 +39,8 @@ public class Config implements DataSourceFactory {
     private static final String KEY_DATABASE_PASSWORD = "database.password";
     private static final String KEY_ALLOWED_FILETYPES = "allowed_filetypes";
     private static final String KEY_ALLOWED_HOSTS = "allowed_hosts";
+    private static final String KEY_SUPPORT_DOWNLOAD_BUNDLING = "supportDownloadBundling";
+    private static final String KEY_DISTRIBUTED_BY = "distributedBy";
     
     private static final String KEY_CORS = "cors";
     private static final java.lang.String KEY_ORDER_VALID_DAYS = "order.days_valid";
@@ -52,6 +54,8 @@ public class Config implements DataSourceFactory {
     private static List<String> allowedHosts = new ArrayList<>();
     private static List<String> allowedFiletypes = new ArrayList<>();
     private static int orderValidDays = 7; // default value. Can be overridden by property order.days_valid
+    private static boolean supportsDownloadBundling = false; // default false
+    private static String distributedBy;
 
     private static final Logger log = Logger.getLogger(Config.class.getName());
     public static List<String> getAllowedFiletypes;
@@ -121,6 +125,23 @@ public class Config implements DataSourceFactory {
             }
         } else {
             orderValidDays = 7;
+        }
+
+        String _supportsDownloadBundling = getProperty(prop,KEY_SUPPORT_DOWNLOAD_BUNDLING,null);
+        if (_supportsDownloadBundling != null) {
+            if (_supportsDownloadBundling.equalsIgnoreCase("true")) {
+                supportsDownloadBundling = true;
+            } else {
+                supportsDownloadBundling = false;
+            }
+        }
+        String _distributedBy = getProperty(prop,KEY_DISTRIBUTED_BY,null);
+        if (_distributedBy != null) {
+            distributedBy = _distributedBy;
+        } else {
+            System.err.println("Missing property in geonorge.properties: " + KEY_DISTRIBUTED_BY);
+            System.err.println("Using default: Geonorge");
+            distributedBy = "Geonorge";
         }
 
         BasicDataSource nds = new BasicDataSource();
@@ -250,5 +271,9 @@ public class Config implements DataSourceFactory {
     public static String getCors() {
         return cors;
     }
+
+    public static String getKeyDistributedBy() { return distributedBy; }
+
+    public static boolean isSupportsDownloadBundling() { return supportsDownloadBundling; }
 
 }
