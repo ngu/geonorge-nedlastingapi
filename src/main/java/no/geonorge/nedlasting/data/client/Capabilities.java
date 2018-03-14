@@ -12,6 +12,7 @@ public class Capabilities {
     private boolean supportsDownloadBundling;
     private String distributedBy;
     private boolean deliveryNotificationByEmail;
+    private String mapSelectionLayer;
 
     private List<Link> _links = new ArrayList<>();
 
@@ -64,6 +65,12 @@ public class Capabilities {
     public void setDeliveryNotificationByEmail(boolean deliveryNotificationByEmail) {
         this.deliveryNotificationByEmail = deliveryNotificationByEmail;
     }
+
+    public void setMapSelectionLayer(String mapSelectionLayer) {
+        this.mapSelectionLayer = mapSelectionLayer;
+    }
+
+    public String getMapSelectionLayer() {return mapSelectionLayer;}
 
     public void addLink(Link link) {
         _links.add(link);
