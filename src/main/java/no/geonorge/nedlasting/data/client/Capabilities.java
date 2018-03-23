@@ -10,6 +10,7 @@ public class Capabilities {
     private boolean supportsPolygonSelection;
     private boolean supportsAreaSelection;
     private boolean supportsDownloadBundling;
+    private String mapSelectionLayer;
     private String distributedBy;
     private boolean deliveryNotificationByEmail;
 
@@ -63,6 +64,11 @@ public class Capabilities {
 
     public void setDeliveryNotificationByEmail(boolean deliveryNotificationByEmail) {
         this.deliveryNotificationByEmail = deliveryNotificationByEmail;
+    }
+
+    public String getMapSelectionLayer() { return mapSelectionLayer;}
+    public void setMapSelectionLayer(String mapSelectionLayer) {
+        this.mapSelectionLayer = mapSelectionLayer;
     }
 
     public void addLink(Link link) {

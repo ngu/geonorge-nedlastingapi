@@ -63,6 +63,7 @@ public class Dataset extends _Dataset {
         ct.setSupportsPolygonSelection(isSupportsPolygonSelection());
         ct.setSupportsProjectionSelection(isSupportsProjectionSelection());
         ct.setDistributedBy(Config.getKeyDistributedBy());
+        ct.setMapSelectionLayer(getMapSelectionLayer());
         ct.setSupportsDownloadBundling(Config.isSupportsDownloadBundling());
         ct.setDeliveryNotificationByEmail(isExternal());
 

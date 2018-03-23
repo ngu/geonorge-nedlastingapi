@@ -334,6 +334,7 @@ public class DownloadService {
             
             Dataset dataset = Dataset.forMetadataUUID(ctxt, orderLine.getMetadataUuid());
 
+            /* An order can be a combination of preproduced files and polygon from map */
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
                 downloadItem.setProjection(datasetFile.getProjection());
@@ -352,7 +353,8 @@ public class DownloadService {
                 formatRest.remove(datasetFile.getFormat());
                 projectionRest.remove(datasetFile.getProjection().forClient());
             }
-            
+
+            /* Remove the combinations that are already preproduced files */
             if (!areaRest.isEmpty() && !formatRest.isEmpty() && !projectionRest.isEmpty() && dataset.isExternal()) {
                 for (Format format : orderLine.getFormats()) {
                     for (Projection projection : orderLine.getProjections()) {
