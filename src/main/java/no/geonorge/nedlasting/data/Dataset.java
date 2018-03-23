@@ -65,6 +65,7 @@ public class Dataset extends _Dataset {
         ct.setDistributedBy(Config.getKeyDistributedBy());
         ct.setMapSelectionLayer(getMapSelectionLayer());
         ct.setSupportsDownloadBundling(Config.isSupportsDownloadBundling());
+        ct.setMapSelectionLayer(getMapSelectionLayer());
         ct.setDeliveryNotificationByEmail(isExternal());
 
         String p = urlPrefix;
