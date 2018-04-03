@@ -358,6 +358,7 @@ public class DownloadService {
                     for (Projection projection : orderLine.getProjections()) {
                         for (OrderArea area : orderLine.getAreas()) {
                             if (area.isTypePolygonSelection() && orderLine.hasCoordinates()) {
+                                areaRest.remove(area);
                                 area = null;
                             }
                             External external = dataset.getExternal();
