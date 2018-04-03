@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-
-import com.google.gson.Gson;
 
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Projection;
@@ -122,6 +121,10 @@ public abstract class FMEClient extends External {
     public abstract String getProjectionParameterName();
     
     public abstract String getCoordinatesParameterName();
+    
+    public Map<String, String> jobPostParameters(Format format, Projection projection, String email, String coordinates) {
+        return Collections.emptyMap();
+    }
 
     public List<Format> getFormats() throws IOException {
         List<Format> formats = new ArrayList<>();
@@ -182,6 +185,7 @@ public abstract class FMEClient extends External {
              */
             postParameters.put(getCoordinatesParameterName(), coordinates);
         }
+        postParameters.putAll(jobPostParameters(format, projection, email, coordinates));
 
         StringBuilder postData = new StringBuilder();
         for (Map.Entry<String, String> e : postParameters.entrySet()) {
