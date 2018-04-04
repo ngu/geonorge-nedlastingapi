@@ -31,7 +31,7 @@ public class NGUFMEClient extends FMEClient {
         setFMEProjectionName("ETRS89.UTM-35N", "25835");
         setFMEProjectionName("UTM84-32N", "32632");
         setFMEProjectionName("UTM84-33N", "32633");
-        setFMEProjectionName("UTM84-35N", "32625");
+        setFMEProjectionName("UTM84-35N", "32635");
         setFMEProjectionName("LL-WGS84", "4326");
     }
 
