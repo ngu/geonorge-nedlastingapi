@@ -9,7 +9,8 @@ The official API documentation available at https://nedlasting.geonorge.no/Help
 
 With this download api you can integrate download and query a dataset for
   
-  - Its capabilities (polygon selection,area selection etc)
+  - Its capabilities (polygon selection,area selection, map selection layer etc)
+    A list of possible map selection layer can be found at https://github.com/kartverket/anathem/tree/norgeskart/themes/layers/geoJSON
   
   - Which formats the dataset supports
   

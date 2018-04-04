@@ -1,6 +1,15 @@
 package no.geonorge.nedlasting.external.fme;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+
+import no.geonorge.nedlasting.data.client.Format;
+import no.geonorge.nedlasting.data.client.Projection;
+import no.geonorge.nedlasting.utils.GeometryUtils;
 
 public class NGUFMEClient extends FMEClient {
 
@@ -39,6 +48,28 @@ public class NGUFMEClient extends FMEClient {
     @Override
     public String getCoordinatesParameterName() {
         return "koordinatListe";
+    }
+    
+    @Override
+    public Map<String, String> jobPostParameters(Format format, Projection projection, String email,
+            String coordinates) {
+        
+        Map<String, String> m = new HashMap<>(super.jobPostParameters(format, projection, email, coordinates));
+        
+        if (coordinates != null) {
+            m.put("Kommunenr", "-1");
+            
+            Geometry geometry = GeometryUtils.parseCoordList(coordinates);
+            if (geometry != null) {
+                Envelope e = geometry.getEnvelopeInternal();
+                m.put("ENVELOPE_MINX", Double.toString(e.getMinX()));
+                m.put("ENVELOPE_MINY", Double.toString(e.getMinY()));
+                m.put("ENVELOPE_MAXX", Double.toString(e.getMaxX()));
+                m.put("ENVELOPE_MAXY", Double.toString(e.getMaxY()));
+            }
+        }
+        
+        return Collections.unmodifiableMap(m);
     }
 
 }
