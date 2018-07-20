@@ -5,7 +5,7 @@ insert into dataset
 -- http://www.ngu.no/FileArchive/geonorge/Grunnvannsborehull/
 insert into dataset_file
     (dataset_id, file_id, url, format_name, srid, area_type, area_code, area_name)
-    values (1, '1', 'http://www.ngu.no/FileArchive/geonorge/Grunnvannsborehull/Grunnvannsborehull-fylke_1-32632-sosi.zip', 'SOSI', 32632, 'fylke', '01', 'Østfold');
+    values (1, '1', 'http://cdn.foo.bar/Grunnvannsborehull-fylke_1-32632-sosi.zip', 'SOSI', 32632, 'fylke', '01', 'Østfold');
 insert into dataset_file
     (dataset_id, file_id, url, format_name, srid, area_type, area_code, area_name)
-    values (1, '2', 'http://www.ngu.no/FileArchive/geonorge/Grunnvannsborehull/Grunnvannsborehull-fylke_2-32632-sosi.zip', 'SOSI', 32632, 'fylke', '02', 'Akershus');
+    values (1, '2', 'http://cdn.foo.bar/Grunnvannsborehull-fylke_2-32632-sosi.zip', 'SOSI', 32632, 'fylke', '02', 'Akershus');
