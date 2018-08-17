@@ -157,6 +157,12 @@ This API is developed at the Geological survey of Norway
 
 Contact: Bjorn.Ove.Grotan AT ngu.no
 
+## Talks
+
+This software have been or is going to be presented at 
+  * FME World Tour Oslo 2018
+  * #FOSS4G Tanzania 2018 
+
 ### Thanks 
   * [@halset](https://www.github.com/halset) from Electronic Chart Centre. 
   * Dag-Olav at [Arkitektum](http://www.arkitektum.no) for help during development.
