@@ -33,6 +33,7 @@ public class NGUFMEClient extends FMEClient {
         setFMEProjectionName("UTM84-33N", "32633");
         setFMEProjectionName("UTM84-35N", "32635");
         setFMEProjectionName("LL-WGS84", "4326");
+        setFMEProjectionName("LL-ETRF89", "4258");
     }
 
     @Override
