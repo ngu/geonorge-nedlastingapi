@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -182,6 +183,7 @@ public class Dataset extends _Dataset {
         }
 
         List<Area> areas = new ArrayList<>(areaTypeByAreaKey.values());
+        areas.sort(Comparator.comparing(Area::getName));
         return Collections.unmodifiableList(areas);
     }
 
