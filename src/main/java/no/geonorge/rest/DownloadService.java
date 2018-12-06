@@ -575,6 +575,7 @@ public class DownloadService {
                 datasetFile.setUrl(file.getDownloadUrl());
                 datasetFile.setAreaCode(file.getArea());
                 datasetFile.setAreaName(file.getAreaName());
+                datasetFile.setAreaType(file.getAreaType());
                 datasetFile.setProjection(no.geonorge.nedlasting.data.Projection.getForSrid(ctxt,
                         Integer.parseInt(file.getProjection())));
                 datasetFile.setFormatName(file.getFormat());
