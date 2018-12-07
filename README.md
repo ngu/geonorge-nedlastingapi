@@ -164,6 +164,7 @@ This software have been or is going to be presented at
   * #FOSS4G Tanzania 2018 
 
 ### Thanks 
+  * [@MalteStr](https://www.github.com/MalteStr) - from the Norwegian Institute of Bioeconomy Research 
   * [@halset](https://www.github.com/halset) from Electronic Chart Centre. 
   * Dag-Olav at [Arkitektum](http://www.arkitektum.no) for help during development.
   * Kartverket (Norwegian Mapping Authority)
