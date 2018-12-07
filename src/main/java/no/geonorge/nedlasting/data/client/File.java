@@ -13,6 +13,7 @@ public class File {
     private String metadataUuid;
     private String area;
     private String areaName;
+    private String areaType;
     private String coordinates;
     private String projection;
     private String projectionName;
@@ -102,6 +103,14 @@ public class File {
 
     public void setAreaName(String areaName) {
         this.areaName = areaName;
+    }
+    
+    public String getAreaType() {
+        return areaType;
+    }
+
+    public void setAreaType(String areaType) {
+        this.areaType = areaType;
     }
 
     public String getCoordinates() {
