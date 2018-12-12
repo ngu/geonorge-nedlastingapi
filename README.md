@@ -116,6 +116,11 @@ database.username=user
 database.password=pass
 cors=*
 ````
+Another note on postgresql. PostgreSQL will use public as currentSchema unless overridden.
+So - if you want to use a custom db schema you can configure it in the jdbc url:
+````
+-Ddatabase.url=jdbc:postgresql://127.0.0.1/nedlastingtest?currentSchema=myschema
+````
 
 ## API Documentation
 
