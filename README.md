@@ -105,7 +105,8 @@ And then add the following to pom.xml:
 
 Here are example parameters as java VM arguments.
 ````
--Ddatabase.url=jdbc:postgresql://127.0.0.1/db -Ddatabase.driver=org.postgresql.Driver -Ddatabase.username=user -Ddatabase.password=pass
+-Ddatabase.url=jdbc:postgresql://127.0.0.1/db -Ddatabase.driver=org.postgresql.Driver \
+-Ddatabase.username=user -Ddatabase.password=pass
 ````
 
 Here is an example properties file. It should be located in `./geonorge.properties` or `/etc/geonorge.properties`.
