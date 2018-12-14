@@ -59,7 +59,7 @@ public class DatasetFile extends _DatasetFile {
         file.setName(getFileName());
         file.setMetadataUuid(getDataset().getMetadataUuid());
         file.setMetadataName(getDataset().getTitle());
-        file.setFormat(getFormatName());
+        file.setFormat(getFormatNameWithVersion());
         file.setProjection(getProjection().getSrid().toString());
         file.setProjectionName(getProjection().getName());
         file.setArea(getAreaCode());
@@ -67,6 +67,18 @@ public class DatasetFile extends _DatasetFile {
         file.setAreaType(getAreaType());
         file.setFileDate(getFileDate());
         return file;
+    }
+    
+    public String getFormatNameWithVersion() {
+        if (getFormatName() == null) {
+            return null;
+        }
+        StringBuilder format = new StringBuilder(getFormatName());
+        if (getFormatVersion() != null) {
+            format.append(' ');
+            format.append(getFormatVersion());
+        }
+        return format.toString();
     }
 
     public static List<DatasetFile> findForOrderLine(ObjectContext ctxt, OrderLine orderLine) {
