@@ -24,6 +24,18 @@ public class Format {
         return version;
     }
 
+    public String getNameAndVersion() {
+        if (getName() == null) {
+            return null;
+        }
+        StringBuilder format = new StringBuilder(getName());
+        if (getVersion() != null) {
+            format.append(' ');
+            format.append(getVersion());
+        }
+        return format.toString();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
