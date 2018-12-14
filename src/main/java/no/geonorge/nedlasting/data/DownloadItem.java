@@ -43,10 +43,12 @@ public class DownloadItem extends _DownloadItem {
             file.setMetadataName(dataset.getTitle());
         }
 
-        /*
-         * file.setFormat(getFormatName()); file.setArea(getAreaCode());
-         * file.setAreaName(getAreaName());
-         */
+        DatasetFile datasetFile = dataset.getFile(getFileId());
+        if (datasetFile != null) {
+            file.setFormat(datasetFile.getFormatName());
+            file.setArea(datasetFile.getAreaName());
+            file.setAreaName(datasetFile.getAreaName());
+        }
 
         /*
          * example with
