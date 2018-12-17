@@ -1,5 +1,6 @@
 package no.geonorge.rest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.cayenne.ObjectContext;
 
@@ -246,7 +248,7 @@ public class DownloadServiceTest extends DbTestCase {
 
         File dsf2 = ds2.getFiles().get(0);
         assertEquals(dsf.getFileId(), dsf2.getFileId());
-        assertEquals(dsf.getDownloadUrl(), dsf2.getDownloadUrl());
+        assertTrue(looksLikeProxyUrl(dsf2.getDownloadUrl()));
 
         // try to add a file
         File dsf3 = new File();
@@ -288,6 +290,103 @@ public class DownloadServiceTest extends DbTestCase {
         assertEquals(ds.getTitle(), ds5.getTitle());
         assertEquals(1, ds5.getFiles().size());
 
+    }
+    
+    public void testGetFileForDownload() throws IOException {
+        ObjectContext ctxt = Config.getObjectContext();
+
+        Projection p1 = createOrFind(ctxt, 4326);
+        ctxt.commitChanges();
+
+        Dataset dataset = ctxt.newObject(Dataset.class);
+        dataset.setMetadataUuid(UUID.randomUUID().toString());
+        DatasetFile datasetFile1 = ctxt.newObject(DatasetFile.class);
+        datasetFile1.setArea("fylke", "02", "Akershus");
+        datasetFile1.setDataset(dataset);
+        datasetFile1.setFormatName("SOSI");
+        datasetFile1.setUrl("https://raw.githubusercontent.com/halset/test/master/README.md");
+        datasetFile1.setProjection(p1);
+        datasetFile1.setFileDate(new Date());
+        datasetFile1.setFileId(UUID.randomUUID().toString());
+        ctxt.commitChanges();
+
+        assertFalse(looksLikeProxyUrl(datasetFile1.getUrl()));
+
+        DownloadService ds = new DownloadService();
+        
+        Response response = ds.getFileForDownload(dataset.getMetadataUuid(), datasetFile1.getFileId());
+        assertEquals(200, response.getStatus());
+        StreamingOutput out = (StreamingOutput) response.getEntity();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        out.write(baos);
+        assertTrue(new String(baos.toByteArray(), "UTF-8").contains("test"));
+    }
+    
+    public void testGetFileForOrder() throws IOException {
+        ObjectContext ctxt = Config.getObjectContext();
+
+        Projection p1 = createOrFind(ctxt, 4326);
+        ctxt.commitChanges();
+
+        Dataset dataset = ctxt.newObject(Dataset.class);
+        dataset.setMetadataUuid(UUID.randomUUID().toString());
+        DatasetFile datasetFile1 = ctxt.newObject(DatasetFile.class);
+        datasetFile1.setArea("fylke", "02", "Akershus");
+        datasetFile1.setDataset(dataset);
+        datasetFile1.setFormatName("SOSI");
+        datasetFile1.setUrl("https://raw.githubusercontent.com/halset/test/master/README.md");
+        datasetFile1.setProjection(p1);
+        datasetFile1.setFileDate(new Date());
+        ctxt.commitChanges();
+
+        assertFalse(looksLikeProxyUrl(datasetFile1.getUrl()));
+
+        Order order = new Order();
+        OrderLine orderLine = new OrderLine();
+        orderLine.addArea(datasetFile1.getOrderArea());
+        orderLine.addFormat(datasetFile1.getFormat());
+        orderLine.addProjection(datasetFile1.getProjection().forClient());
+        orderLine.setMetadataUuid(dataset.getMetadataUuid());
+        order.addOrderLine(orderLine);
+
+        DownloadService ds = new DownloadService();
+
+        Gson gson = GsonCreator.create();
+        Response response = ds.orderDownload(gson.toJson(order));
+        assertEquals(200, response.getStatus());
+        OrderReceipt orderReceipt = gson.fromJson(response.getEntity().toString(), OrderReceipt.class);
+        assertNotNull(orderReceipt);
+
+        assertEquals(1, orderReceipt.getFiles().size());
+
+        File file = orderReceipt.getFiles().get(0);
+        assertNotNull(file.getDownloadUrl());
+        assertFalse(file.getDownloadUrl().contains(datasetFile1.getUrl()));
+        assertTrue(looksLikeProxyUrl(file.getDownloadUrl()));
+
+        response = ds.getOrderInfo(orderReceipt.getReferenceNumber());
+        assertEquals(200, response.getStatus());
+        orderReceipt = gson.fromJson(response.getEntity().toString(), OrderReceipt.class);
+        assertNotNull(orderReceipt);
+
+        file = orderReceipt.getFiles().get(0);
+        assertNotNull(file.getDownloadUrl());
+        assertFalse(file.getDownloadUrl().contains(datasetFile1.getUrl()));
+        assertTrue(looksLikeProxyUrl(file.getDownloadUrl()));
+
+        response = ds.getFileForOrder(orderReceipt.getReferenceNumber(), file.getFileId());
+        assertEquals(200, response.getStatus());
+        StreamingOutput out = (StreamingOutput) response.getEntity();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        out.write(baos);
+        assertTrue(new String(baos.toByteArray(), "UTF-8").contains("test"));
+    }
+    
+    private static boolean looksLikeProxyUrl(String url) {
+        if (url == null) {
+            return false;
+        }
+        return url.contains("fileproxy/") || url.contains("v2/download/order/");
     }
 
 }
