@@ -1,77 +1,55 @@
 -- Script for creating database and tables for use with Geonorge nedlasting-api
 
--- CREATE DATABASE nedlasting;
--- \connect nedlasting;
+CREATE TABLE PROJECTION (CODESPACE varchar(512) NOT NULL, NAME varchar(512) NOT NULL, SRID integer NOT NULL, PRIMARY KEY (SRID))
+;
 
--- Main table containing datasets
-CREATE TABLE dataset (
-	id serial  NOT NULL,
-	tittel text NULL,
-	metadatauuid text NULL,
-	supportsareaselection text NULL,
-	supportsformatselection text NULL,
-	supportspolygonselection text NULL,
-	supportsprojectionselection text NULL,
-	fmeklippeurl text NULL,
-	mapselectionlayer text NULL,
-	accessconstraint text NULL,
-	maxarea integer NOT NULL
-);
+CREATE TABLE DATASET (ACCESS_CONSTRAINT varchar(1024) NULL, DATASET_ID bigint NOT NULL, FME_CUT_URL varchar(2048) NULL, MAP_SELECTION_LAYER varchar(1024) NULL, MAX_AREA integer NULL, METADATA_UUID varchar(64) NULL, SUPPORTS_AREA_SELECTION boolean NULL, SUPPORTS_FORMAT_SELECTION boolean NULL, SUPPORTS_POLYGON_SELECTION boolean NULL, SUPPORTS_PROJECTION_SELECTION boolean NULL, TITLE varchar(1024) NULL, PRIMARY KEY (DATASET_ID))
+;
 
-ALTER TABLE dataset ADD PRIMARY KEY (id);
-ALTER TABLE dataset ADD CONSTRAINT idx_uuid UNIQUE (metadatauuid);
+CREATE TABLE DATASET_FILE (AREA_CODE varchar(32) NULL, AREA_NAME varchar(1024) NULL, AREA_TYPE varchar(256) NULL, DATASET_ID bigint NOT NULL, FILE_DATE timestamp with time zone NOT NULL, FILE_ID varchar(64) NOT NULL, FILE_NAME varchar(1024) NULL, FORMAT_NAME varchar(1024) NULL, FORMAT_VERSION varchar(32) NULL, SRID integer NOT NULL, URL varchar(2048) NULL, PRIMARY KEY (DATASET_ID, FILE_ID))
+;
 
-CREATE TABLE filliste (
-	id serial NOT NULL,
-	filnavn text NOT NULL,
-	url text NOT NULL,
-	kategori text NULL,
-	underkategori text NULL,
-	inndeling text NULL,
-	inndelingsverdi text NULL,
-	projeksjon text NULL,
-	format text NULL,
-	dataset integer NULL
-);
+CREATE TABLE DOWNLOAD_ORDER (EMAIL varchar(512) NULL, ORDER_ID bigint NOT NULL, REFERENCE_NUMBER varchar(64) NOT NULL, START_TIME timestamp with time zone NOT NULL, PRIMARY KEY (ORDER_ID))
+;
 
-ALTER TABLE filliste ADD PRIMARY KEY (id);
-ALTER TABLE filliste ADD CONSTRAINT fk_dataset FOREIGN KEY (dataset) REFERENCES dataset (id);
+CREATE TABLE API_USER (PASSWORD_SHA512 varchar(128) NULL, USERNAME varchar(128) NOT NULL, PRIMARY KEY (USERNAME))
+;
 
-CREATE TABLE orderdownload (
-	referencenumber integer NOT NULL,
-	email text NULL,
-	orderdate date  NULL,
-	username text NULL,
-	uuid  text NOT NULL
-);
-ALTER TABLE orderdownload ADD PRIMARY KEY (referencenumber);
+CREATE TABLE DATASET_EXTERNAL_PARAMETER (DATASET_ID bigint NOT NULL, PARAMETER_NAME varchar(1024) NOT NULL, PARAMETER_VALUE varchar(1024) NOT NULL, PRIMARY KEY (DATASET_ID, PARAMETER_NAME))
+;
 
-CREATE TABLE orderitem (
-	id serial NOT NULL,
-	referencenumber int NOT NULL,
-	downloadurl text NULL,
-	filename text NULL,
-	status int NOT NULL,
-	message text NULL,
-	fileid text NOT NULL,
-	format text NULL,
-	area text NULL,
-	coordinates text NULL,
-	coordinatesystem text NULL,
-	projection text NULL,
-	metadatauuid text NULL,
-	metadataname text NULL,
-	areaname text NULL,
-	projectionname text NULL
-);
-ALTER TABLE orderitem ADD PRIMARY KEY (id);
-ALTER TABLE orderitem ADD CONSTRAINT fk_filliste FOREIGN KEY (fileid) REFERENCES filliste(id);
+CREATE TABLE DOWNLOAD_ITEM (COORDINATES text NULL, EXTERNAL_JOB_ID varchar(1024) NULL, FILE_ID varchar(64) NOT NULL, FILE_NAME varchar(1024) NULL, METADATA_UUID varchar(64) NULL, ORDER_ID bigint NOT NULL, ORDER_ITEM_ID bigint NOT NULL, SRID integer NOT NULL, URL varchar(2048) NULL, PRIMARY KEY (ORDER_ITEM_ID))
+;
 
--- Column defaults
-ALTER TABLE dataset ALTER COLUMN maxarea SET  DEFAULT ((0)) ;
-ALTER TABLE orderdownload ALTER COLUMN  orderdate SET DEFAULT now();
-ALTER TABLE orderdownload ALTER COLUMN  uuid SET DEFAULT ('00000000-0000-0000-0000-000000000000');
-ALTER TABLE orderitem ALTER COLUMN status SET DEFAULT ((0));
-ALTER TABLE orderitem ALTER COLUMN fileid SET DEFAULT ('00000000-0000-0000-0000-000000000000');
-ALTER TABLE filliste  WITH CHECK ADD  CONSTRAINT fk_dataset FOREIGN KEY(dataset) REFERENCES dataset (ID) ON DELETE CASCADE
-ALTER TABLE orderitem  WITH CHECK ADD  CONSTRAINT fk_order FOREIGN KEY(referencenumber) REFERENCES orderdownload (referencenumber)
+ALTER TABLE DATASET_FILE ADD FOREIGN KEY (SRID) REFERENCES PROJECTION (SRID)
+;
+
+ALTER TABLE DATASET_FILE ADD FOREIGN KEY (DATASET_ID) REFERENCES DATASET (DATASET_ID)
+;
+
+ALTER TABLE DATASET_EXTERNAL_PARAMETER ADD FOREIGN KEY (DATASET_ID) REFERENCES DATASET (DATASET_ID)
+;
+
+ALTER TABLE DOWNLOAD_ITEM ADD FOREIGN KEY (ORDER_ID) REFERENCES DOWNLOAD_ORDER (ORDER_ID)
+;
+
+CREATE SEQUENCE pk_api_user INCREMENT 20 START 200
+;
+
+CREATE SEQUENCE pk_dataset INCREMENT 20 START 200
+;
+
+CREATE SEQUENCE pk_dataset_external_parameter INCREMENT 20 START 200
+;
+
+CREATE SEQUENCE pk_dataset_file INCREMENT 20 START 200
+;
+
+CREATE SEQUENCE pk_download_item INCREMENT 20 START 200
+;
+
+CREATE SEQUENCE pk_download_order INCREMENT 20 START 200
+;
+
+CREATE SEQUENCE pk_projection INCREMENT 20 START 200
+;

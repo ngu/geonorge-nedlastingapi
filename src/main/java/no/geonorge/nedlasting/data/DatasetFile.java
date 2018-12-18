@@ -11,6 +11,7 @@ import no.geonorge.nedlasting.data.client.File;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.OrderArea;
 import no.geonorge.nedlasting.data.client.OrderLine;
+import no.geonorge.nedlasting.security.FileProxyURLGenerator;
 
 public class DatasetFile extends _DatasetFile {
 
@@ -52,10 +53,10 @@ public class DatasetFile extends _DatasetFile {
         return u.substring(lp + 1);
     }
 
-    public File forClient() {
+    public File forClient(String urlPrefix) {
         File file = new File();
         file.setFileId(getFileId());
-        file.setDownloadUrl(getUrl());
+        file.setDownloadUrl(FileProxyURLGenerator.createUrl(urlPrefix, this));
         file.setName(getFileName());
         file.setMetadataUuid(getDataset().getMetadataUuid());
         file.setMetadataName(getDataset().getTitle());

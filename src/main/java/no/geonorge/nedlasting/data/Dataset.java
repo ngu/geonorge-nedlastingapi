@@ -19,6 +19,7 @@ import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.query.SelectQuery;
 
+import no.geonorge.nedlasting.config.Config;
 import no.geonorge.nedlasting.data.auto._Dataset;
 import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.nedlasting.data.client.Capabilities;
@@ -26,8 +27,6 @@ import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Link;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.External;
-
-import no.geonorge.nedlasting.config.Config;
 
 public class Dataset extends _Dataset {
 
@@ -81,13 +80,13 @@ public class Dataset extends _Dataset {
         return ct;
     }
 
-    public no.geonorge.nedlasting.data.client.Dataset forClient() {
+    public no.geonorge.nedlasting.data.client.Dataset forClient(String urlPrefix) {
         no.geonorge.nedlasting.data.client.Dataset d = new no.geonorge.nedlasting.data.client.Dataset();
         d.setMetadataUuid(getMetadataUuid());
         d.setTitle(getTitle());
         d.setMaxArea(getMaxArea());
         for (DatasetFile file : getFiles()) {
-            d.addFile(file.forClient());
+            d.addFile(file.forClient(urlPrefix));
         }
         for (DatasetExternalParameter dep : getExternalParameters()) {
             if (dep.getKey().toLowerCase().contains("pass")) {

@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -337,12 +336,7 @@ public class DownloadService {
             for (DatasetFile datasetFile : DatasetFile.findForOrderLine(ctxt, orderLine)) {
                 DownloadItem downloadItem = ctxt.newObject(DownloadItem.class);
                 downloadItem.setProjection(datasetFile.getProjection());
-                if (Config.isEnableFileProxy()) {
-                    downloadItem.setUrl(getUrlPrefix() + "v2/download/order/" + downloadOrder.getReferenceNumber() + "/"
-                            + datasetFile.getFileId());
-                } else {
-                    downloadItem.setUrl(datasetFile.getUrl());
-                }
+                downloadItem.setUrl(datasetFile.getUrl());
                 downloadItem.setFileId(datasetFile.getFileId());
                 downloadItem.setFileName(datasetFile.getFileName());
                 downloadItem.setMetadataUuid(datasetFile.getDataset().getMetadataUuid());
@@ -528,7 +522,7 @@ public class DownloadService {
         if (dataset == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        String json = gson().toJson(dataset.forClient());
+        String json = gson().toJson(dataset.forClient(getUrlPrefix()));
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
     
