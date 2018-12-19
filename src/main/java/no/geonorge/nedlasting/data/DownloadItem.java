@@ -45,7 +45,8 @@ public class DownloadItem extends _DownloadItem {
 
         DatasetFile datasetFile = dataset.getFile(getFileId());
         if (datasetFile != null) {
-            file.setFormat(datasetFile.getFormat().getNameAndVersion());
+            file.setFormat(datasetFile.getFormatName());
+            file.setFormatVersion(datasetFile.getFormatVersion());
             file.setArea(datasetFile.getAreaCode());
             file.setAreaName(datasetFile.getAreaName());
         }

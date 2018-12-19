@@ -60,7 +60,8 @@ public class DatasetFile extends _DatasetFile {
         file.setName(getFileName());
         file.setMetadataUuid(getDataset().getMetadataUuid());
         file.setMetadataName(getDataset().getTitle());
-        file.setFormat(getFormat().getNameAndVersion());
+        file.setFormat(getFormatName());
+        file.setFormatVersion(getFormatVersion());
         file.setProjection(getProjection().getSrid().toString());
         file.setProjectionName(getProjection().getName());
         file.setArea(getAreaCode());
