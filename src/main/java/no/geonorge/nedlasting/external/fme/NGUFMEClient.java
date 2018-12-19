@@ -1,12 +1,15 @@
 package no.geonorge.nedlasting.external.fme;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
+import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.utils.GeometryUtils;
@@ -49,6 +52,17 @@ public class NGUFMEClient extends FMEClient {
     @Override
     public String getCoordinatesParameterName() {
         return "koordinatListe";
+    }
+
+    @Override
+    public String getAreaParameterName(String areaType) {
+        if (areaType.equalsIgnoreCase("kommune")) {
+            return "Kommunenr";
+        } else if (areaType.equalsIgnoreCase("raster-n50")) {
+            return "n50kartblad";
+        } else {
+            return "unknown";
+        }
     }
     
     @Override

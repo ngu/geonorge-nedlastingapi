@@ -122,7 +122,9 @@ public abstract class FMEClient extends External {
     public abstract String getProjectionParameterName();
     
     public abstract String getCoordinatesParameterName();
-    
+
+    public abstract String getAreaParameterName(String mapSelectionLayer);
+
     public Map<String, String> jobPostParameters(Format format, Projection projection, String email, String coordinates) {
         return Collections.emptyMap();
     }
@@ -150,7 +152,7 @@ public abstract class FMEClient extends External {
     /**
      * submitJob submits an order to FME DataDownload service
      */
-    public String submitJob(Format format, Projection projection, String email, List<Area> areas) throws IOException {
+    public String submitJob(Format format, Projection projection, String email, List<Area> areas, String mapSelectionLayer) throws IOException {
         String url = urlPrefix + "/fmedatadownload/" + repository + "/" + workspace + "?accept=json&token="
                 + getToken();
         Map<String, String> postParameters = new HashMap<>();
@@ -172,27 +174,14 @@ public abstract class FMEClient extends External {
         postParameters.put(getProjectionParameterName(), projectionValue);
 
         // Convert areas of type kommune/fylke/other to a list of area-codes
-        List<String> kommuner = new ArrayList<String>();
-        List<String> fylker = new ArrayList<String>();
-        List<String> celle = new ArrayList<String>();
+        List<String> areaList = new ArrayList<String>();
         for (Area area:areas) {
-            if (area.getType().equalsIgnoreCase("kommune")) {
-                kommuner.add(area.getCode());
-            } else if (area.getType().equals("fylke")) {
-                fylker.add(area.getCode());
-            } else {
-                celle.add(area.getCode());
-            }
+            areaList.add(area.getCode());
         }
-        if (kommuner.size() > 0) {
-            postParameters.put("Kommunenr",StringUtils.join(kommuner,','));
+        if (areaList.size() > 0) {
+            postParameters.put(getAreaParameterName(mapSelectionLayer),StringUtils.join(areaList,','));
         }
-        if (fylker.size() > 0) {
-            postParameters.put("Fylkenr",StringUtils.join(fylker,','));
-        }
-        if (celle.size() > 0) {
-            postParameters.put("Cellenr",StringUtils.join(celle,','));
-        }
+
         StringBuilder postData = new StringBuilder();
         for (Map.Entry<String, String> e : postParameters.entrySet()) {
             if (postData.length() > 0) {
