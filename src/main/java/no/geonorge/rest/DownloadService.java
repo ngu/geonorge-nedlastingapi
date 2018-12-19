@@ -41,6 +41,8 @@ import org.apache.commons.io.FilenameUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.rometools.rome.feed.synd.SyndCategory;
+import com.rometools.rome.feed.synd.SyndCategoryImpl;
 import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndContentImpl;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -68,6 +70,7 @@ import no.geonorge.nedlasting.data.client.OrderArea;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.External;
+import no.geonorge.nedlasting.security.FileProxyURLGenerator;
 import no.geonorge.nedlasting.utils.GeometryUtils;
 import no.geonorge.nedlasting.utils.GsonCreator;
 import no.geonorge.nedlasting.utils.IOUtils;
@@ -708,12 +711,22 @@ public class DownloadService {
                 entry.setPublishedDate(datasetFile.getFileDate());
                 entry.setUpdatedDate(datasetFile.getFileDate());
             }
-            if (Config.isEnableFileProxy()) {
-                entry.setLink(getUrlPrefix().concat("fileproxy/").concat(dataset.getMetadataUuid())
-                        .concat("/" + datasetFile.getFileId()));
-            } else {
-                entry.setLink(datasetFile.getUrl());
-            }
+            entry.setLink(FileProxyURLGenerator.createUrl(getUrlPrefix(), datasetFile));
+            
+            List<SyndCategory> categories = new ArrayList<>();
+            
+            SyndCategory formatCategory = new SyndCategoryImpl();
+            formatCategory.setName("Format:" + datasetFile.getFormatName());
+            formatCategory.setTaxonomyUri("https://register.geonorge.no/metadata/kodelister/vektorformater/");
+            categories.add(formatCategory);
+            
+            SyndCategory crsCategory = new SyndCategoryImpl();
+            crsCategory.setName(datasetFile.getProjection().getAuthorityAndCode());
+            crsCategory.setTaxonomyUri(datasetFile.getProjection().getScheme());
+            categories.add(crsCategory);
+            
+            entry.setCategories(categories);
+            
             /* <summary />*/
             SyndContent description = new SyndContentImpl();
             description.setType(MediaType.TEXT_PLAIN);
