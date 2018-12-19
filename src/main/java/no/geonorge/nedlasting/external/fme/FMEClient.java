@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import no.geonorge.nedlasting.data.client.Area;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -149,6 +150,65 @@ public abstract class FMEClient extends External {
     /**
      * submitJob submits an order to FME DataDownload service
      */
+    public String submitJob(Format format, Projection projection, String email, List<Area> areas) throws IOException {
+        String url = urlPrefix + "/fmedatadownload/" + repository + "/" + workspace + "?accept=json&token="
+                + getToken();
+        Map<String, String> postParameters = new HashMap<>();
+        postParameters.put("opt_responseformat", "json");
+        postParameters.put("opt_showresult", "false");
+        postParameters.put("opt_servicemode", "async");
+
+        if (email != null) {
+            postParameters.put("opt_requesteremail", email);
+        }
+
+        postParameters.put(getFormatParameterName(), format.getName());
+
+        String projectionValue = fMENameByEpsgCode.get(projection.getCode());
+        if (projectionValue == null) {
+            projectionValue = projection.getCode();
+        }
+
+        postParameters.put(getProjectionParameterName(), projectionValue);
+
+        // Convert areas of type kommune/fylke/other to a list of area-codes
+        List<String> kommuner = new ArrayList<String>();
+        List<String> fylker = new ArrayList<String>();
+        List<String> celle = new ArrayList<String>();
+        for (Area area:areas) {
+            if (area.getType().equalsIgnoreCase("kommune")) {
+                kommuner.add(area.getCode());
+            } else if (area.getType().equals("fylke")) {
+                fylker.add(area.getCode());
+            } else {
+                celle.add(area.getCode());
+            }
+        }
+        if (kommuner.size() > 0) {
+            postParameters.put("Kommunenr",StringUtils.join(kommuner,','));
+        }
+        if (fylker.size() > 0) {
+            postParameters.put("Fylkenr",StringUtils.join(fylker,','));
+        }
+        if (celle.size() > 0) {
+            postParameters.put("Cellenr",StringUtils.join(celle,','));
+        }
+        StringBuilder postData = new StringBuilder();
+        for (Map.Entry<String, String> e : postParameters.entrySet()) {
+            if (postData.length() > 0) {
+                postData.append('&');
+            }
+            postData.append(e.getKey());
+            postData.append('=');
+            postData.append(URLEncoder.encode(e.getValue(), "UTF-8"));
+        }
+
+        String r = httpPOST(url, "application/x-www-form-urlencoded", postData.toString());
+
+        DataDownloadResponse ddr = GsonCreator.create().fromJson(r, DataDownloadResponse.class);
+
+        return ddr == null ? null : ddr.getServiceResponse().getJobID().toString();
+    }
     public String submitJob(Format format, Projection projection, String email, String coordinates) throws IOException {
         String url = urlPrefix + "/fmedatadownload/" + repository + "/" + workspace + "?accept=json&token="
                 + getToken();
