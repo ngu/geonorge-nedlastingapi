@@ -718,13 +718,14 @@ public class DownloadService {
             
             SyndCategory formatCategory = new SyndCategoryImpl();
             formatCategory.setName("Format:" + datasetFile.getFormatName());
-            formatCategory.setTaxonomyUri("https://register.geonorge.no/metadata/kodelister/vektorformater/");
+            formatCategory.setTaxonomyUri("https://register.geonorge.no/metadata-kodelister/vektorformater");
             categories.add(formatCategory);
 
             SyndCategory areaCategory = new SyndCategoryImpl();
             areaCategory.setName(datasetFile.getAreaType());
             // Support category labels. Requires patched rometools from https://github.com/bgrotan/rome/tree/syndcategorylabel
             areaCategory.setLabel(datasetFile.getAreaName());
+            areaCategory.setTaxonomyUri("https://register.geonorge.no/metadata-kodelister/geografisk-distribusjonsinndeling");
             categories.add(areaCategory);
 
             SyndCategory crsCategory = new SyndCategoryImpl();
