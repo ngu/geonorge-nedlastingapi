@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
+import com.rometools.rome.feed.CopyFrom;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.query.SelectQuery;
 import org.apache.commons.io.FilenameUtils;
@@ -719,7 +720,13 @@ public class DownloadService {
             formatCategory.setName("Format:" + datasetFile.getFormatName());
             formatCategory.setTaxonomyUri("https://register.geonorge.no/metadata/kodelister/vektorformater/");
             categories.add(formatCategory);
-            
+
+            SyndCategory areaCategory = new SyndCategoryImpl();
+            areaCategory.setName(datasetFile.getAreaType());
+            // Support category labels. Requires patched rometools from https://github.com/bgrotan/rome/tree/syndcategorylabel
+            areaCategory.setLabel(datasetFile.getAreaName());
+            categories.add(areaCategory);
+
             SyndCategory crsCategory = new SyndCategoryImpl();
             crsCategory.setName(datasetFile.getProjection().getAuthorityAndCode());
             crsCategory.setTaxonomyUri(datasetFile.getProjection().getScheme());
