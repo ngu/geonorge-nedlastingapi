@@ -723,6 +723,8 @@ public class DownloadService {
             SyndCategory crsCategory = new SyndCategoryImpl();
             crsCategory.setName(datasetFile.getProjection().getAuthorityAndCode());
             crsCategory.setTaxonomyUri(datasetFile.getProjection().getScheme());
+            // Support category labels. Requires patched rometools from https://github.com/bgrotan/rome/tree/syndcategorylabel
+            crsCategory.setLabel(datasetFile.getProjection().getName());
             categories.add(crsCategory);
             
             entry.setCategories(categories);
