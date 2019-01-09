@@ -31,7 +31,7 @@
     <repository>
       <id>ngu</id>
       <name>NGU public repository</name>
-      <url>https://github.com/ngu/ngu-mvn-repo/tree/master/releases/</url>
+      <url>https://github.com/ngu/ngu-mvn-repo/raw/master/releases/</url>
     </repository>	  
   </repositories>
 
