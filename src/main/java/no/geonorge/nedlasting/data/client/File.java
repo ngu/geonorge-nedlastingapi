@@ -13,38 +13,18 @@ public class File {
     private String metadataUuid;
     private String area;
     private String areaName;
+    private String areaType;
     private String coordinates;
     private String projection;
     private String projectionName;
     private String format;
+    private String formatVersion;
     private String status;
     private String metadataName;
     private Date fileDate;
     
     public static final String STATUS_READY_FOR_DOWNLOAD = "ReadyForDownload";
     public static final String STATUS_WAITING_FOR_PROCESSING = "WaitingForProcessing";
-    
-    /*
-    {
-
-        "fileId": "e7782d3f-1499-4512-a93b-4a787d5e9402",
-
-        "metadataUuid": "73f863ba-628f-48af-b7fa-30d3ab331b8d",
-
-        "coordinates": "344754 7272921 404330 7187619 304134 7156477 344754 7272921",
-
-        "projection": "25832",
-
-        "projectionName": "EUREF89 UTM sone 32, 2d",
-
-        "format": "GML 3.2.1",
-
-        "status": "WaitingForProcessing",
-
-        "metadataName": "Brannsmitteomrader"
-
-      }
-      */
 
     private List<Link> _links;
 
@@ -103,6 +83,14 @@ public class File {
     public void setAreaName(String areaName) {
         this.areaName = areaName;
     }
+    
+    public String getAreaType() {
+        return areaType;
+    }
+
+    public void setAreaType(String areaType) {
+        this.areaType = areaType;
+    }
 
     public String getCoordinates() {
         return coordinates;
@@ -134,6 +122,14 @@ public class File {
 
     public void setFormat(String format) {
         this.format = format;
+    }
+
+    public String getFormatVersion() {
+        return formatVersion;
+    }
+
+    public void setFormatVersion(String formatVersion) {
+        this.formatVersion = formatVersion;
     }
 
     public String getStatus() {

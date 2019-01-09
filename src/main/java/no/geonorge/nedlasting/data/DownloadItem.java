@@ -6,6 +6,7 @@ import no.geonorge.nedlasting.data.auto._DownloadItem;
 import no.geonorge.nedlasting.data.client.File;
 import no.geonorge.nedlasting.external.External;
 import no.geonorge.nedlasting.external.ExternalStatus;
+import no.geonorge.nedlasting.security.FileProxyURLGenerator;
 
 public class DownloadItem extends _DownloadItem {
 
@@ -23,8 +24,7 @@ public class DownloadItem extends _DownloadItem {
         File file = new File();
         file.setFileId(getFileId());
         file.setMetadataUuid(getMetadataUuid());
-        file.setDownloadUrl(urlPrefix + "v2/download/order/" + getOrder().getReferenceNumber() + "/"
-                        + getFileId());
+        file.setDownloadUrl(FileProxyURLGenerator.createUrl(urlPrefix, this));
         file.setStatus(File.STATUS_READY_FOR_DOWNLOAD);
         file.setProjection(getSrid().toString());
         if (getProjection() != null) {
@@ -43,10 +43,13 @@ public class DownloadItem extends _DownloadItem {
             file.setMetadataName(dataset.getTitle());
         }
 
-        /*
-         * file.setFormat(getFormatName()); file.setArea(getAreaCode());
-         * file.setAreaName(getAreaName());
-         */
+        DatasetFile datasetFile = dataset.getFile(getFileId());
+        if (datasetFile != null) {
+            file.setFormat(datasetFile.getFormatName());
+            file.setFormatVersion(datasetFile.getFormatVersion());
+            file.setArea(datasetFile.getAreaCode());
+            file.setAreaName(datasetFile.getAreaName());
+        }
 
         /*
          * example with
