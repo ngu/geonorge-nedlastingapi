@@ -327,7 +327,7 @@ public class DownloadService {
         downloadOrder.setEmail(order.getEmail());
         downloadOrder.setStartTime(new Date());
         downloadOrder.setReferenceNumber(UUID.randomUUID().toString());
-
+    
         for (OrderLine orderLine : order.getOrderLines()) {
             
             List<OrderArea> areaRest = new ArrayList<>(orderLine.getAreas());
@@ -361,6 +361,8 @@ public class DownloadService {
                                 area = null;
                             }
                             External external = dataset.getExternal();
+			    // TODO: Support cells (municipalities,counties,map sheets etc) enabling use of 
+	                    // administrative area codes in the external-API
                             String jobId = external.submitJob(format, projection, order.getEmail(),
                                     orderLine.getCoordinates());
                             
