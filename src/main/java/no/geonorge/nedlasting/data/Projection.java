@@ -20,7 +20,7 @@ public class Projection extends _Projection {
     }
     
     public String getScheme() {
-        return "http://www.opengis.net/def/crs/";
+        return "https://register.geonorge.no/api/epsg-koder.xml";
     }
     
     public static Projection getForSrid(ObjectContext ctxt, int srid) {
