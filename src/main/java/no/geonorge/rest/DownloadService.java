@@ -36,6 +36,8 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
 import com.rometools.rome.feed.CopyFrom;
+import no.geonorge.nedlasting.external.CodelistRegistry;
+import no.geonorge.nedlasting.external.data.RegisterItem;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.query.SelectQuery;
 import org.apache.commons.io.FilenameUtils;
@@ -680,6 +682,10 @@ public class DownloadService {
     @GET
     @Path("atom/{metadataUuid}")
     public Response getAtomFeed(@PathParam("metadataUuid") String metadataUuid) {
+        CodelistRegistry clReg = new CodelistRegistry();
+        List<RegisterItem> vectorFormats = clReg.getVectorFormats();
+        List<RegisterItem> areaCategories = clReg.getAreaCategories();
+        List<RegisterItem> crsCodes = clReg.getCrsCodes();
         ObjectContext ctxt = Config.getObjectContext();
         Dataset dataset = Dataset.forMetadataUUID(ctxt, metadataUuid);
         if (dataset == null) {
@@ -722,9 +728,9 @@ public class DownloadService {
             categories.add(formatCategory);
 
             SyndCategory areaCategory = new SyndCategoryImpl();
-            areaCategory.setName(datasetFile.getAreaType());
             // Support category labels. Requires patched rometools from https://github.com/bgrotan/rome/tree/syndcategorylabel
-            areaCategory.setLabel(datasetFile.getAreaName());
+            areaCategory.setName(getLabelForCode(areaCategories,datasetFile.getAreaType()));
+            areaCategory.setLabel(datasetFile.getAreaName()); // <category term="Fylke" label="Akershus"/>
             areaCategory.setTaxonomyUri("https://register.geonorge.no/api/metadata-kodelister/geografisk-distribusjonsinndeling.xml");
             categories.add(areaCategory);
 
@@ -732,7 +738,7 @@ public class DownloadService {
             crsCategory.setName(datasetFile.getProjection().getAuthorityAndCode());
             crsCategory.setTaxonomyUri(datasetFile.getProjection().getScheme());
             // Support category labels. Requires patched rometools from https://github.com/bgrotan/rome/tree/syndcategorylabel
-            crsCategory.setLabel(datasetFile.getProjection().getName());
+            crsCategory.setLabel(getLabelForCode(crsCodes,datasetFile.getProjection().getSrid().toString()));
             categories.add(crsCategory);
             
             entry.setCategories(categories);
@@ -753,6 +759,41 @@ public class DownloadService {
             e.printStackTrace();
             return Response.serverError().build();
         }
+    }
+
+    private String getLabelForCode(List<RegisterItem> items,String code) {
+        // areaType is not syncronized with this codelist
+        if (code.equalsIgnoreCase("fylke")) {
+            code = "fylkesvis";
+        }
+        if (code.equalsIgnoreCase("landsdekkende")) {
+            code = "landsfiler";
+        }
+        if (code.equalsIgnoreCase("kommune")) {
+            code = "kommunevis";
+        }
+        if (code.equalsIgnoreCase("region")) {
+            code = "regional inndeling";
+        }
+        for (RegisterItem item:items) {
+            if (item.getCodevalue() != null) {
+                // First match on codeValues
+                if (item.getCodevalue().equalsIgnoreCase(code)) {
+                    return item.getLabel();
+                }
+                // Then try to match on partial code value
+                if (item.getCodevalue().length() > code.length()) {
+                    if (item.getCodevalue().substring(0, code.length() - 1).equalsIgnoreCase(code)) {
+                        return item.getLabel();
+                    }
+                } else {
+                    if (item.getCodevalue().equalsIgnoreCase(code.substring(0,item.getCodevalue().length()-1))) {
+                        return item.getLabel();
+                    }
+                }
+            }
+        }
+        return null;
     }
     
 }
