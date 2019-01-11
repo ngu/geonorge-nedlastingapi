@@ -315,11 +315,7 @@ public class DownloadServiceTest extends DbTestCase {
         DownloadService ds = new DownloadService();
         
         Response response = ds.getFileForDownload(dataset.getMetadataUuid(), datasetFile1.getFileId());
-        assertEquals(200, response.getStatus());
-        StreamingOutput out = (StreamingOutput) response.getEntity();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        out.write(baos);
-        assertTrue(new String(baos.toByteArray(), "UTF-8").contains("test"));
+        assertTrue(responseToString(response).contains("test"));
     }
     
     public void testGetFileForOrder() throws IOException {
@@ -375,11 +371,45 @@ public class DownloadServiceTest extends DbTestCase {
         assertTrue(looksLikeProxyUrl(file.getDownloadUrl()));
 
         response = ds.getFileForOrder(orderReceipt.getReferenceNumber(), file.getFileId());
-        assertEquals(200, response.getStatus());
-        StreamingOutput out = (StreamingOutput) response.getEntity();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        out.write(baos);
-        assertTrue(new String(baos.toByteArray(), "UTF-8").contains("test"));
+        assertTrue(responseToString(response).contains("test"));
+    }
+    
+    public void testGetAtomFeed() throws IOException {
+        ObjectContext ctxt = Config.getObjectContext();
+
+        Projection p1 = createOrFind(ctxt, 4326);
+        ctxt.commitChanges();
+
+        Dataset dataset = ctxt.newObject(Dataset.class);
+        dataset.setTitle("junit " + System.currentTimeMillis());
+        dataset.setMetadataUuid(UUID.randomUUID().toString());
+        DatasetFile datasetFile1 = ctxt.newObject(DatasetFile.class);
+        datasetFile1.setArea("fylke", "02", "Akershus");
+        datasetFile1.setDataset(dataset);
+        datasetFile1.setFormatName("SOSI");
+        datasetFile1.setUrl("https://raw.githubusercontent.com/halset/test/master/README.md");
+        datasetFile1.setProjection(p1);
+        datasetFile1.setFileDate(new Date());
+        ctxt.commitChanges();
+
+        DownloadService ds = new DownloadService();
+
+        Response response = ds.getAtomFeed(dataset.getMetadataUuid());
+        assertTrue(responseToString(response).contains("Format:SOSI"));
+    }
+    
+    private static String responseToString(Response response) throws IOException {
+        Object entity = response.getEntity();
+        if (entity instanceof String) {
+            return (String) entity;
+        }
+        if (entity instanceof StreamingOutput) {
+            StreamingOutput out = (StreamingOutput) entity;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            out.write(baos);
+            return new String(baos.toByteArray(), "UTF-8");
+        }
+        return entity.toString();
     }
     
     private static boolean looksLikeProxyUrl(String url) {

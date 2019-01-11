@@ -15,6 +15,14 @@ public class Projection extends _Projection {
         return p;
     }
     
+    public String getAuthorityAndCode() {
+        return "EPSG:" + getSrid();
+    }
+    
+    public String getScheme() {
+        return "https://register.geonorge.no/api/epsg-koder.xml";
+    }
+    
     public static Projection getForSrid(ObjectContext ctxt, int srid) {
         return Cayenne.objectForPK(ctxt, Projection.class, srid);
     }
