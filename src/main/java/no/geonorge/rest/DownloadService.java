@@ -724,7 +724,6 @@ public class DownloadService {
             
             SyndCategory formatCategory = new SyndCategoryImpl();
             formatCategory.setName("Format:" + datasetFile.getFormatName());
-            //formatCategory.setLabel(getLabelForCode(vectorFormats,datasetFile.getFormat().getName()));
             formatCategory.setTaxonomyUri("https://register.geonorge.no/api/metadata-kodelister/vektorformater.xml");
             categories.add(formatCategory);
 
@@ -739,7 +738,6 @@ public class DownloadService {
             crsCategory.setName(datasetFile.getProjection().getAuthorityAndCode());
             crsCategory.setTaxonomyUri(datasetFile.getProjection().getScheme());
             // Support category labels. Requires patched rometools from https://github.com/bgrotan/rome/tree/syndcategorylabel
-            //crsCategory.setLabel(datasetFile.getProjection().getName());
             crsCategory.setLabel(getLabelForCode(crsCodes,datasetFile.getProjection().getSrid().toString()));
             categories.add(crsCategory);
             
