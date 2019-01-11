@@ -12,6 +12,7 @@ public class RegisterItem {
     private String id;
     private String label;
     private String description;
+    private String codevalue;
 
     public String getId() {
         return id;
@@ -35,5 +36,13 @@ public class RegisterItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCodevalue() {
+        return codevalue;
+    }
+
+    public void setCodevalue(String codevalue) {
+        this.codevalue = codevalue;
     }
 }

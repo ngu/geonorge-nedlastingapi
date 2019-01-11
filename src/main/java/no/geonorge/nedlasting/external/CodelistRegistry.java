@@ -13,9 +13,10 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Created by Grotan_Bjorn_Ove on 11.01.2019.
+ * Wrapper class for Geonorge Codelist Registry
  */
 public class CodelistRegistry {
+
     private String areaCategoryUrl = "https://register.geonorge.no/api/metadata-kodelister/geografisk-distribusjonsinndeling.json";
     private String crsUrl = "https://register.geonorge.no/api/register/epsg-koder.json";
     private String vectorFormatsUrl = "https://register.geonorge.no/api/metadata-kodelister/vektorformater.json";
@@ -25,29 +26,38 @@ public class CodelistRegistry {
      * @return List<RegisterItem>
      * @throws IOException
      */
-    public List<RegisterItem> getVectorFormats() throws IOException {
+    public List<RegisterItem> getVectorFormats()  {
         return getRegisterItems(vectorFormatsUrl);
     }
 
-    public List<RegisterItem> getCrsCodes() throws IOException {
+    public List<RegisterItem> getCrsCodes()  {
         return getRegisterItems(crsUrl);
     }
 
-    public List<RegisterItem> getAreaCategories() throws IOException {
+    public List<RegisterItem> getAreaCategories()  {
         return getRegisterItems(areaCategoryUrl);
     }
-    private List<RegisterItem> getRegisterItems(String url) throws IOException {
+    private List<RegisterItem> getRegisterItems(String url)  {
         List<RegisterItem> items = new ArrayList<RegisterItem>();
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = httpGET(url);
-        JsonNode jsonNode = objectMapper.readTree(json);
-        JsonNode containedItems = jsonNode.get("containeditems");
-        for (JsonNode containedItem:containedItems) {
-            RegisterItem regItem = new RegisterItem();
-            regItem.setId(containedItem.get("id").asText());
-            regItem.setLabel(containedItem.get("label").asText());
-            regItem.setDescription(containedItem.get("description").asText());
-            items.add(regItem);
+        try {
+            String json = httpGET(url);
+            JsonNode jsonNode = objectMapper.readTree(json);
+            JsonNode containedItems = jsonNode.get("containeditems"); // Register Items are found in containeditems
+            for (JsonNode containedItem : containedItems) {
+                RegisterItem regItem = new RegisterItem();
+                regItem.setId(containedItem.get("id").asText());
+                regItem.setLabel(containedItem.get("label").asText());
+                JsonNode _description = containedItem.get("description");
+                if (_description != null) { regItem.setDescription(_description.asText()); }
+                JsonNode _codeValue = containedItem.get("codevalue");
+                if (_codeValue != null) { regItem.setCodevalue(_codeValue.asText()); }
+                JsonNode _epsgCode = containedItem.get("epsgcode");
+                if (_epsgCode != null) { regItem.setCodevalue(_epsgCode.asText());}
+                items.add(regItem);
+            }
+        } catch (IOException ie) {
+            ie.printStackTrace();
         }
         return items;
     }
