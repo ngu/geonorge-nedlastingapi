@@ -1,7 +1,7 @@
 /bin/
 /target/
 .classpath
+.idea
 .project
 .settings/
 derby.log
-.idea/

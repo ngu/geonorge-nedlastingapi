@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import no.geonorge.nedlasting.data.client.Area;
 import no.geonorge.nedlasting.data.client.Format;
 import no.geonorge.nedlasting.data.client.Projection;
 import no.geonorge.nedlasting.external.fme.NGUFMEClient;
@@ -17,6 +18,8 @@ public abstract class External {
     public abstract List<Format> getFormats() throws IOException;
 
     public abstract String submitJob(Format format, Projection projection, String email, String coordinates) throws IOException;
+
+    public abstract String submitJob(Format format, Projection projection, String email, List<Area> areas, String mapSelectionLayer) throws IOException;
 
     public abstract ExternalStatus status(String jobId) throws IOException;
 
