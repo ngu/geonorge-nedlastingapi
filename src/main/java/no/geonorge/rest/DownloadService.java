@@ -277,14 +277,7 @@ public class DownloadService {
             }
         }
         
-        // check srid
-        if (!dataset.supportSrid(req.getSrid())) {
-            log.info("unsupported srid " + req.getSrid() + ". only support " + dataset.getSrids());
-            canDownload.setCanDownload(false);
-            canDownload.setMessage("unsupported srid " + req.getSrid() + ". only support " + dataset.getSrids());
-            return gson().toJson(canDownload);
-        }
-        
+       
         canDownload.setCanDownload(true);
         return gson().toJson(canDownload);
     }
