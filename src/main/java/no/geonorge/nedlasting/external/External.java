@@ -21,7 +21,7 @@ public abstract class External {
 
     public abstract String submitJob(Format format, Projection projection, String email, String coordinates) throws IOException;
 
-    public abstract String submitJob(Format format, Projection projection, String email, List<Area> areas, String mapSelectionLayer) throws IOException;
+    public abstract String submitJob(Format format, Projection projection, String email, Area area, String mapSelectionLayer) throws IOException;
 
     public abstract ExternalStatus status(String jobId) throws IOException;
 
