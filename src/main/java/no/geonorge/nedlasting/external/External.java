@@ -16,6 +16,8 @@ public abstract class External {
     public abstract List<Projection> getProjections() throws IOException;
 
     public abstract List<Format> getFormats() throws IOException;
+    
+    public abstract List<Area> getArea() throws IOException;
 
     public abstract String submitJob(Format format, Projection projection, String email, String coordinates) throws IOException;
 
