@@ -263,7 +263,7 @@ public class DownloadService {
             // check if selected polygon is too large
             if (dataset.getMaxArea() != null) {
                 try {
-                    double selectedSquareKvm = GeometryUtils.calculateAreaSquareKilometer(geom, 25833);
+                    double selectedSquareKvm = GeometryUtils.calculateAreaSquareKilometer(geom, req.getSrid());
                     if (selectedSquareKvm > dataset.getMaxArea().doubleValue()) {
                         canDownload.setCanDownload(false);
                         canDownload.setMessage("too large area");
@@ -277,14 +277,7 @@ public class DownloadService {
             }
         }
         
-        // check srid
-        if (!dataset.supportSrid(req.getSrid())) {
-            log.info("unsupported srid " + req.getSrid() + ". only support " + dataset.getSrids());
-            canDownload.setCanDownload(false);
-            canDownload.setMessage("unsupported srid " + req.getSrid() + ". only support " + dataset.getSrids());
-            return gson().toJson(canDownload);
-        }
-        
+       
         canDownload.setCanDownload(true);
         return gson().toJson(canDownload);
     }
