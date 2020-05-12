@@ -18,20 +18,20 @@
       <maven.compile.target>1.8</maven.compile.target>
       <jerseyframework.version>2.7</jerseyframework.version>
       <jetty.version>9.4.17.v20190418</jetty.version>      	  
-      <jackson.version>2.9.10.1</jackson.version>
+      <jackson.version>[2.9.10.4,)</jackson.version>
       <geotools.version>18.1</geotools.version>
   </properties>
 
   <repositories>
-    <repository>
-      <id>osgeo</id>
-      <name>Open Source Geospatial Foundation Repository</name>
-      <url>http://download.osgeo.org/webdav/geotools/</url>
-    </repository>
-    <repository>
-      <id>ngu</id>
-      <name>NGU public repository</name>
-      <url>https://github.com/ngu/ngu-mvn-repo/raw/master/releases/</url>
+      <repository>
+          <id>osgeo</id>
+          <name>OSGeo Release Repository</name>
+          <url>https://repo.osgeo.org/repository/release/</url>
+      </repository>
+      <repository>
+          <id>ngu</id>
+          <name>NGU public repository</name>
+          <url>https://github.com/ngu/ngu-mvn-repo/raw/master/releases/</url>
     </repository>	  
   </repositories>
 
