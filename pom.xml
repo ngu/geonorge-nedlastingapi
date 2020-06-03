@@ -19,7 +19,7 @@
       <jerseyframework.version>2.7</jerseyframework.version>
       <jetty.version>9.4.17.v20190418</jetty.version>      	  
       <jackson.version>[2.9.10.4,)</jackson.version>
-      <geotools.version>18.1</geotools.version>
+      <geotools.version>19.4</geotools.version>
   </properties>
 
   <repositories>
