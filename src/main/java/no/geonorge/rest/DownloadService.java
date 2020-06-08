@@ -35,9 +35,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
-import com.rometools.rome.feed.CopyFrom;
-import no.geonorge.nedlasting.external.CodelistRegistry;
-import no.geonorge.nedlasting.external.data.RegisterItem;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.query.SelectQuery;
 import org.apache.commons.io.FilenameUtils;
@@ -52,6 +49,8 @@ import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndEntryImpl;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
+import com.rometools.rome.feed.synd.SyndLink;
+import com.rometools.rome.feed.synd.SyndLinkImpl;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedOutput;
 import com.vividsolutions.jts.geom.Geometry;
@@ -72,7 +71,9 @@ import no.geonorge.nedlasting.data.client.Order;
 import no.geonorge.nedlasting.data.client.OrderArea;
 import no.geonorge.nedlasting.data.client.OrderLine;
 import no.geonorge.nedlasting.data.client.Projection;
+import no.geonorge.nedlasting.external.CodelistRegistry;
 import no.geonorge.nedlasting.external.External;
+import no.geonorge.nedlasting.external.data.RegisterItem;
 import no.geonorge.nedlasting.security.FileProxyURLGenerator;
 import no.geonorge.nedlasting.utils.GeometryUtils;
 import no.geonorge.nedlasting.utils.GsonCreator;
@@ -653,11 +654,30 @@ public class DownloadService {
                 }
             }
             
-            entry.setLink(getUrlPrefix().concat("atom/".concat(dataset.getMetadataUuid())));
             SyndContent description = new SyndContentImpl();
             description.setType(MediaType.TEXT_PLAIN);
             description.setValue("Dataset ATOM Feed");
             entry.setDescription(description);
+            
+            List<SyndLink> links = new ArrayList<>(2);
+            
+            SyndLinkImpl alternateLink = new SyndLinkImpl();
+            alternateLink.setHref(getUrlPrefix() + "atom/" + dataset.getMetadataUuid());
+            alternateLink.setRel("alternate");
+            links.add(alternateLink);
+            
+            if (dataset.getMetadataUuid() != null) {
+                SyndLinkImpl describedbyLink = new SyndLinkImpl();
+                describedbyLink.setHref("https://www.geonorge.no/geonetwork/srv/nor/xml_iso19139?uuid="
+                        .concat(dataset.getMetadataUuid()));
+                describedbyLink.setRel("describedby");
+                describedbyLink.setTitle("Dataset Metadata");
+                describedbyLink.setType("application/xml");
+                links.add(describedbyLink);
+            }
+            
+            entry.setLinks(links);
+            
             entries.add(entry);
         }
         feed.setEntries(entries);
@@ -690,8 +710,24 @@ public class DownloadService {
         feed.setFeedType("atom_1.0");
         feed.setTitle(dataset.getTitle());
         feed.setDescription(dataset.getTitle() + " ATOM Feed");
-        feed.setLink(getUrlPrefix()+"atom/"+metadataUuid);
         
+        List<SyndLink> links = new ArrayList<>(2);
+
+        SyndLinkImpl alternateLink = new SyndLinkImpl();
+        alternateLink.setHref(getUrlPrefix() + "atom/" + dataset.getMetadataUuid());
+        alternateLink.setRel("alternate");
+        links.add(alternateLink);
+
+        SyndLinkImpl describedbyLink = new SyndLinkImpl();
+        describedbyLink.setHref(
+                "https://www.geonorge.no/geonetwork/srv/nor/xml_iso19139?uuid=".concat(dataset.getMetadataUuid()));
+        describedbyLink.setRel("describedby");
+        describedbyLink.setTitle("Dataset Metadata");
+        describedbyLink.setType("application/xml");
+        links.add(describedbyLink);
+
+        feed.setLinks(links);
+
         Date lastFileDate = dataset.getLastFileDate();
         if (lastFileDate != null) {
             feed.setPublishedDate(lastFileDate);
