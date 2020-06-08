@@ -631,7 +631,24 @@ public class DownloadService {
         feed.setFeedType("atom_1.0");
         feed.setTitle("GEONORGE DATASET ATOM FEEDS ");
         feed.setDescription("ATOM Feeds for Datasets");
-        feed.setLink(getUrlPrefix().concat("atomfeeds"));
+        
+        List<SyndLink> feedLinks = new ArrayList<>(2);
+        SyndLinkImpl feedAlternateLink = new SyndLinkImpl();
+        feedAlternateLink.setHref(getUrlPrefix().concat("atomfeeds"));
+        feedAlternateLink.setRel("alternate");
+        feedLinks.add(feedAlternateLink);
+        
+        if (Config.getGeonorgeServiceUUID() != null && Config.getGeonorgeServiceUUID().length() > 0) {
+            SyndLinkImpl feedDescribedByLink = new SyndLinkImpl();
+            feedDescribedByLink.setHref(
+                    "https://www.geonorge.no/geonetwork/srv/nor/xml_iso19139?uuid=" + Config.getGeonorgeServiceUUID());
+            feedDescribedByLink.setRel("describedby");
+            feedDescribedByLink.setType("application/xml");
+            feedDescribedByLink.setTitle("Download Service Feed Metadata");
+            feedLinks.add(feedDescribedByLink);
+        }
+        
+        feed.setLinks(feedLinks);
         
         Date lastDate = null;
 

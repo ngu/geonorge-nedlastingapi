@@ -41,6 +41,7 @@ public class Config implements DataSourceFactory {
     private static final String KEY_ALLOWED_HOSTS = "allowed_hosts";
     private static final String KEY_SUPPORT_DOWNLOAD_BUNDLING = "supportDownloadBundling";
     private static final String KEY_DISTRIBUTED_BY = "distributedBy";
+    private static final String KEY_GEONORGE_SERVICE_UUID = "geonorge.service.uuid";
     
     private static final String KEY_CORS = "cors";
     private static final java.lang.String KEY_ORDER_VALID_DAYS = "order.days_valid";
@@ -56,6 +57,7 @@ public class Config implements DataSourceFactory {
     private static int orderValidDays = 7; // default value. Can be overridden by property order.days_valid
     private static boolean supportsDownloadBundling = false; // default false
     private static String distributedBy;
+    private static String geonorgeServiceUUID;
 
     private static final Logger log = Logger.getLogger(Config.class.getName());
     public static List<String> getAllowedFiletypes;
@@ -142,6 +144,13 @@ public class Config implements DataSourceFactory {
             System.err.println("Missing property in geonorge.properties: " + KEY_DISTRIBUTED_BY);
             System.err.println("Using default: Geonorge");
             distributedBy = "Geonorge";
+        }
+        
+        String _geonorgeServiceUUID = getProperty(prop, KEY_GEONORGE_SERVICE_UUID, null);
+        if (_geonorgeServiceUUID != null) {
+            geonorgeServiceUUID = _geonorgeServiceUUID;
+        } else {
+            System.err.println("Missing property in geonorge.properties: " + KEY_GEONORGE_SERVICE_UUID);
         }
 
         BasicDataSource nds = new BasicDataSource();
@@ -273,6 +282,10 @@ public class Config implements DataSourceFactory {
     }
 
     public static String getKeyDistributedBy() { return distributedBy; }
+    
+    public static String getGeonorgeServiceUUID() {
+        return geonorgeServiceUUID;
+    }
 
     public static boolean isSupportsDownloadBundling() { return supportsDownloadBundling; }
 
