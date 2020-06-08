@@ -662,7 +662,7 @@ public class DownloadService {
             List<SyndLink> links = new ArrayList<>(2);
             
             SyndLinkImpl alternateLink = new SyndLinkImpl();
-            alternateLink.setHref(getUrlPrefix().concat("atom/".concat(dataset.getMetadataUuid())));
+            alternateLink.setHref(getUrlPrefix() + "atom/" + dataset.getMetadataUuid());
             alternateLink.setRel("alternate");
             links.add(alternateLink);
             
@@ -710,8 +710,24 @@ public class DownloadService {
         feed.setFeedType("atom_1.0");
         feed.setTitle(dataset.getTitle());
         feed.setDescription(dataset.getTitle() + " ATOM Feed");
-        feed.setLink(getUrlPrefix()+"atom/"+metadataUuid);
         
+        List<SyndLink> links = new ArrayList<>(2);
+
+        SyndLinkImpl alternateLink = new SyndLinkImpl();
+        alternateLink.setHref(getUrlPrefix() + "atom/" + dataset.getMetadataUuid());
+        alternateLink.setRel("alternate");
+        links.add(alternateLink);
+
+        SyndLinkImpl describedbyLink = new SyndLinkImpl();
+        describedbyLink.setHref(
+                "https://www.geonorge.no/geonetwork/srv/nor/xml_iso19139?uuid=".concat(dataset.getMetadataUuid()));
+        describedbyLink.setRel("describedby");
+        describedbyLink.setTitle("Dataset Metadata");
+        describedbyLink.setType("application/xml");
+        links.add(describedbyLink);
+
+        feed.setLinks(links);
+
         Date lastFileDate = dataset.getLastFileDate();
         if (lastFileDate != null) {
             feed.setPublishedDate(lastFileDate);
