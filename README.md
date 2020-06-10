@@ -116,6 +116,7 @@ database.driver=org.postgresql.Driver
 database.username=user
 database.password=pass
 cors=*
+geonorge.service.uuid=
 ````
 Another note on postgresql. PostgreSQL will use public as currentSchema unless overridden.
 So - if you want to use a custom db schema you can configure it in the jdbc url:
