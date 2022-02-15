@@ -4,7 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -16,13 +22,24 @@ import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.configuration.server.DataSourceFactory;
 import org.apache.cayenne.configuration.server.ServerRuntime;
 import org.apache.cayenne.dba.DbAdapter;
+import org.apache.cayenne.dbsync.DbSyncModule;
+import org.apache.cayenne.dbsync.merge.DataMapMerger;
+import org.apache.cayenne.dbsync.merge.context.MergerContext;
+import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactory;
+import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactoryProvider;
+import org.apache.cayenne.dbsync.merge.token.MergerToken;
+import org.apache.cayenne.dbsync.merge.token.db.AbstractToDbToken;
+import org.apache.cayenne.dbsync.merge.token.db.DropColumnToDb;
+import org.apache.cayenne.dbsync.merge.token.db.DropTableToDb;
+import org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator;
+import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
+import org.apache.cayenne.dbsync.reverse.dbload.DbLoader;
+import org.apache.cayenne.dbsync.reverse.dbload.DbLoaderConfiguration;
+import org.apache.cayenne.dbsync.reverse.dbload.DbLoaderDelegate;
+import org.apache.cayenne.dbsync.reverse.dbload.DefaultDbLoaderDelegate;
+import org.apache.cayenne.log.JdbcEventLogger;
+import org.apache.cayenne.log.NoopJdbcEventLogger;
 import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.merge.AbstractToDbToken;
-import org.apache.cayenne.merge.DbMerger;
-import org.apache.cayenne.merge.DropColumnToDb;
-import org.apache.cayenne.merge.DropTableToDb;
-import org.apache.cayenne.merge.ExecutingMergerContext;
-import org.apache.cayenne.merge.MergerToken;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import no.geonorge.nedlasting.data.upgrade.DbUpgrade;
@@ -64,7 +81,9 @@ public class Config implements DataSourceFactory {
 
     static {
         log.info("setting up cayenne ServerRuntime");
-        runtime = new ServerRuntime("cayenne-domain.xml");
+        runtime = ServerRuntime.builder().addConfig("cayenne-domain.xml")
+                .addModule(binder -> binder.bind(JdbcEventLogger.class).to(NoopJdbcEventLogger.class))
+                .addModule(new DbSyncModule()).build();
     }
 
     public static void readConfiguration() throws IOException {
@@ -195,7 +214,7 @@ public class Config implements DataSourceFactory {
     }
 
     public static ObjectContext getObjectContext() {
-        return runtime.getContext();
+        return runtime.newContext();
     }
 
     private static void init() {
@@ -215,12 +234,28 @@ public class Config implements DataSourceFactory {
         DataNode dataNode = domain.getDataNode("datanode");
         DbAdapter adapter = dataNode.getAdapter();
 
-        DbMerger merger = new DbMerger();
-        List<MergerToken> tokens = merger.createMergeTokens(dataNode, dataMap);
+        MergerTokenFactoryProvider mergerFactoryProvider = runtime.getInjector()
+                .getInstance(MergerTokenFactoryProvider.class);
+        MergerTokenFactory mergerFactory = mergerFactoryProvider.get(adapter);
+        DataMapMerger merger = DataMapMerger.builder(mergerFactory).build();
+        
+        // load current schema from db
+        DataMap currentDbDataMap = null;
+        try (Connection conn = dataSource.getConnection()) {
+            DbLoaderConfiguration config = new DbLoaderConfiguration();
+            DbLoaderDelegate delegate = new DefaultDbLoaderDelegate();
+            ObjectNameGenerator nameGenerator = new DefaultObjectNameGenerator();
+            DbLoader dbLoader = new DbLoader(adapter, conn, config, delegate, nameGenerator);
+            currentDbDataMap = dbLoader.load();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        List<MergerToken> tokens = merger.createMergeTokens(dataMap, currentDbDataMap);
         List<AbstractToDbToken> toDbTokens = new ArrayList<AbstractToDbToken>();
         for (MergerToken token : tokens) {
             if (token.getDirection().isToModel()) {
-                token = token.createReverse(adapter.mergerFactory());
+                token = token.createReverse(mergerFactory);
             }
             if (token instanceof DropTableToDb) {
                 continue;
@@ -234,7 +269,8 @@ public class Config implements DataSourceFactory {
             }
         }
 
-        ExecutingMergerContext mc = new ExecutingMergerContext(dataMap, dataNode);
+        MergerContext mc = MergerContext.builder(dataMap).dataNode(dataNode).build();
+
         for (AbstractToDbToken token : toDbTokens) {
             token.execute(mc);
         }
