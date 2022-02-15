@@ -62,6 +62,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile.setUrl("http://a.url.com");
         datasetFile.setProjection(createOrFind(ctxt, 4326));
         datasetFile.setFileDate(new Date());
+        datasetFile.setFileId(UUID.randomUUID().toString());
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnFormats(uuid).getStatus());
@@ -90,6 +91,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile.setUrl("http://a.url.com");
         datasetFile.setProjection(createOrFind(ctxt, 4326));
         datasetFile.setFileDate(new Date());
+        datasetFile.setFileId(UUID.randomUUID().toString());
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnProjections(uuid).getStatus());
@@ -125,6 +127,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile1.setUrl("http://a.url.com/1");
         datasetFile1.setProjection(p1);
         datasetFile1.setFileDate(new Date());
+        datasetFile1.setFileId(UUID.randomUUID().toString());
         DatasetFile datasetFile2 = ctxt.newObject(DatasetFile.class);
         datasetFile2.setArea("fylke", "02", "Akershus");
         datasetFile2.setDataset(dataset);
@@ -132,6 +135,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile2.setUrl("http://a.url.com/2");
         datasetFile2.setProjection(p1);
         datasetFile2.setFileDate(new Date());
+        datasetFile2.setFileId(UUID.randomUUID().toString());
         DatasetFile datasetFile3 = ctxt.newObject(DatasetFile.class);
         datasetFile3.setArea("fylke", "02", "Akershus");
         datasetFile3.setDataset(dataset);
@@ -139,6 +143,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile3.setUrl("http://a.url.com/3");
         datasetFile3.setProjection(p1);
         datasetFile3.setFileDate(new Date());
+        datasetFile3.setFileId(UUID.randomUUID().toString());
         DatasetFile datasetFile4 = ctxt.newObject(DatasetFile.class);
         datasetFile4.setArea("fylke", "02", "Akershus");
         datasetFile4.setDataset(dataset);
@@ -146,6 +151,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile4.setUrl("http://a.url.com/4");
         datasetFile4.setFileDate(new Date());
         datasetFile4.setProjection(p2);
+        datasetFile4.setFileId(UUID.randomUUID().toString());
         DatasetFile datasetFile5 = ctxt.newObject(DatasetFile.class);
         datasetFile5.setArea("fylke", "03", "Whatever");
         datasetFile5.setDataset(dataset);
@@ -153,6 +159,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile5.setUrl("http://a.url.com/5");
         datasetFile5.setProjection(p2);
         datasetFile5.setFileDate(new Date());
+        datasetFile5.setFileId(UUID.randomUUID().toString());
         ctxt.commitChanges();
 
         assertEquals(HttpServletResponse.SC_OK, ds.returnAreas(uuid).getStatus());
@@ -202,6 +209,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile1.setUrl("http://a.url.com/1");
         datasetFile1.setProjection(p1);
         datasetFile1.setFileDate(new Date());
+        datasetFile1.setFileId(UUID.randomUUID().toString());
         ctxt.commitChanges();
 
         Order order = new Order();
@@ -333,6 +341,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile1.setUrl("https://raw.githubusercontent.com/halset/test/master/README.md");
         datasetFile1.setProjection(p1);
         datasetFile1.setFileDate(new Date());
+        datasetFile1.setFileId(UUID.randomUUID().toString());
         ctxt.commitChanges();
 
         assertFalse(looksLikeProxyUrl(datasetFile1.getUrl()));
@@ -390,6 +399,7 @@ public class DownloadServiceTest extends DbTestCase {
         datasetFile1.setUrl("https://raw.githubusercontent.com/halset/test/master/README.md");
         datasetFile1.setProjection(p1);
         datasetFile1.setFileDate(new Date());
+        datasetFile1.setFileId(UUID.randomUUID().toString());
         ctxt.commitChanges();
 
         DownloadService ds = new DownloadService();
