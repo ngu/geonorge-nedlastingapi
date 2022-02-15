@@ -20,6 +20,7 @@
       <jetty.version>9.4.45.v20220203</jetty.version>
       <jackson.version>[2.9.10.4,)</jackson.version>
       <geotools.version>19.4</geotools.version>
+      <cayenne.version>4.1.1</cayenne.version>
   </properties>
 
   <repositories>
@@ -122,7 +123,12 @@
     <dependency>
         <groupId>org.apache.cayenne</groupId>
         <artifactId>cayenne-server</artifactId>
-        <version>3.1.1</version>
+        <version>${cayenne.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cayenne</groupId>
+        <artifactId>cayenne-dbsync</artifactId>
+        <version>${cayenne.version}</version>
     </dependency>
     <dependency>
     	<groupId>org.postgresql</groupId>

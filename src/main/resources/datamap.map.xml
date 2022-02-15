@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/3.0/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/3.0/modelMap http://cayenne.apache.org/schema/3.0/modelMap.xsd"
-	 project-version="6">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap https://cayenne.apache.org/schema/10/modelMap.xsd"
+	 project-version="10">
 	<property name="defaultPackage" value="no.geonorge.nedlasting.data"/>
 	<db-entity name="API_USER">
 		<db-attribute name="PASSWORD_SHA512" type="VARCHAR" length="128"/>
@@ -117,16 +117,16 @@
 	<db-relationship name="to_dataset_file" source="DATASET" target="DATASET_FILE" toDependentPK="true" toMany="true">
 		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
 	</db-relationship>
-	<db-relationship name="to_dataset" source="DATASET_EXTERNAL_PARAMETER" target="DATASET" toMany="false">
+	<db-relationship name="to_dataset" source="DATASET_EXTERNAL_PARAMETER" target="DATASET">
 		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
 	</db-relationship>
-	<db-relationship name="toProjection" source="DATASET_FILE" target="PROJECTION" toMany="false">
+	<db-relationship name="toProjection" source="DATASET_FILE" target="PROJECTION">
 		<db-attribute-pair source="SRID" target="SRID"/>
 	</db-relationship>
-	<db-relationship name="to_dataset" source="DATASET_FILE" target="DATASET" toMany="false">
+	<db-relationship name="to_dataset" source="DATASET_FILE" target="DATASET">
 		<db-attribute-pair source="DATASET_ID" target="DATASET_ID"/>
 	</db-relationship>
-	<db-relationship name="toOrder" source="DOWNLOAD_ITEM" target="DOWNLOAD_ORDER" toMany="false">
+	<db-relationship name="toOrder" source="DOWNLOAD_ITEM" target="DOWNLOAD_ORDER">
 		<db-attribute-pair source="ORDER_ID" target="ORDER_ID"/>
 	</db-relationship>
 	<db-relationship name="toItems" source="DOWNLOAD_ORDER" target="DOWNLOAD_ITEM" toMany="true">
@@ -146,4 +146,23 @@
 	<obj-relationship name="order" source="DownloadItem" target="DownloadOrder" deleteRule="Deny" db-relationship-path="toOrder"/>
 	<obj-relationship name="items" source="DownloadOrder" target="DownloadItem" deleteRule="Cascade" db-relationship-path="toItems"/>
 	<obj-relationship name="files" source="Projection" target="DatasetFile" deleteRule="Deny" db-relationship-path="toFile"/>
+	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
+		<destDir>../java</destDir>
+		<mode>entity</mode>
+		<template>templates/v4_1/subclass.vm</template>
+		<superTemplate>templates/v4_1/superclass.vm</superTemplate>
+		<template>templates/v4_1/subclass.vm</template>
+		<superTemplate>templates/v4_1/superclass.vm</superTemplate>
+		<embeddableTemplate>templates/v4_1/embeddable-subclass.vm</embeddableTemplate>
+		<embeddableSuperTemplate>templates/v4_1/embeddable-superclass.vm</embeddableSuperTemplate>
+		<queryTemplate>templates/v4_1/datamap-subclass.vm</queryTemplate>
+		<querySuperTemplate>templates/v4_1/datamap-superclass.vm</querySuperTemplate>
+		<outputPattern>*.java</outputPattern>
+		<makePairs>true</makePairs>
+		<usePkgPath>true</usePkgPath>
+		<overwrite>false</overwrite>
+		<createPropertyNames>true</createPropertyNames>
+		<createPKProperties>false</createPKProperties>
+		<client>false</client>
+	</cgen>
 </data-map>

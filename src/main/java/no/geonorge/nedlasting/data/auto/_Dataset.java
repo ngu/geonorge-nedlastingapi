@@ -1,8 +1,12 @@
 package no.geonorge.nedlasting.data.auto;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 
-import org.apache.cayenne.CayenneDataObject;
+import org.apache.cayenne.BaseDataObject;
+import org.apache.cayenne.exp.Property;
 
 import no.geonorge.nedlasting.data.DatasetExternalParameter;
 import no.geonorge.nedlasting.data.DatasetFile;
@@ -13,7 +17,9 @@ import no.geonorge.nedlasting.data.DatasetFile;
  * since it may be overwritten next time code is regenerated.
  * If you need to make any customizations, please use subclass.
  */
-public abstract class _Dataset extends CayenneDataObject {
+public abstract class _Dataset extends BaseDataObject {
+
+    private static final long serialVersionUID = 1L; 
 
     public static final String ACCESS_CONSTRAINT_PROPERTY = "accessConstraint";
     public static final String FME_CUT_URL_PROPERTY = "fmeCutUrl";
@@ -30,102 +36,295 @@ public abstract class _Dataset extends CayenneDataObject {
 
     public static final String DATASET_ID_PK_COLUMN = "DATASET_ID";
 
+    public static final Property<String> ACCESS_CONSTRAINT = Property.create("accessConstraint", String.class);
+    public static final Property<String> FME_CUT_URL = Property.create("fmeCutUrl", String.class);
+    public static final Property<String> MAP_SELECTION_LAYER = Property.create("mapSelectionLayer", String.class);
+    public static final Property<Integer> MAX_AREA = Property.create("maxArea", Integer.class);
+    public static final Property<String> METADATA_UUID = Property.create("metadataUuid", String.class);
+    public static final Property<Boolean> SUPPORTS_AREA_SELECTION = Property.create("supportsAreaSelection", Boolean.class);
+    public static final Property<Boolean> SUPPORTS_FORMAT_SELECTION = Property.create("supportsFormatSelection", Boolean.class);
+    public static final Property<Boolean> SUPPORTS_POLYGON_SELECTION = Property.create("supportsPolygonSelection", Boolean.class);
+    public static final Property<Boolean> SUPPORTS_PROJECTION_SELECTION = Property.create("supportsProjectionSelection", Boolean.class);
+    public static final Property<String> TITLE = Property.create("title", String.class);
+    public static final Property<List<DatasetExternalParameter>> EXTERNAL_PARAMETERS = Property.create("externalParameters", List.class);
+    public static final Property<List<DatasetFile>> FILES = Property.create("files", List.class);
+
+    protected String accessConstraint;
+    protected String fmeCutUrl;
+    protected String mapSelectionLayer;
+    protected Integer maxArea;
+    protected String metadataUuid;
+    protected Boolean supportsAreaSelection;
+    protected Boolean supportsFormatSelection;
+    protected Boolean supportsPolygonSelection;
+    protected Boolean supportsProjectionSelection;
+    protected String title;
+
+    protected Object externalParameters;
+    protected Object files;
+
     public void setAccessConstraint(String accessConstraint) {
-        writeProperty(ACCESS_CONSTRAINT_PROPERTY, accessConstraint);
+        beforePropertyWrite("accessConstraint", this.accessConstraint, accessConstraint);
+        this.accessConstraint = accessConstraint;
     }
+
     public String getAccessConstraint() {
-        return (String)readProperty(ACCESS_CONSTRAINT_PROPERTY);
+        beforePropertyRead("accessConstraint");
+        return this.accessConstraint;
     }
 
     public void setFmeCutUrl(String fmeCutUrl) {
-        writeProperty(FME_CUT_URL_PROPERTY, fmeCutUrl);
+        beforePropertyWrite("fmeCutUrl", this.fmeCutUrl, fmeCutUrl);
+        this.fmeCutUrl = fmeCutUrl;
     }
+
     public String getFmeCutUrl() {
-        return (String)readProperty(FME_CUT_URL_PROPERTY);
+        beforePropertyRead("fmeCutUrl");
+        return this.fmeCutUrl;
     }
 
     public void setMapSelectionLayer(String mapSelectionLayer) {
-        writeProperty(MAP_SELECTION_LAYER_PROPERTY, mapSelectionLayer);
+        beforePropertyWrite("mapSelectionLayer", this.mapSelectionLayer, mapSelectionLayer);
+        this.mapSelectionLayer = mapSelectionLayer;
     }
+
     public String getMapSelectionLayer() {
-        return (String)readProperty(MAP_SELECTION_LAYER_PROPERTY);
+        beforePropertyRead("mapSelectionLayer");
+        return this.mapSelectionLayer;
     }
 
     public void setMaxArea(Integer maxArea) {
-        writeProperty(MAX_AREA_PROPERTY, maxArea);
+        beforePropertyWrite("maxArea", this.maxArea, maxArea);
+        this.maxArea = maxArea;
     }
+
     public Integer getMaxArea() {
-        return (Integer)readProperty(MAX_AREA_PROPERTY);
+        beforePropertyRead("maxArea");
+        return this.maxArea;
     }
 
     public void setMetadataUuid(String metadataUuid) {
-        writeProperty(METADATA_UUID_PROPERTY, metadataUuid);
+        beforePropertyWrite("metadataUuid", this.metadataUuid, metadataUuid);
+        this.metadataUuid = metadataUuid;
     }
+
     public String getMetadataUuid() {
-        return (String)readProperty(METADATA_UUID_PROPERTY);
+        beforePropertyRead("metadataUuid");
+        return this.metadataUuid;
     }
 
     public void setSupportsAreaSelection(boolean supportsAreaSelection) {
-        writeProperty(SUPPORTS_AREA_SELECTION_PROPERTY, supportsAreaSelection);
+        beforePropertyWrite("supportsAreaSelection", this.supportsAreaSelection, supportsAreaSelection);
+        this.supportsAreaSelection = supportsAreaSelection;
     }
+
 	public boolean isSupportsAreaSelection() {
-        Boolean value = (Boolean)readProperty(SUPPORTS_AREA_SELECTION_PROPERTY);
-        return (value != null) ? value.booleanValue() : false;
+        beforePropertyRead("supportsAreaSelection");
+        if(this.supportsAreaSelection == null) {
+            return false;
+        }
+        return this.supportsAreaSelection;
     }
 
     public void setSupportsFormatSelection(boolean supportsFormatSelection) {
-        writeProperty(SUPPORTS_FORMAT_SELECTION_PROPERTY, supportsFormatSelection);
+        beforePropertyWrite("supportsFormatSelection", this.supportsFormatSelection, supportsFormatSelection);
+        this.supportsFormatSelection = supportsFormatSelection;
     }
+
 	public boolean isSupportsFormatSelection() {
-        Boolean value = (Boolean)readProperty(SUPPORTS_FORMAT_SELECTION_PROPERTY);
-        return (value != null) ? value.booleanValue() : false;
+        beforePropertyRead("supportsFormatSelection");
+        if(this.supportsFormatSelection == null) {
+            return false;
+        }
+        return this.supportsFormatSelection;
     }
 
     public void setSupportsPolygonSelection(boolean supportsPolygonSelection) {
-        writeProperty(SUPPORTS_POLYGON_SELECTION_PROPERTY, supportsPolygonSelection);
+        beforePropertyWrite("supportsPolygonSelection", this.supportsPolygonSelection, supportsPolygonSelection);
+        this.supportsPolygonSelection = supportsPolygonSelection;
     }
+
 	public boolean isSupportsPolygonSelection() {
-        Boolean value = (Boolean)readProperty(SUPPORTS_POLYGON_SELECTION_PROPERTY);
-        return (value != null) ? value.booleanValue() : false;
+        beforePropertyRead("supportsPolygonSelection");
+        if(this.supportsPolygonSelection == null) {
+            return false;
+        }
+        return this.supportsPolygonSelection;
     }
 
     public void setSupportsProjectionSelection(boolean supportsProjectionSelection) {
-        writeProperty(SUPPORTS_PROJECTION_SELECTION_PROPERTY, supportsProjectionSelection);
+        beforePropertyWrite("supportsProjectionSelection", this.supportsProjectionSelection, supportsProjectionSelection);
+        this.supportsProjectionSelection = supportsProjectionSelection;
     }
+
 	public boolean isSupportsProjectionSelection() {
-        Boolean value = (Boolean)readProperty(SUPPORTS_PROJECTION_SELECTION_PROPERTY);
-        return (value != null) ? value.booleanValue() : false;
+        beforePropertyRead("supportsProjectionSelection");
+        if(this.supportsProjectionSelection == null) {
+            return false;
+        }
+        return this.supportsProjectionSelection;
     }
 
     public void setTitle(String title) {
-        writeProperty(TITLE_PROPERTY, title);
+        beforePropertyWrite("title", this.title, title);
+        this.title = title;
     }
+
     public String getTitle() {
-        return (String)readProperty(TITLE_PROPERTY);
+        beforePropertyRead("title");
+        return this.title;
     }
 
     public void addToExternalParameters(DatasetExternalParameter obj) {
-        addToManyTarget(EXTERNAL_PARAMETERS_PROPERTY, obj, true);
+        addToManyTarget("externalParameters", obj, true);
     }
+
     public void removeFromExternalParameters(DatasetExternalParameter obj) {
-        removeToManyTarget(EXTERNAL_PARAMETERS_PROPERTY, obj, true);
+        removeToManyTarget("externalParameters", obj, true);
     }
+
     @SuppressWarnings("unchecked")
     public List<DatasetExternalParameter> getExternalParameters() {
-        return (List<DatasetExternalParameter>)readProperty(EXTERNAL_PARAMETERS_PROPERTY);
+        return (List<DatasetExternalParameter>)readProperty("externalParameters");
     }
-
 
     public void addToFiles(DatasetFile obj) {
-        addToManyTarget(FILES_PROPERTY, obj, true);
-    }
-    public void removeFromFiles(DatasetFile obj) {
-        removeToManyTarget(FILES_PROPERTY, obj, true);
-    }
-    @SuppressWarnings("unchecked")
-    public List<DatasetFile> getFiles() {
-        return (List<DatasetFile>)readProperty(FILES_PROPERTY);
+        addToManyTarget("files", obj, true);
     }
 
+    public void removeFromFiles(DatasetFile obj) {
+        removeToManyTarget("files", obj, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DatasetFile> getFiles() {
+        return (List<DatasetFile>)readProperty("files");
+    }
+
+    @Override
+    public Object readPropertyDirectly(String propName) {
+        if(propName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch(propName) {
+            case "accessConstraint":
+                return this.accessConstraint;
+            case "fmeCutUrl":
+                return this.fmeCutUrl;
+            case "mapSelectionLayer":
+                return this.mapSelectionLayer;
+            case "maxArea":
+                return this.maxArea;
+            case "metadataUuid":
+                return this.metadataUuid;
+            case "supportsAreaSelection":
+                return this.supportsAreaSelection;
+            case "supportsFormatSelection":
+                return this.supportsFormatSelection;
+            case "supportsPolygonSelection":
+                return this.supportsPolygonSelection;
+            case "supportsProjectionSelection":
+                return this.supportsProjectionSelection;
+            case "title":
+                return this.title;
+            case "externalParameters":
+                return this.externalParameters;
+            case "files":
+                return this.files;
+            default:
+                return super.readPropertyDirectly(propName);
+        }
+    }
+
+    @Override
+    public void writePropertyDirectly(String propName, Object val) {
+        if(propName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (propName) {
+            case "accessConstraint":
+                this.accessConstraint = (String)val;
+                break;
+            case "fmeCutUrl":
+                this.fmeCutUrl = (String)val;
+                break;
+            case "mapSelectionLayer":
+                this.mapSelectionLayer = (String)val;
+                break;
+            case "maxArea":
+                this.maxArea = (Integer)val;
+                break;
+            case "metadataUuid":
+                this.metadataUuid = (String)val;
+                break;
+            case "supportsAreaSelection":
+                this.supportsAreaSelection = (Boolean)val;
+                break;
+            case "supportsFormatSelection":
+                this.supportsFormatSelection = (Boolean)val;
+                break;
+            case "supportsPolygonSelection":
+                this.supportsPolygonSelection = (Boolean)val;
+                break;
+            case "supportsProjectionSelection":
+                this.supportsProjectionSelection = (Boolean)val;
+                break;
+            case "title":
+                this.title = (String)val;
+                break;
+            case "externalParameters":
+                this.externalParameters = val;
+                break;
+            case "files":
+                this.files = val;
+                break;
+            default:
+                super.writePropertyDirectly(propName, val);
+        }
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        writeSerialized(out);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        readSerialized(in);
+    }
+
+    @Override
+    protected void writeState(ObjectOutputStream out) throws IOException {
+        super.writeState(out);
+        out.writeObject(this.accessConstraint);
+        out.writeObject(this.fmeCutUrl);
+        out.writeObject(this.mapSelectionLayer);
+        out.writeObject(this.maxArea);
+        out.writeObject(this.metadataUuid);
+        out.writeObject(this.supportsAreaSelection);
+        out.writeObject(this.supportsFormatSelection);
+        out.writeObject(this.supportsPolygonSelection);
+        out.writeObject(this.supportsProjectionSelection);
+        out.writeObject(this.title);
+        out.writeObject(this.externalParameters);
+        out.writeObject(this.files);
+    }
+
+    @Override
+    protected void readState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        super.readState(in);
+        this.accessConstraint = (String)in.readObject();
+        this.fmeCutUrl = (String)in.readObject();
+        this.mapSelectionLayer = (String)in.readObject();
+        this.maxArea = (Integer)in.readObject();
+        this.metadataUuid = (String)in.readObject();
+        this.supportsAreaSelection = (Boolean)in.readObject();
+        this.supportsFormatSelection = (Boolean)in.readObject();
+        this.supportsPolygonSelection = (Boolean)in.readObject();
+        this.supportsProjectionSelection = (Boolean)in.readObject();
+        this.title = (String)in.readObject();
+        this.externalParameters = in.readObject();
+        this.files = in.readObject();
+    }
 
 }

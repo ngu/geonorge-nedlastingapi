@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<domain project-version="6">
+<domain xmlns="http://cayenne.apache.org/schema/10/domain"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/domain https://cayenne.apache.org/schema/10/domain.xsd"
+	 project-version="10">
 	<property name="cayenne.DataDomain.sharedCache" value="false"/>
 	<property name="cayenne.DataRowStore.snapshot.size" value="0"/>
-
 	<map name="datamap"/>
-
 	<node name="datanode"
-		 factory="no.geonorge.nedlasting.config.Config"
-		 parameters="unknown"
-		 schema-update-strategy="org.apache.cayenne.access.dbsync.SkipSchemaUpdateStrategy"
-		>
+		 factory="no.geonorge.nedlasting.config.Config" parameters="unknown"
+		 schema-update-strategy="org.apache.cayenne.access.dbsync.SkipSchemaUpdateStrategy">
 		<map-ref name="datamap"/>
 	</node>
 </domain>

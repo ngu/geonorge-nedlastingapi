@@ -1,8 +1,12 @@
 package no.geonorge.nedlasting.data.auto;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Date;
 
-import org.apache.cayenne.CayenneDataObject;
+import org.apache.cayenne.BaseDataObject;
+import org.apache.cayenne.exp.Property;
 
 import no.geonorge.nedlasting.data.Dataset;
 import no.geonorge.nedlasting.data.Projection;
@@ -13,7 +17,9 @@ import no.geonorge.nedlasting.data.Projection;
  * since it may be overwritten next time code is regenerated.
  * If you need to make any customizations, please use subclass.
  */
-public abstract class _DatasetFile extends CayenneDataObject {
+public abstract class _DatasetFile extends BaseDataObject {
+
+    private static final long serialVersionUID = 1L; 
 
     public static final String AREA_CODE_PROPERTY = "areaCode";
     public static final String AREA_NAME_PROPERTY = "areaName";
@@ -30,85 +36,254 @@ public abstract class _DatasetFile extends CayenneDataObject {
     public static final String DATASET_ID_PK_COLUMN = "DATASET_ID";
     public static final String FILE_ID_PK_COLUMN = "FILE_ID";
 
+    public static final Property<String> AREA_CODE = Property.create("areaCode", String.class);
+    public static final Property<String> AREA_NAME = Property.create("areaName", String.class);
+    public static final Property<String> AREA_TYPE = Property.create("areaType", String.class);
+    public static final Property<Date> FILE_DATE = Property.create("fileDate", Date.class);
+    public static final Property<String> FILE_ID = Property.create("fileId", String.class);
+    public static final Property<String> FILE_NAME = Property.create("fileName", String.class);
+    public static final Property<String> FORMAT_NAME = Property.create("formatName", String.class);
+    public static final Property<String> FORMAT_VERSION = Property.create("formatVersion", String.class);
+    public static final Property<String> URL = Property.create("url", String.class);
+    public static final Property<Dataset> DATASET = Property.create("dataset", Dataset.class);
+    public static final Property<Projection> PROJECTION = Property.create("projection", Projection.class);
+
+    protected String areaCode;
+    protected String areaName;
+    protected String areaType;
+    protected Date fileDate;
+    protected String fileId;
+    protected String fileName;
+    protected String formatName;
+    protected String formatVersion;
+    protected String url;
+
+    protected Object dataset;
+    protected Object projection;
+
     public void setAreaCode(String areaCode) {
-        writeProperty(AREA_CODE_PROPERTY, areaCode);
+        beforePropertyWrite("areaCode", this.areaCode, areaCode);
+        this.areaCode = areaCode;
     }
+
     public String getAreaCode() {
-        return (String)readProperty(AREA_CODE_PROPERTY);
+        beforePropertyRead("areaCode");
+        return this.areaCode;
     }
 
     public void setAreaName(String areaName) {
-        writeProperty(AREA_NAME_PROPERTY, areaName);
+        beforePropertyWrite("areaName", this.areaName, areaName);
+        this.areaName = areaName;
     }
+
     public String getAreaName() {
-        return (String)readProperty(AREA_NAME_PROPERTY);
+        beforePropertyRead("areaName");
+        return this.areaName;
     }
 
     public void setAreaType(String areaType) {
-        writeProperty(AREA_TYPE_PROPERTY, areaType);
+        beforePropertyWrite("areaType", this.areaType, areaType);
+        this.areaType = areaType;
     }
+
     public String getAreaType() {
-        return (String)readProperty(AREA_TYPE_PROPERTY);
+        beforePropertyRead("areaType");
+        return this.areaType;
     }
 
     public void setFileDate(Date fileDate) {
-        writeProperty(FILE_DATE_PROPERTY, fileDate);
+        beforePropertyWrite("fileDate", this.fileDate, fileDate);
+        this.fileDate = fileDate;
     }
+
     public Date getFileDate() {
-        return (Date)readProperty(FILE_DATE_PROPERTY);
+        beforePropertyRead("fileDate");
+        return this.fileDate;
     }
 
     public void setFileId(String fileId) {
-        writeProperty(FILE_ID_PROPERTY, fileId);
+        beforePropertyWrite("fileId", this.fileId, fileId);
+        this.fileId = fileId;
     }
+
     public String getFileId() {
-        return (String)readProperty(FILE_ID_PROPERTY);
+        beforePropertyRead("fileId");
+        return this.fileId;
     }
 
     public void setFileName(String fileName) {
-        writeProperty(FILE_NAME_PROPERTY, fileName);
+        beforePropertyWrite("fileName", this.fileName, fileName);
+        this.fileName = fileName;
     }
+
     public String getFileName() {
-        return (String)readProperty(FILE_NAME_PROPERTY);
+        beforePropertyRead("fileName");
+        return this.fileName;
     }
 
     public void setFormatName(String formatName) {
-        writeProperty(FORMAT_NAME_PROPERTY, formatName);
+        beforePropertyWrite("formatName", this.formatName, formatName);
+        this.formatName = formatName;
     }
+
     public String getFormatName() {
-        return (String)readProperty(FORMAT_NAME_PROPERTY);
+        beforePropertyRead("formatName");
+        return this.formatName;
     }
 
     public void setFormatVersion(String formatVersion) {
-        writeProperty(FORMAT_VERSION_PROPERTY, formatVersion);
+        beforePropertyWrite("formatVersion", this.formatVersion, formatVersion);
+        this.formatVersion = formatVersion;
     }
+
     public String getFormatVersion() {
-        return (String)readProperty(FORMAT_VERSION_PROPERTY);
+        beforePropertyRead("formatVersion");
+        return this.formatVersion;
     }
 
     public void setUrl(String url) {
-        writeProperty(URL_PROPERTY, url);
+        beforePropertyWrite("url", this.url, url);
+        this.url = url;
     }
+
     public String getUrl() {
-        return (String)readProperty(URL_PROPERTY);
+        beforePropertyRead("url");
+        return this.url;
     }
 
     public void setDataset(Dataset dataset) {
-        setToOneTarget(DATASET_PROPERTY, dataset, true);
+        setToOneTarget("dataset", dataset, true);
     }
 
     public Dataset getDataset() {
-        return (Dataset)readProperty(DATASET_PROPERTY);
+        return (Dataset)readProperty("dataset");
     }
 
-
     public void setProjection(Projection projection) {
-        setToOneTarget(PROJECTION_PROPERTY, projection, true);
+        setToOneTarget("projection", projection, true);
     }
 
     public Projection getProjection() {
-        return (Projection)readProperty(PROJECTION_PROPERTY);
+        return (Projection)readProperty("projection");
     }
 
+    @Override
+    public Object readPropertyDirectly(String propName) {
+        if(propName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch(propName) {
+            case "areaCode":
+                return this.areaCode;
+            case "areaName":
+                return this.areaName;
+            case "areaType":
+                return this.areaType;
+            case "fileDate":
+                return this.fileDate;
+            case "fileId":
+                return this.fileId;
+            case "fileName":
+                return this.fileName;
+            case "formatName":
+                return this.formatName;
+            case "formatVersion":
+                return this.formatVersion;
+            case "url":
+                return this.url;
+            case "dataset":
+                return this.dataset;
+            case "projection":
+                return this.projection;
+            default:
+                return super.readPropertyDirectly(propName);
+        }
+    }
+
+    @Override
+    public void writePropertyDirectly(String propName, Object val) {
+        if(propName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (propName) {
+            case "areaCode":
+                this.areaCode = (String)val;
+                break;
+            case "areaName":
+                this.areaName = (String)val;
+                break;
+            case "areaType":
+                this.areaType = (String)val;
+                break;
+            case "fileDate":
+                this.fileDate = (Date)val;
+                break;
+            case "fileId":
+                this.fileId = (String)val;
+                break;
+            case "fileName":
+                this.fileName = (String)val;
+                break;
+            case "formatName":
+                this.formatName = (String)val;
+                break;
+            case "formatVersion":
+                this.formatVersion = (String)val;
+                break;
+            case "url":
+                this.url = (String)val;
+                break;
+            case "dataset":
+                this.dataset = val;
+                break;
+            case "projection":
+                this.projection = val;
+                break;
+            default:
+                super.writePropertyDirectly(propName, val);
+        }
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        writeSerialized(out);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        readSerialized(in);
+    }
+
+    @Override
+    protected void writeState(ObjectOutputStream out) throws IOException {
+        super.writeState(out);
+        out.writeObject(this.areaCode);
+        out.writeObject(this.areaName);
+        out.writeObject(this.areaType);
+        out.writeObject(this.fileDate);
+        out.writeObject(this.fileId);
+        out.writeObject(this.fileName);
+        out.writeObject(this.formatName);
+        out.writeObject(this.formatVersion);
+        out.writeObject(this.url);
+        out.writeObject(this.dataset);
+        out.writeObject(this.projection);
+    }
+
+    @Override
+    protected void readState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        super.readState(in);
+        this.areaCode = (String)in.readObject();
+        this.areaName = (String)in.readObject();
+        this.areaType = (String)in.readObject();
+        this.fileDate = (Date)in.readObject();
+        this.fileId = (String)in.readObject();
+        this.fileName = (String)in.readObject();
+        this.formatName = (String)in.readObject();
+        this.formatVersion = (String)in.readObject();
+        this.url = (String)in.readObject();
+        this.dataset = in.readObject();
+        this.projection = in.readObject();
+    }
 
 }

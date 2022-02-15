@@ -1,9 +1,13 @@
 package no.geonorge.nedlasting.data.auto;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.cayenne.CayenneDataObject;
+import org.apache.cayenne.BaseDataObject;
+import org.apache.cayenne.exp.Property;
 
 import no.geonorge.nedlasting.data.DownloadItem;
 
@@ -13,7 +17,9 @@ import no.geonorge.nedlasting.data.DownloadItem;
  * since it may be overwritten next time code is regenerated.
  * If you need to make any customizations, please use subclass.
  */
-public abstract class _DownloadOrder extends CayenneDataObject {
+public abstract class _DownloadOrder extends BaseDataObject {
+
+    private static final long serialVersionUID = 1L; 
 
     public static final String EMAIL_PROPERTY = "email";
     public static final String REFERENCE_NUMBER_PROPERTY = "referenceNumber";
@@ -22,37 +28,128 @@ public abstract class _DownloadOrder extends CayenneDataObject {
 
     public static final String ORDER_ID_PK_COLUMN = "ORDER_ID";
 
+    public static final Property<String> EMAIL = Property.create("email", String.class);
+    public static final Property<String> REFERENCE_NUMBER = Property.create("referenceNumber", String.class);
+    public static final Property<Date> START_TIME = Property.create("startTime", Date.class);
+    public static final Property<List<DownloadItem>> ITEMS = Property.create("items", List.class);
+
+    protected String email;
+    protected String referenceNumber;
+    protected Date startTime;
+
+    protected Object items;
+
     public void setEmail(String email) {
-        writeProperty(EMAIL_PROPERTY, email);
+        beforePropertyWrite("email", this.email, email);
+        this.email = email;
     }
+
     public String getEmail() {
-        return (String)readProperty(EMAIL_PROPERTY);
+        beforePropertyRead("email");
+        return this.email;
     }
 
     public void setReferenceNumber(String referenceNumber) {
-        writeProperty(REFERENCE_NUMBER_PROPERTY, referenceNumber);
+        beforePropertyWrite("referenceNumber", this.referenceNumber, referenceNumber);
+        this.referenceNumber = referenceNumber;
     }
+
     public String getReferenceNumber() {
-        return (String)readProperty(REFERENCE_NUMBER_PROPERTY);
+        beforePropertyRead("referenceNumber");
+        return this.referenceNumber;
     }
 
     public void setStartTime(Date startTime) {
-        writeProperty(START_TIME_PROPERTY, startTime);
+        beforePropertyWrite("startTime", this.startTime, startTime);
+        this.startTime = startTime;
     }
+
     public Date getStartTime() {
-        return (Date)readProperty(START_TIME_PROPERTY);
+        beforePropertyRead("startTime");
+        return this.startTime;
     }
 
     public void addToItems(DownloadItem obj) {
-        addToManyTarget(ITEMS_PROPERTY, obj, true);
-    }
-    public void removeFromItems(DownloadItem obj) {
-        removeToManyTarget(ITEMS_PROPERTY, obj, true);
-    }
-    @SuppressWarnings("unchecked")
-    public List<DownloadItem> getItems() {
-        return (List<DownloadItem>)readProperty(ITEMS_PROPERTY);
+        addToManyTarget("items", obj, true);
     }
 
+    public void removeFromItems(DownloadItem obj) {
+        removeToManyTarget("items", obj, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DownloadItem> getItems() {
+        return (List<DownloadItem>)readProperty("items");
+    }
+
+    @Override
+    public Object readPropertyDirectly(String propName) {
+        if(propName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch(propName) {
+            case "email":
+                return this.email;
+            case "referenceNumber":
+                return this.referenceNumber;
+            case "startTime":
+                return this.startTime;
+            case "items":
+                return this.items;
+            default:
+                return super.readPropertyDirectly(propName);
+        }
+    }
+
+    @Override
+    public void writePropertyDirectly(String propName, Object val) {
+        if(propName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (propName) {
+            case "email":
+                this.email = (String)val;
+                break;
+            case "referenceNumber":
+                this.referenceNumber = (String)val;
+                break;
+            case "startTime":
+                this.startTime = (Date)val;
+                break;
+            case "items":
+                this.items = val;
+                break;
+            default:
+                super.writePropertyDirectly(propName, val);
+        }
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        writeSerialized(out);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        readSerialized(in);
+    }
+
+    @Override
+    protected void writeState(ObjectOutputStream out) throws IOException {
+        super.writeState(out);
+        out.writeObject(this.email);
+        out.writeObject(this.referenceNumber);
+        out.writeObject(this.startTime);
+        out.writeObject(this.items);
+    }
+
+    @Override
+    protected void readState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        super.readState(in);
+        this.email = (String)in.readObject();
+        this.referenceNumber = (String)in.readObject();
+        this.startTime = (Date)in.readObject();
+        this.items = in.readObject();
+    }
 
 }
