@@ -1,6 +1,11 @@
 package no.geonorge.nedlasting.data.auto;
 
-import org.apache.cayenne.CayenneDataObject;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import org.apache.cayenne.BaseDataObject;
+import org.apache.cayenne.exp.Property;
 
 import no.geonorge.nedlasting.data.DownloadOrder;
 
@@ -10,7 +15,9 @@ import no.geonorge.nedlasting.data.DownloadOrder;
  * since it may be overwritten next time code is regenerated.
  * If you need to make any customizations, please use subclass.
  */
-public abstract class _DownloadItem extends CayenneDataObject {
+public abstract class _DownloadItem extends BaseDataObject {
+
+    private static final long serialVersionUID = 1L; 
 
     public static final String COORDINATES_PROPERTY = "coordinates";
     public static final String EXTERNAL_JOB_ID_PROPERTY = "externalJobId";
@@ -23,62 +30,199 @@ public abstract class _DownloadItem extends CayenneDataObject {
 
     public static final String ORDER_ITEM_ID_PK_COLUMN = "ORDER_ITEM_ID";
 
+    public static final Property<String> COORDINATES = Property.create("coordinates", String.class);
+    public static final Property<String> EXTERNAL_JOB_ID = Property.create("externalJobId", String.class);
+    public static final Property<String> FILE_ID = Property.create("fileId", String.class);
+    public static final Property<String> FILE_NAME = Property.create("fileName", String.class);
+    public static final Property<String> METADATA_UUID = Property.create("metadataUuid", String.class);
+    public static final Property<Integer> SRID = Property.create("srid", Integer.class);
+    public static final Property<String> URL = Property.create("url", String.class);
+    public static final Property<DownloadOrder> ORDER = Property.create("order", DownloadOrder.class);
+
+    protected String coordinates;
+    protected String externalJobId;
+    protected String fileId;
+    protected String fileName;
+    protected String metadataUuid;
+    protected Integer srid;
+    protected String url;
+
+    protected Object order;
+
     public void setCoordinates(String coordinates) {
-        writeProperty(COORDINATES_PROPERTY, coordinates);
+        beforePropertyWrite("coordinates", this.coordinates, coordinates);
+        this.coordinates = coordinates;
     }
+
     public String getCoordinates() {
-        return (String)readProperty(COORDINATES_PROPERTY);
+        beforePropertyRead("coordinates");
+        return this.coordinates;
     }
 
     public void setExternalJobId(String externalJobId) {
-        writeProperty(EXTERNAL_JOB_ID_PROPERTY, externalJobId);
+        beforePropertyWrite("externalJobId", this.externalJobId, externalJobId);
+        this.externalJobId = externalJobId;
     }
+
     public String getExternalJobId() {
-        return (String)readProperty(EXTERNAL_JOB_ID_PROPERTY);
+        beforePropertyRead("externalJobId");
+        return this.externalJobId;
     }
 
     public void setFileId(String fileId) {
-        writeProperty(FILE_ID_PROPERTY, fileId);
+        beforePropertyWrite("fileId", this.fileId, fileId);
+        this.fileId = fileId;
     }
+
     public String getFileId() {
-        return (String)readProperty(FILE_ID_PROPERTY);
+        beforePropertyRead("fileId");
+        return this.fileId;
     }
 
     public void setFileName(String fileName) {
-        writeProperty(FILE_NAME_PROPERTY, fileName);
+        beforePropertyWrite("fileName", this.fileName, fileName);
+        this.fileName = fileName;
     }
+
     public String getFileName() {
-        return (String)readProperty(FILE_NAME_PROPERTY);
+        beforePropertyRead("fileName");
+        return this.fileName;
     }
 
     public void setMetadataUuid(String metadataUuid) {
-        writeProperty(METADATA_UUID_PROPERTY, metadataUuid);
+        beforePropertyWrite("metadataUuid", this.metadataUuid, metadataUuid);
+        this.metadataUuid = metadataUuid;
     }
+
     public String getMetadataUuid() {
-        return (String)readProperty(METADATA_UUID_PROPERTY);
+        beforePropertyRead("metadataUuid");
+        return this.metadataUuid;
     }
 
     public void setSrid(Integer srid) {
-        writeProperty(SRID_PROPERTY, srid);
+        beforePropertyWrite("srid", this.srid, srid);
+        this.srid = srid;
     }
+
     public Integer getSrid() {
-        return (Integer)readProperty(SRID_PROPERTY);
+        beforePropertyRead("srid");
+        return this.srid;
     }
 
     public void setUrl(String url) {
-        writeProperty(URL_PROPERTY, url);
+        beforePropertyWrite("url", this.url, url);
+        this.url = url;
     }
+
     public String getUrl() {
-        return (String)readProperty(URL_PROPERTY);
+        beforePropertyRead("url");
+        return this.url;
     }
 
     public void setOrder(DownloadOrder order) {
-        setToOneTarget(ORDER_PROPERTY, order, true);
+        setToOneTarget("order", order, true);
     }
 
     public DownloadOrder getOrder() {
-        return (DownloadOrder)readProperty(ORDER_PROPERTY);
+        return (DownloadOrder)readProperty("order");
     }
 
+    @Override
+    public Object readPropertyDirectly(String propName) {
+        if(propName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch(propName) {
+            case "coordinates":
+                return this.coordinates;
+            case "externalJobId":
+                return this.externalJobId;
+            case "fileId":
+                return this.fileId;
+            case "fileName":
+                return this.fileName;
+            case "metadataUuid":
+                return this.metadataUuid;
+            case "srid":
+                return this.srid;
+            case "url":
+                return this.url;
+            case "order":
+                return this.order;
+            default:
+                return super.readPropertyDirectly(propName);
+        }
+    }
+
+    @Override
+    public void writePropertyDirectly(String propName, Object val) {
+        if(propName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (propName) {
+            case "coordinates":
+                this.coordinates = (String)val;
+                break;
+            case "externalJobId":
+                this.externalJobId = (String)val;
+                break;
+            case "fileId":
+                this.fileId = (String)val;
+                break;
+            case "fileName":
+                this.fileName = (String)val;
+                break;
+            case "metadataUuid":
+                this.metadataUuid = (String)val;
+                break;
+            case "srid":
+                this.srid = (Integer)val;
+                break;
+            case "url":
+                this.url = (String)val;
+                break;
+            case "order":
+                this.order = val;
+                break;
+            default:
+                super.writePropertyDirectly(propName, val);
+        }
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        writeSerialized(out);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        readSerialized(in);
+    }
+
+    @Override
+    protected void writeState(ObjectOutputStream out) throws IOException {
+        super.writeState(out);
+        out.writeObject(this.coordinates);
+        out.writeObject(this.externalJobId);
+        out.writeObject(this.fileId);
+        out.writeObject(this.fileName);
+        out.writeObject(this.metadataUuid);
+        out.writeObject(this.srid);
+        out.writeObject(this.url);
+        out.writeObject(this.order);
+    }
+
+    @Override
+    protected void readState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        super.readState(in);
+        this.coordinates = (String)in.readObject();
+        this.externalJobId = (String)in.readObject();
+        this.fileId = (String)in.readObject();
+        this.fileName = (String)in.readObject();
+        this.metadataUuid = (String)in.readObject();
+        this.srid = (Integer)in.readObject();
+        this.url = (String)in.readObject();
+        this.order = in.readObject();
+    }
 
 }

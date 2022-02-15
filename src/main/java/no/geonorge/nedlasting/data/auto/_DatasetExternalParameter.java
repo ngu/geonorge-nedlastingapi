@@ -1,6 +1,11 @@
 package no.geonorge.nedlasting.data.auto;
 
-import org.apache.cayenne.CayenneDataObject;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import org.apache.cayenne.BaseDataObject;
+import org.apache.cayenne.exp.Property;
 
 import no.geonorge.nedlasting.data.Dataset;
 
@@ -10,7 +15,9 @@ import no.geonorge.nedlasting.data.Dataset;
  * since it may be overwritten next time code is regenerated.
  * If you need to make any customizations, please use subclass.
  */
-public abstract class _DatasetExternalParameter extends CayenneDataObject {
+public abstract class _DatasetExternalParameter extends BaseDataObject {
+
+    private static final long serialVersionUID = 1L; 
 
     public static final String KEY_PROPERTY = "key";
     public static final String VALUE_PROPERTY = "value";
@@ -19,27 +26,104 @@ public abstract class _DatasetExternalParameter extends CayenneDataObject {
     public static final String DATASET_ID_PK_COLUMN = "DATASET_ID";
     public static final String PARAMETER_NAME_PK_COLUMN = "PARAMETER_NAME";
 
+    public static final Property<String> KEY = Property.create("key", String.class);
+    public static final Property<String> VALUE = Property.create("value", String.class);
+    public static final Property<Dataset> DATASET = Property.create("dataset", Dataset.class);
+
+    protected String key;
+    protected String value;
+
+    protected Object dataset;
+
     public void setKey(String key) {
-        writeProperty(KEY_PROPERTY, key);
+        beforePropertyWrite("key", this.key, key);
+        this.key = key;
     }
+
     public String getKey() {
-        return (String)readProperty(KEY_PROPERTY);
+        beforePropertyRead("key");
+        return this.key;
     }
 
     public void setValue(String value) {
-        writeProperty(VALUE_PROPERTY, value);
+        beforePropertyWrite("value", this.value, value);
+        this.value = value;
     }
+
     public String getValue() {
-        return (String)readProperty(VALUE_PROPERTY);
+        beforePropertyRead("value");
+        return this.value;
     }
 
     public void setDataset(Dataset dataset) {
-        setToOneTarget(DATASET_PROPERTY, dataset, true);
+        setToOneTarget("dataset", dataset, true);
     }
 
     public Dataset getDataset() {
-        return (Dataset)readProperty(DATASET_PROPERTY);
+        return (Dataset)readProperty("dataset");
     }
 
+    @Override
+    public Object readPropertyDirectly(String propName) {
+        if(propName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch(propName) {
+            case "key":
+                return this.key;
+            case "value":
+                return this.value;
+            case "dataset":
+                return this.dataset;
+            default:
+                return super.readPropertyDirectly(propName);
+        }
+    }
+
+    @Override
+    public void writePropertyDirectly(String propName, Object val) {
+        if(propName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (propName) {
+            case "key":
+                this.key = (String)val;
+                break;
+            case "value":
+                this.value = (String)val;
+                break;
+            case "dataset":
+                this.dataset = val;
+                break;
+            default:
+                super.writePropertyDirectly(propName, val);
+        }
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        writeSerialized(out);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        readSerialized(in);
+    }
+
+    @Override
+    protected void writeState(ObjectOutputStream out) throws IOException {
+        super.writeState(out);
+        out.writeObject(this.key);
+        out.writeObject(this.value);
+        out.writeObject(this.dataset);
+    }
+
+    @Override
+    protected void readState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        super.readState(in);
+        this.key = (String)in.readObject();
+        this.value = (String)in.readObject();
+        this.dataset = in.readObject();
+    }
 
 }

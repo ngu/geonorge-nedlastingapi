@@ -146,4 +146,23 @@
 	<obj-relationship name="order" source="DownloadItem" target="DownloadOrder" deleteRule="Deny" db-relationship-path="toOrder"/>
 	<obj-relationship name="items" source="DownloadOrder" target="DownloadItem" deleteRule="Cascade" db-relationship-path="toItems"/>
 	<obj-relationship name="files" source="Projection" target="DatasetFile" deleteRule="Deny" db-relationship-path="toFile"/>
+	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
+		<destDir>../java</destDir>
+		<mode>entity</mode>
+		<template>templates/v4_1/subclass.vm</template>
+		<superTemplate>templates/v4_1/superclass.vm</superTemplate>
+		<template>templates/v4_1/subclass.vm</template>
+		<superTemplate>templates/v4_1/superclass.vm</superTemplate>
+		<embeddableTemplate>templates/v4_1/embeddable-subclass.vm</embeddableTemplate>
+		<embeddableSuperTemplate>templates/v4_1/embeddable-superclass.vm</embeddableSuperTemplate>
+		<queryTemplate>templates/v4_1/datamap-subclass.vm</queryTemplate>
+		<querySuperTemplate>templates/v4_1/datamap-superclass.vm</querySuperTemplate>
+		<outputPattern>*.java</outputPattern>
+		<makePairs>true</makePairs>
+		<usePkgPath>true</usePkgPath>
+		<overwrite>false</overwrite>
+		<createPropertyNames>true</createPropertyNames>
+		<createPKProperties>false</createPKProperties>
+		<client>false</client>
+	</cgen>
 </data-map>
