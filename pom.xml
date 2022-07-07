@@ -17,7 +17,7 @@
       <maven.compile.source>1.8</maven.compile.source>
       <maven.compile.target>1.8</maven.compile.target>
       <jerseyframework.version>2.7</jerseyframework.version>
-      <jetty.version>9.4.45.v20220203</jetty.version>
+      <jetty.version>10.0.10</jetty.version>
       <jackson.version>[2.9.10.4,)</jackson.version>
       <geotools.version>19.4</geotools.version>
       <cayenne.version>4.1.1</cayenne.version>
