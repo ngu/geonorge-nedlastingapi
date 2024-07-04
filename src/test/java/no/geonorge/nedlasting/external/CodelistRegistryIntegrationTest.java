@@ -8,12 +8,26 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by Grotan_Bjorn_Ove on 11.01.2019.
+ * Integration tests for Codelist Registry from Geonorge
  */
 public class CodelistRegistryIntegrationTest extends TestCase {
+
     public void testGetVectorFormatItems() throws IOException{
         CodelistRegistry clReg = new CodelistRegistry();
         List<RegisterItem> vectorFormats = clReg.getVectorFormats();
         assertTrue(vectorFormats.size()>1);
     }
+
+    public void testGetAreas() throws IOException {
+        CodelistRegistry clReg = new CodelistRegistry();
+        List<RegisterItem> areas = clReg.getAreaCategories();
+        assertTrue(areas.size() > 1);
+    }
+
+    public void testGetProjections() throws IOException {
+        CodelistRegistry clReg = new CodelistRegistry();
+        List<RegisterItem> projections = clReg.getCrsCodes();
+        assertTrue(projections.size() > 1);
+    }
+
 }
