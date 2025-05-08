@@ -641,7 +641,7 @@ public class DownloadService {
         if (Config.getGeonorgeServiceUUID() != null && Config.getGeonorgeServiceUUID().length() > 0) {
             SyndLinkImpl feedDescribedByLink = new SyndLinkImpl();
             feedDescribedByLink.setHref(
-                    "https://www.geonorge.no/geonetwork/srv/nor/xml_iso19139?uuid=" + Config.getGeonorgeServiceUUID());
+                    "https://www.geonorge.no/geonetwork/srv/nor/csw?service=CSW&request=GetRecordById&version=2.0.2&outputSchema=http://www.isotc211.org/2005/gmd&elementSetName=full&id=" + Config.getGeonorgeServiceUUID());
             feedDescribedByLink.setRel("describedby");
             feedDescribedByLink.setType("application/xml");
             feedDescribedByLink.setTitle("Download Service Feed Metadata");
@@ -685,7 +685,7 @@ public class DownloadService {
             
             if (dataset.getMetadataUuid() != null) {
                 SyndLinkImpl describedbyLink = new SyndLinkImpl();
-                describedbyLink.setHref("https://www.geonorge.no/geonetwork/srv/nor/xml_iso19139?uuid="
+                describedbyLink.setHref("https://www.geonorge.no/geonetwork/srv/nor/csw?service=CSW&request=GetRecordById&version=2.0.2&outputSchema=http://www.isotc211.org/2005/gmd&elementSetName=full&id="
                         .concat(dataset.getMetadataUuid()));
                 describedbyLink.setRel("describedby");
                 describedbyLink.setTitle("Dataset Metadata");
@@ -737,7 +737,7 @@ public class DownloadService {
 
         SyndLinkImpl describedbyLink = new SyndLinkImpl();
         describedbyLink.setHref(
-                "https://www.geonorge.no/geonetwork/srv/nor/xml_iso19139?uuid=".concat(dataset.getMetadataUuid()));
+                "https://www.geonorge.no/geonetwork/srv/nor/csw?service=CSW&request=GetRecordById&version=2.0.2&outputSchema=http://www.isotc211.org/2005/gmd&elementSetName=full&id=".concat(dataset.getMetadataUuid()));
         describedbyLink.setRel("describedby");
         describedbyLink.setTitle("Dataset Metadata");
         describedbyLink.setType("application/xml");
