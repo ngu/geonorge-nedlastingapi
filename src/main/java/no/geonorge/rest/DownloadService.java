@@ -412,10 +412,10 @@ public class DownloadService {
             long days = ChronoUnit.DAYS.between(then, now);
             if (days > Config.getOrderDaysValid()) {
                 // Fetch your file within a working week please
-                Response.status(Response.Status.GONE).build();
+                return Response.status(Response.Status.GONE).build();
             }
         } catch (IOException ignored) {
-            Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
         
         DownloadItem item = order.getItemForFileId(fileId);
@@ -480,7 +480,17 @@ public class DownloadService {
 
         // Return file proxied by this API
         HttpURLConnection uc = (HttpURLConnection) url.openConnection();
-        if (uc.getResponseCode() != 200) {
+        int responseCode = uc.getResponseCode();
+        // HttpURLConnection does not follow cross-protocol redirects (HTTP->HTTPS)
+        if (responseCode == 301 || responseCode == 302 || responseCode == 303 || responseCode == 307 || responseCode == 308) {
+            String redirectUrl = uc.getHeaderField("Location");
+            if (redirectUrl != null) {
+                urlString = redirectUrl;
+                uc = (HttpURLConnection) new URL(redirectUrl).openConnection();
+                responseCode = uc.getResponseCode();
+            }
+        }
+        if (responseCode != 200) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
