@@ -269,9 +269,19 @@ public abstract class FMEClient extends External {
     private String httpGET(String url) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setRequestProperty("Authorization", "fmetoken token=" + getToken());
-        if (conn.getResponseCode() != 200) {
+        int responseCode = conn.getResponseCode();
+        // HttpURLConnection does not follow cross-protocol redirects (HTTP->HTTPS)
+        if (responseCode == 301 || responseCode == 302 || responseCode == 303 || responseCode == 307 || responseCode == 308) {
+            String redirectUrl = conn.getHeaderField("Location");
+            if (redirectUrl != null) {
+                conn = (HttpURLConnection) new URL(redirectUrl).openConnection();
+                conn.setRequestProperty("Authorization", "fmetoken token=" + getToken());
+                responseCode = conn.getResponseCode();
+            }
+        }
+        if (responseCode != 200) {
             throw new IOException(
-                    "GET got " + conn.getResponseCode() + " " + conn.getResponseMessage() + " from " + url);
+                    "GET got " + responseCode + " " + conn.getResponseMessage() + " from " + url);
         }
         String s = IOUtils.toString(conn.getInputStream());
         System.out.println(url + " : ");
@@ -290,9 +300,26 @@ public abstract class FMEClient extends External {
             conn.getOutputStream().write(data.getBytes("UTF-8"));
         }
 
-        if (conn.getResponseCode() != 200) {
+        int responseCode = conn.getResponseCode();
+        // HttpURLConnection does not follow cross-protocol redirects (HTTP->HTTPS)
+        if (responseCode == 301 || responseCode == 302 || responseCode == 307 || responseCode == 308) {
+            String redirectUrl = conn.getHeaderField("Location");
+            if (redirectUrl != null) {
+                conn = (HttpURLConnection) new URL(redirectUrl).openConnection();
+                conn.setRequestProperty("Authorization", "fmetoken token=" + getToken());
+                conn.setRequestMethod("POST");
+                if (data != null) {
+                    conn.setDoOutput(true);
+                    conn.setRequestProperty("Content-Type", contentType);
+                    conn.getOutputStream().write(data.getBytes("UTF-8"));
+                }
+                responseCode = conn.getResponseCode();
+            }
+        }
+
+        if (responseCode != 200) {
             throw new IOException(
-                    "POST got " + conn.getResponseCode() + " " + conn.getResponseMessage() + " from " + url);
+                    "POST got " + responseCode + " " + conn.getResponseMessage() + " from " + url);
         }
         String s = IOUtils.toString(conn.getInputStream());
         System.out.println(url + " : ");
